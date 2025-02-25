@@ -22,6 +22,7 @@ This document describes the format of FPP JSON dictionaries.
     - [Struct Type Definition](#struct-type-definition)
         - [Struct Type Definition](#struct-type-definition_1)
         - [Struct Member](#struct-member-descriptor)
+    - [Type Alias Definition](#type-alias-definition)
 - [Values](#values)
     - [Primitive Integer Values](#primitive-integer-values)
     - [Floating-Point Values](#floating-point-values)
@@ -342,6 +343,62 @@ module M1 {
         "y": 0
     },
 }
+```
+
+### Type Alias Definition
+
+| Field | Description | Options | Required |
+| ----- | ----------- | ------- | -------- |
+| `kind` | The kind of type | `alias` | true |
+| `qualifiedName` | Fully qualified name of element in FPP model | Period-separated **String** | true |
+| `type` | [Type Descriptor](#type-descriptors) of the alias | [Type Descriptor](#type-descriptors) | true |
+| `underlyingType` | [Type Descriptor](#type-descriptors) of the underlying type of the alias | [Type Descriptor](#type-descriptors) | true |
+| `annotation` | User-defined annotation | **String** extracted from FPP model | false |
+
+Example FPP model with JSON representation:
+```
+module M1 {
+    @ Alias of type U32
+    type A1 = U32
+    @ Alias of type A1
+    type A2 = A1
+}
+```
+```json
+[
+  {
+    "kind": "alias",
+    "qualifiedName": "M1.A1",
+    "type": {
+      "name": "U32",
+      "kind": "integer",
+      "signed": false,
+      "size": 32
+    },
+    "underlyingType": {
+      "name": "U32",
+      "kind": "integer",
+      "signed": false,
+      "size": 32
+    },
+    "annotation": "Alias of type U32"
+  },
+  {
+    "kind": "alias",
+    "qualifiedName": "M1.A2",
+      "type": {
+        "name": "M1.A1",
+        "kind": "qualifiedIdentifier"
+      },
+      "underlyingType": {
+        "name": "U32",
+        "kind": "integer",
+        "signed": false,
+        "size": 32
+      },
+    "annotation": "Alias of type A2"
+  }
+]
 ```
 
 ## Values
