@@ -25,9 +25,9 @@ namespace Svc {
 DeframerTester::MockDeframer::MockDeframer(DeframerTester& parent) : m_status(DeframingProtocol::DEFRAMING_STATUS_SUCCESS) {}
 
 DeframerTester::MockDeframer::DeframingStatus DeframerTester::MockDeframer::deframe(Types::CircularBuffer& ring_buffer, U32& needed) {
-    needed = ring_buffer.get_allocated_size();
+    needed = static_cast<U32>(ring_buffer.get_allocated_size());
     if (m_status == DeframingProtocol::DEFRAMING_MORE_NEEDED) {
-        needed = ring_buffer.get_allocated_size() + 1; // Obey the rules
+        needed = static_cast<U32>(ring_buffer.get_allocated_size() + 1); // Obey the rules
     }
     return m_status;
 }
@@ -42,11 +42,11 @@ void DeframerTester::MockDeframer::test_interface(Fw::ComPacket::ComPacketType c
 }
 
 
-DeframerTester ::DeframerTester(ConnectStatus::t bufferOutStatus)
+DeframerTester ::DeframerTester(ConnectStatus::t a_bufferOutStatus)
     : DeframerGTestBase("Tester", MAX_HISTORY_SIZE),
       component("Deframer"),
       m_mock(*this),
-      bufferOutStatus(bufferOutStatus) {
+      bufferOutStatus(a_bufferOutStatus) {
     this->initComponents();
     this->connectPorts();
     component.setup(this->m_mock);
