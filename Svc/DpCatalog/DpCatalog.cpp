@@ -186,13 +186,13 @@ namespace Svc {
             return Fw::CmdResponse::EXECUTION_ERROR;
         }
 
-        FwSignedSizeType fileLoc = 0;
+        FwSizeType fileLoc = 0;
         this->m_stateFileEntries = 0;
 
         // read entries from the state file
         for (FwSizeType entry = 0; entry < this->m_numDpSlots; entry++) {
 
-            FwSignedSizeType size = sizeof(buffer);
+            FwSizeType size = static_cast<FwSizeType>(sizeof(buffer));
             // read the directory index
             stat = stateFile.read(buffer, size);
             if (stat != Os::File::OP_OK) {
@@ -303,10 +303,8 @@ namespace Svc {
                 // Should always fit
                 FW_ASSERT(Fw::FW_SERIALIZE_OK == serStat,serStat);
                 // write the entry
-                FwSizeType unsignedSize = entryBuffer.getBuffLength();
+                FwSizeType size = entryBuffer.getBuffLength();
                 // Protect against overflow
-                FW_ASSERT(unsignedSize < std::numeric_limits<FwSignedSizeType>::max(), static_cast<FwAssertArgType>(unsignedSize));
-                FwSignedSizeType size = static_cast<FwSignedSizeType>(unsignedSize);
                 stat = stateFile.write(buffer, size);
                 if (stat != Os::File::OP_OK) {
                     this->log_WARNING_HI_StateFileWriteError(this->m_stateFile, stat);
@@ -352,10 +350,7 @@ namespace Svc {
         // should fit
         FW_ASSERT(serStat == Fw::FW_SERIALIZE_OK,serStat);
         // write the entry
-        FwSizeType unsignedSize = entryBuffer.getBuffLength();
-        // Protect against overflow
-        FW_ASSERT(unsignedSize < std::numeric_limits<FwSignedSizeType>::max(), static_cast<FwAssertArgType>(unsignedSize));
-        FwSignedSizeType size = static_cast<FwSignedSizeType>(unsignedSize);
+        FwSizeType size = entryBuffer.getBuffLength();
         stat = stateFile.write(buffer, size);
         if (stat != Os::File::OP_OK) {
             this->log_WARNING_HI_StateFileWriteError(this->m_stateFile, stat);
@@ -484,7 +479,7 @@ namespace Svc {
                 this->log_ACTIVITY_LO_ProcessingFile(fullFile);
 
                 // get file size
-                FwSignedSizeType fileSize = 0;
+                FwSizeType fileSize = 0;
                 Os::FileSystem::Status sizeStat =
                     Os::FileSystem::getFileSize(fullFile.toChar(),fileSize);
                 if (sizeStat != Os::FileSystem::OP_OK) {
@@ -499,7 +494,7 @@ namespace Svc {
                 }
 
                 // Read DP header
-                FwSignedSizeType size = Fw::DpContainer::Header::SIZE;
+                FwSizeType size = Fw::DpContainer::Header::SIZE;
 
                 stat = dpFile.read(dpBuff, size);
                 if (stat != Os::File::OP_OK) {
