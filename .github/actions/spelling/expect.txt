@@ -496,6 +496,7 @@ jsonable
 kermit
 kevin
 kislyuk
+kubiak
 Lammert
 lammertbies
 LASTLOG
@@ -653,6 +654,7 @@ osaves
 osets
 ossw
 ostate
+OSTIME
 otherdictitems
 otheritems
 otherside
@@ -769,6 +771,7 @@ RATEGROUPDRIVERIMPLTESTER
 RATEGROUPMEMBEROUT
 RATELIMITERTESTER
 rawtime
+RAWTIMETESTER
 RBF
 RCHILD
 rcvd
