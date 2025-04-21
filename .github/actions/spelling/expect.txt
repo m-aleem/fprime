@@ -35,6 +35,7 @@ AQuat
 AQueued
 Arcsecond
 arduino
+ARef
 argcomplete
 argcount
 ARGN
@@ -823,6 +824,7 @@ RTEMS
 runperiod
 RXD
 saddr
+SAlias
 sanitizers
 sats
 savelist
