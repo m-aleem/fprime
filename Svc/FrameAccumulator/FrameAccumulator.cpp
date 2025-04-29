@@ -50,12 +50,12 @@ void FrameAccumulator ::cleanup() {
 // Handler implementations for user-defined typed input ports
 // ----------------------------------------------------------------------
 
-void FrameAccumulator ::dataIn_handler(FwIndexType portNum, Fw::Buffer& buffer, const Drv::RecvStatus& status) {
+void FrameAccumulator ::dataIn_handler(FwIndexType portNum, Fw::Buffer& buffer) {
     // Check whether there is data to process
-    if (status.e == Drv::RecvStatus::RECV_OK) {
-        // There is: process the data
+    if (buffer.isValid()) {
         this->processBuffer(buffer);
     }
+    // TODO: rework the uplink deallocation logic to use the bufferReturn chaining pattern
     // Deallocate the buffer
     this->bufferDeallocate_out(0, buffer);
 }
@@ -135,8 +135,8 @@ void FrameAccumulator ::processRing() {
                 FW_ASSERT(m_inRing.get_allocated_size() == remaining - size_out,
                           static_cast<FwAssertArgType>(m_inRing.get_allocated_size()),
                           static_cast<FwAssertArgType>(remaining), static_cast<FwAssertArgType>(size_out));
-                Fw::Buffer nullContext;
-                this->frameOut_out(0, buffer, nullContext);
+                ComCfg::FrameContext context;
+                this->frameOut_out(0, buffer, context);
             } else {
                 // No buffer is available, we need to exit and try again later
                 this->log_WARNING_HI_NoBufferAvailable();
