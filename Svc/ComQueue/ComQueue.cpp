@@ -8,6 +8,7 @@
 #include <Svc/ComQueue/ComQueue.hpp>
 #include <Fw/Com/ComPacket.hpp>
 #include "Fw/Types/BasicTypes.hpp"
+#include <type_traits>
 
 namespace Svc {
 
@@ -15,8 +16,11 @@ namespace Svc {
 // Construction, initialization, and destruction
 // ----------------------------------------------------------------------
 
+using FwUnsignedIndexType = std::make_unsigned<FwIndexType>::type;
+
 ComQueue ::QueueConfigurationTable ::QueueConfigurationTable() {
-    static_assert(std::numeric_limits<FwIndexType>::max() >= FW_NUM_ARRAY_ELEMENTS(this->entries), "Number of entries must fit into FwIndexType");
+    static_assert(static_cast<FwUnsignedIndexType>(std::numeric_limits<FwIndexType>::max()) >= FW_NUM_ARRAY_ELEMENTS(this->entries),
+                  "Number of entries must fit into FwIndexType");
     for (FwIndexType i = 0; i < static_cast<FwIndexType>(FW_NUM_ARRAY_ELEMENTS(this->entries)); i++) {
         this->entries[i].priority = 0;
         this->entries[i].depth = 0;
