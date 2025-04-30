@@ -48,6 +48,7 @@ ASTRING
 ATester
 ATL
 ATMs
+ATSAM
 atypes
 AUTOBRIEF
 autocode
@@ -436,6 +437,7 @@ hidecallgraph
 hideinitializer
 hlp
 HLTH
+HPSC
 htags
 HTH
 htmlfile
@@ -700,6 +702,7 @@ pbuild
 pcmake
 pcomp
 pdflatex
+PEB
 Peet
 penv
 PERLMOD
@@ -1071,6 +1074,7 @@ viewcontent
 viewforum
 vla
 vlist
+VOXL
 vtype
 vuejs
 vwong
