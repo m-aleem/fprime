@@ -4,11 +4,15 @@
 # Basic CMake tests.
 #
 ####
-import platform
 import json
+import platform
 
 from . import cmake
 from . import settings
+
+
+TOOLCHAIN_NAME = "generic-native"
+
 
 FEATURE_BUILD_RESULT = cmake.get_build(
     "FEATURE_BUILD",
@@ -22,6 +26,14 @@ FEATURE_BUILD_RESULT = cmake.get_build(
                 str(settings.DATA_DIR / "test-fprime-library2"),
             ]
         ),
+        "CMAKE_TOOLCHAIN_FILE": str(
+            settings.DATA_DIR
+            / "test-fprime-library"
+            / "cmake"
+            / "toolchain"
+            / f"{TOOLCHAIN_NAME}.cmake"
+        ),
+        "FPRIME_PLATFORM": platform.system(),
     },
     make_targets=[
         "TestDeployment",
@@ -44,7 +56,7 @@ def test_feature_framework(FEATURE_BUILD):
     cmake.assert_process_success(FEATURE_BUILD)
     for module in settings.FRAMEWORK_MODULES + ["Svc_CmdDispatcher"]:
         library_name = f"lib{module}.a"
-        output_path = FEATURE_BUILD["build"] / "lib" / platform.system() / library_name
+        output_path = FEATURE_BUILD["build"] / "lib" / TOOLCHAIN_NAME / library_name
         assert output_path.exists(), f"Failed to locate {library_name} in build output"
 
 
@@ -54,7 +66,7 @@ def test_feature_library(FEATURE_BUILD):
     modules = ["TestLibrary_TestComponent", "TestLibrary2_TestComponent"]
     for module in modules:
         library_name = f"lib{module}.a"
-        output_path = FEATURE_BUILD["build"] / "lib" / platform.system() / library_name
+        output_path = FEATURE_BUILD["build"] / "lib" / TOOLCHAIN_NAME / library_name
         assert output_path.exists(), f"Failed to locate {library_name} in build output"
 
 
@@ -62,7 +74,7 @@ def test_feature_deployment(FEATURE_BUILD):
     """Feature build check deployment properly detected"""
     cmake.assert_process_success(FEATURE_BUILD)
     library_name = "TestDeployment"
-    output_path = FEATURE_BUILD["build"] / "bin" / platform.system() / library_name
+    output_path = FEATURE_BUILD["build"] / "bin" / TOOLCHAIN_NAME / library_name
     assert output_path.exists(), f"Failed to locate {library_name} in build output"
 
 
@@ -124,7 +136,7 @@ def test_feature_installation(FEATURE_BUILD):
         library_name = f"lib{module}.a"
         output_path = (
             FEATURE_BUILD["install"]
-            / platform.system()
+            / TOOLCHAIN_NAME
             / deployment_name
             / "lib"
             / "static"
@@ -133,7 +145,7 @@ def test_feature_installation(FEATURE_BUILD):
         assert output_path.exists(), f"Failed to locate {library_name} in build output"
     output_path = (
         FEATURE_BUILD["install"]
-        / platform.system()
+        / TOOLCHAIN_NAME
         / deployment_name
         / "bin"
         / deployment_name
