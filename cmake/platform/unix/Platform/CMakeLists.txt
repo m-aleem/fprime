@@ -8,5 +8,15 @@ register_fprime_config(
         "${CMAKE_CURRENT_LIST_DIR}/PlatformTypes.fpp"
     HEADERS
         "${CMAKE_CURRENT_LIST_DIR}/PlatformTypes.h"
-    INTERFACE # No buildable files generated
+    CHOOSES_IMPLEMENTATIONS
+        Os_File_Posix
+        Os_Console_Posix
+        Os_Task_Posix
+        Os_Mutex_Posix
+        Os_Generic_PriorityQueue
+        Os_RawTime_Posix
+        # No posix API
+        Os_Cpu_Stub
+        Os_Memory_Stub
+    INTERFACE # No compilable outputs produced
 )
