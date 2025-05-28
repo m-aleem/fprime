@@ -20,6 +20,9 @@
 #include "Svc/FpySequencer/SequenceSerializableAc.hpp"
 #include "Svc/FpySequencer/StatementSerializableAc.hpp"
 #include "config/FppConstantsAc.hpp"
+#include "googletest/googletest/include/gtest/gtest_prod.h"
+
+
 
 static_assert(Svc::Fpy::MAX_SEQUENCE_ARG_COUNT <= std::numeric_limits<U8>::max(),
               "Sequence arg count must be below U8 max");
@@ -38,6 +41,45 @@ using Signal = FpySequencer_SequencerStateMachineStateMachineBase::Signal;
 using State = FpySequencer_SequencerStateMachineStateMachineBase::State;
 
 class FpySequencer : public FpySequencerComponentBase {
+
+    friend class FpySequencerTester;
+    FRIEND_TEST(FpySequencerTester, cmdResponse);
+    FRIEND_TEST(FpySequencerTester, deserialize_getPrm);
+    FRIEND_TEST(FpySequencerTester, deserialize_getTlm);
+    FRIEND_TEST(FpySequencerTester, deserialize_noOp);
+    FRIEND_TEST(FpySequencerTester, deserialize_if);
+    FRIEND_TEST(FpySequencerTester, deserialize_goto);
+    FRIEND_TEST(FpySequencerTester, deserialize_setLVar);
+    FRIEND_TEST(FpySequencerTester, deserialize_waitAbs);
+    FRIEND_TEST(FpySequencerTester, deserialize_waitRel);
+    FRIEND_TEST(FpySequencerTester, dispatchCommand);
+    FRIEND_TEST(FpySequencerTester, dispatchStatement);
+    FRIEND_TEST(FpySequencerTester, allocateBuffer);
+    FRIEND_TEST(FpySequencerTester, validate);
+    FRIEND_TEST(FpySequencerTester, readBytes);
+    FRIEND_TEST(FpySequencerTester, readFooter);
+    FRIEND_TEST(FpySequencerTester, readBody);
+    FRIEND_TEST(FpySequencerTester, readHeader);
+    FRIEND_TEST(FpySequencerTester, cmd_DEBUG_BREAK);
+    FRIEND_TEST(FpySequencerTester, cmd_DEBUG_SET_BREAKPOINT);
+    FRIEND_TEST(FpySequencerTester, cmd_DEBUG_CLEAR_BREAKPOINT);
+    FRIEND_TEST(FpySequencerTester, cmd_VALIDATE);
+    FRIEND_TEST(FpySequencerTester, cmd_RUN);
+    FRIEND_TEST(FpySequencerTester, checkStatementTimeoutMismatchContext);
+    FRIEND_TEST(FpySequencerTester, checkStatementTimeoutMismatchBase);
+    FRIEND_TEST(FpySequencerTester, checkStatementTimeout);
+    FRIEND_TEST(FpySequencerTester, checkShouldWake);
+    FRIEND_TEST(FpySequencerTester, checkShouldWakeMismatchContext);
+    FRIEND_TEST(FpySequencerTester, checkShouldWakeMismatchBase);
+    FRIEND_TEST(FpySequencerTester, getPrm);
+    FRIEND_TEST(FpySequencerTester, getTlm);
+    FRIEND_TEST(FpySequencerTester, noOp);
+    FRIEND_TEST(FpySequencerTester, if);
+    FRIEND_TEST(FpySequencerTester, setLvar);
+    FRIEND_TEST(FpySequencerTester, goto);
+    FRIEND_TEST(FpySequencerTester, waitAbs);
+    FRIEND_TEST(FpySequencerTester, waitRel);
+
   public:
     union DirectiveUnion {
         FpySequencer_WaitRelDirective waitRel;
@@ -66,7 +108,7 @@ class FpySequencer : public FpySequencerComponentBase {
     //!
     ~FpySequencer();
 
-    PRIVATE :
+    private:
 
         //! Handler for command RUN
         //!
@@ -307,7 +349,7 @@ class FpySequencer : public FpySequencerComponentBase {
         const Svc::FpySequencer_DebugBreakpointArgs& value      //!< The value
         ) override;
 
-    PROTECTED :
+    protected:
 
         // ----------------------------------------------------------------------
         // Functions to implement for internal state machine guards
@@ -396,7 +438,7 @@ class FpySequencer : public FpySequencerComponentBase {
     void allocateBuffer(FwEnumStoreType identifier, Fw::MemAllocator& allocator, FwSizeType bytes);
 
     void deallocateBuffer(Fw::MemAllocator& allocator);
-    PRIVATE :
+    private :
 
         static constexpr U32 CRC_INITIAL_VALUE = 0xFFFFFFFFU;
 
