@@ -7,7 +7,7 @@
 ####
 set(SOURCE_FILES
   "${CMAKE_CURRENT_LIST_DIR}/BlockDriver.fpp"
-  "${CMAKE_CURRENT_LIST_DIR}/BlockDriverImpl.cpp"
+  "${CMAKE_CURRENT_LIST_DIR}/BlockDriver.cpp"
 )
 
 register_fprime_module()
