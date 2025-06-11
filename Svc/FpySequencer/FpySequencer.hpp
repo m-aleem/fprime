@@ -20,7 +20,10 @@
 #include "Svc/FpySequencer/SequenceSerializableAc.hpp"
 #include "Svc/FpySequencer/StatementSerializableAc.hpp"
 #include "config/FppConstantsAc.hpp"
+
+#ifdef BUILD_UT
 #include "googletest/googletest/include/gtest/gtest_prod.h"
+#endif
 
 
 
@@ -43,6 +46,7 @@ using State = FpySequencer_SequencerStateMachineStateMachineBase::State;
 class FpySequencer : public FpySequencerComponentBase {
 
     friend class FpySequencerTester;
+    #ifdef BUILD_UT
     FRIEND_TEST(FpySequencerTester, cmdResponse);
     FRIEND_TEST(FpySequencerTester, deserialize_getPrm);
     FRIEND_TEST(FpySequencerTester, deserialize_getTlm);
@@ -79,6 +83,7 @@ class FpySequencer : public FpySequencerComponentBase {
     FRIEND_TEST(FpySequencerTester, goto);
     FRIEND_TEST(FpySequencerTester, waitAbs);
     FRIEND_TEST(FpySequencerTester, waitRel);
+    #endif
 
   public:
     union DirectiveUnion {
