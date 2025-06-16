@@ -37,6 +37,7 @@ extern "C" {
 #include <config/FwTaskPriorityTypeAliasAc.h>
 #include <config/FwQueuePriorityTypeAliasAc.h>
 
+#include <config/FwIdTypeAliasAc.h>
 #include <config/FwChanIdTypeAliasAc.h>
 #include <config/FwDpIdTypeAliasAc.h>
 #include <config/FwDpPriorityTypeAliasAc.h>
