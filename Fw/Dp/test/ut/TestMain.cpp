@@ -84,17 +84,12 @@ void checkHeader(FwDpIdType id, Fw::Buffer& buffer, DpContainer& container) {
 
 void checkBuffers(DpContainer& container, FwSizeType bufferSize) {
     // Check the packet buffer
-    // ASSERT_EQ(container.m_buffer.getSize(), bufferSize);
     ASSERT_EQ(Types::DpContainerTester::tester_get_m_dataBuffer_getSize(container), bufferSize);
     // Check the data buffer
-    // U8* const buffPtr = container.m_buffer.getData();
     U8* const buffPtr = Types::DpContainerTester::tester_get_m_buffer_getData(container);
     U8* const dataPtr = &buffPtr[Fw::DpContainer::DATA_OFFSET];
-    // const FwSizeType dataCapacity = container.m_buffer.getSize() - Fw::DpContainer::MIN_PACKET_SIZE;
     const FwSizeType dataCapacity = Types::DpContainerTester::tester_get_m_dataBuffer_getSize(container) - Fw::DpContainer::MIN_PACKET_SIZE;
-    // ASSERT_EQ(container.m_dataBuffer.getBuffAddr(), dataPtr);
     ASSERT_EQ(Types::DpContainerTester::tester_get_m_dataBuffer_getBuffAddr(container), dataPtr);
-    // ASSERT_EQ(container.m_dataBuffer.getBuffCapacity(), dataCapacity);
     ASSERT_EQ(Types::DpContainerTester::tester_get_m_dataBuffer_getBuffCapacity(container), dataCapacity);
 
 }

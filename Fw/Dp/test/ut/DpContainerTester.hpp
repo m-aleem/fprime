@@ -30,6 +30,10 @@ namespace Types {
             static U8* tester_get_m_buffer_getData(Fw::DpContainer& container){
                 return container.m_buffer.getData();
             }
+
+            static const Fw::SerializeBufferBase& tester_get_m_dataBuffer(const Fw::DpContainer& container){
+                return (container.m_dataBuffer);
+            }
     };
 
 }
