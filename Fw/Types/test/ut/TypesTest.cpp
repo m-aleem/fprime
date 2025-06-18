@@ -90,7 +90,6 @@ TEST(SerializationTest, Serialization1) {
     // Use the tester to verify I8 deserialization
     Fw::SerializeBufferBaseTester::verifyI8Deserialization(buff, i8t2, i8t1);
 
-    // The previous verification already checks this, but keeping it for clarity
     ASSERT_EQ(i8t1, i8t2);
 
     buff.resetSer();
@@ -106,7 +105,6 @@ TEST(SerializationTest, Serialization1) {
     // Use the tester to verify I8 deserialization with negative number
     Fw::SerializeBufferBaseTester::verifyI8Deserialization(buff, i8t2, i8t1);
 
-    // The previous verification already checks this, but keeping it for clarity
     ASSERT_EQ(i8t1, i8t2);
 
 #if DEBUG_VERBOSE
