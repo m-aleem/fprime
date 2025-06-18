@@ -16,14 +16,14 @@
 #include "config/ProcTypeEnumAc.hpp"
 
 // Forward declare for UTs
-namespace Types { class DpContainerTester; }
+namespace Fw { class DpContainerTester; }
 
 namespace Fw {
 
 //! A data product Container
 class DpContainer {
 
-  friend class Types::DpContainerTester;
+  friend class Fw::DpContainerTester;
 
   public:
     // ----------------------------------------------------------------------

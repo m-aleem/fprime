@@ -252,11 +252,7 @@ void DpTest ::dpRecv_Container7_handler(DpContainer& container, Fw::Success::T s
 void DpTest::checkContainerEmpty(const DpContainer& container) const {
     const FwSizeType dataSize = container.getDataSize();
     FW_ASSERT(dataSize == 0, static_cast<FwAssertArgType>(dataSize));
-    const Fw::SerializeBufferBase& buffer = Types::DpContainerTester::tester_get_m_dataBuffer(container);
-    const FwSizeType buffLength = buffer.getBuffLength();
-    FW_ASSERT(buffLength == 0, static_cast<FwAssertArgType>(buffLength));
-    const FwSizeType buffLeft = buffer.getBuffLeft();
-    FW_ASSERT(buffLeft == 0, static_cast<FwAssertArgType>(buffLeft));
+    FW_ASSERT(Fw::DpContainerTester::isDataBufferEmpty(container));
 }
 
 void DpTest::checkContainer(const DpContainer& container,

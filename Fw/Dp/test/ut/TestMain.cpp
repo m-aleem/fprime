@@ -84,14 +84,13 @@ void checkHeader(FwDpIdType id, Fw::Buffer& buffer, DpContainer& container) {
 
 void checkBuffers(DpContainer& container, FwSizeType bufferSize) {
     // Check the packet buffer
-    ASSERT_EQ(Types::DpContainerTester::tester_get_m_dataBuffer_getSize(container), bufferSize);
+    ASSERT_TRUE(Fw::DpContainerTester::verifyBufferSize(container, bufferSize));
     // Check the data buffer
-    U8* const buffPtr = Types::DpContainerTester::tester_get_m_buffer_getData(container);
+    U8* const buffPtr = Fw::DpContainerTester::getBufferPointers(container);
     U8* const dataPtr = &buffPtr[Fw::DpContainer::DATA_OFFSET];
-    const FwSizeType dataCapacity = Types::DpContainerTester::tester_get_m_dataBuffer_getSize(container) - Fw::DpContainer::MIN_PACKET_SIZE;
-    ASSERT_EQ(Types::DpContainerTester::tester_get_m_dataBuffer_getBuffAddr(container), dataPtr);
-    ASSERT_EQ(Types::DpContainerTester::tester_get_m_dataBuffer_getBuffCapacity(container), dataCapacity);
-
+    const FwSizeType dataCapacity = bufferSize - Fw::DpContainer::MIN_PACKET_SIZE;
+    ASSERT_TRUE(Fw::DpContainerTester::verifyDataBufferAddress(container, dataPtr));
+    ASSERT_TRUE(Fw::DpContainerTester::verifyDataBufferCapacity(container, dataCapacity));
 }
 
 void fillWithData(Fw::Buffer& buffer) {

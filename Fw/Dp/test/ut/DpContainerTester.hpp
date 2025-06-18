@@ -9,31 +9,37 @@
 
 #include "Fw/Dp/DpContainer.hpp"
 
-namespace Types {
+namespace Fw {
 
     class DpContainerTester {
 
         public:
 
-            static FwSizeType tester_get_m_dataBuffer_getSize(Fw::DpContainer& container){
-                return container.m_buffer.getSize();
+            static bool verifyBufferSize(const Fw::DpContainer& container, FwSizeType expectedSize) {
+                return container.m_buffer.getSize() == expectedSize;
             }
 
-            static FwSizeType tester_get_m_dataBuffer_getBuffCapacity(Fw::DpContainer& container){
-                return container.m_dataBuffer.getBuffCapacity();
+            static U8* getBufferPointers(const Fw::DpContainer& container) {
+                U8* const buffPtr = container.m_buffer.getData();
+                return buffPtr;
             }
 
-            static U8* tester_get_m_dataBuffer_getBuffAddr(Fw::DpContainer& container){
-                return container.m_dataBuffer.getBuffAddr();
+            static bool verifyDataBufferAddress(const Fw::DpContainer& container, const U8* expectedAddr) {
+                return container.m_dataBuffer.getBuffAddr() == expectedAddr;
             }
 
-            static U8* tester_get_m_buffer_getData(Fw::DpContainer& container){
-                return container.m_buffer.getData();
+            static bool verifyDataBufferCapacity(const Fw::DpContainer& container, FwSizeType expectedCapacity) {
+                return container.m_dataBuffer.getBuffCapacity() == expectedCapacity;
             }
 
-            static const Fw::SerializeBufferBase& tester_get_m_dataBuffer(const Fw::DpContainer& container){
-                return (container.m_dataBuffer);
+            static bool isDataBufferEmpty(const Fw::DpContainer& container) {
+                const Fw::SerializeBufferBase& buffer = container.m_dataBuffer;
+                const FwSizeType buffLength = buffer.getBuffLength();
+                const FwSizeType buffLeft = buffer.getBuffLeft();
+
+                return buffLength == 0 && buffLeft == 0;
             }
+
     };
 
 }
