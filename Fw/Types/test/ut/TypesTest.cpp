@@ -65,14 +65,11 @@ TEST(SerializationTest, Serialization1) {
     buff.resetSer();
     Fw::SerializeBufferBaseTester::assertResetState(buff);
 
-    // Use the tester to verify serialization
     Fw::SerializeBufferBaseTester::verifyU8Serialization(buff, u8t1);
     ASSERT_EQ(0xAB, ptr[0]); // Verify the actual byte value in the buffer
 
-    // Use the tester to verify deserialization
-    Fw::SerializeBufferBaseTester::verifyU8Deserialization(buff, u8t1);
+    Fw::SerializeBufferBaseTester::verifyU8Deserialization(buff, u8t2, u8t1);
 
-    // The previous verification already checks this, but keeping it for clarity
     ASSERT_EQ(u8t2, u8t1);
 
 #if DEBUG_VERBOSE
@@ -91,7 +88,7 @@ TEST(SerializationTest, Serialization1) {
     ASSERT_EQ(0xFF, ptr[0]); // Verify the actual byte value in the buffer
 
     // Use the tester to verify I8 deserialization
-    Fw::SerializeBufferBaseTester::verifyI8Deserialization(buff, i8t1);
+    Fw::SerializeBufferBaseTester::verifyI8Deserialization(buff, i8t2, i8t1);
 
     // The previous verification already checks this, but keeping it for clarity
     ASSERT_EQ(i8t1, i8t2);
@@ -107,7 +104,7 @@ TEST(SerializationTest, Serialization1) {
     Fw::SerializeBufferBaseTester::verifyI8Serialization(buff, i8t1);
 
     // Use the tester to verify I8 deserialization with negative number
-    Fw::SerializeBufferBaseTester::verifyI8Deserialization(buff, i8t1);
+    Fw::SerializeBufferBaseTester::verifyI8Deserialization(buff, i8t2, i8t1);
 
     // The previous verification already checks this, but keeping it for clarity
     ASSERT_EQ(i8t1, i8t2);
@@ -329,11 +326,11 @@ TEST(SerializationTest, Serialization1) {
     ASSERT_EQ(0x40, ptr[0]);
     ASSERT_EQ(0x59, ptr[1]);
     ASSERT_EQ(0x0E, ptr[2]);
-    ASSERT_EQ(0x56, ptr[3]);
-    ASSERT_EQ(0x0F, ptr[4]);
-    ASSERT_EQ(0x0E, ptr[5]);
-    ASSERT_EQ(0x56, ptr[6]);
-    ASSERT_EQ(0x13, ptr[7]);
+    ASSERT_EQ(0xDB, ptr[3]);
+    ASSERT_EQ(0x78, ptr[4]);
+    ASSERT_EQ(0x26, ptr[5]);
+    ASSERT_EQ(0x8B, ptr[6]);
+    ASSERT_EQ(0xA6, ptr[7]);
     stat2 = buff.deserialize(f64t2);
     ASSERT_EQ(Fw::FW_SERIALIZE_OK, stat2);
     ASSERT_DOUBLE_EQ(f64t1, f64t2);
