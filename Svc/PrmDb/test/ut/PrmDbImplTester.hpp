@@ -5,8 +5,8 @@
  *      Author: aleem
  */
 
-#ifndef PRMDB_TEST_UT_PRMDBTESTER_IMPL_HPP_
-#define PRMDB_TEST_UT_PRMDBTESTER_IMPL_HPP_
+#ifndef PRMDB_TEST_UT_PRMDBIMPLTESTER_HPP_
+#define PRMDB_TEST_UT_PRMDBIMPLTESTER_HPP_
 
 #include <Svc/PrmDb/PrmDbImpl.hpp>
 
@@ -36,11 +36,6 @@ namespace Svc {
              */
             void clearDb();
 
-            // /**
-            //  * Access to doDispatch method
-            //  */
-            // Fw::QueuedComponentBase::MsgDispatchStatus doDispatch();
-
             /**
              * Access to readParamFile method
              */
@@ -52,4 +47,4 @@ namespace Svc {
 
 } /* namespace Svc */
 
-#endif /* PRMDB_TEST_UT_PRMDBTESTER_IMPL_HPP_ */
+#endif /* PRMDB_TEST_UT_PRMDBIMPLTESTER_HPP_ */
