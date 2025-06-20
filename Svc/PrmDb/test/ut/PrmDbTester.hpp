@@ -5,8 +5,8 @@
  *      Author: tcanham
  */
 
-#ifndef PRMDB_TEST_UT_PRMDBTESTER_HPP_
-#define PRMDB_TEST_UT_PRMDBTESTER_HPP_
+#ifndef PRMDB_TEST_UT_PRMDB_TESTER_HPP_
+#define PRMDB_TEST_UT_PRMDB_TESTER_HPP_
 
 #include <PrmDbGTestBase.hpp>
 #include <config/PrmDbImplTesterCfg.hpp>
@@ -77,4 +77,4 @@ namespace Svc {
 
 } /* namespace Svc */
 
-#endif /* PRMDB_TEST_UT_PRMDBTESTER_HPP_ */
+#endif /* PRMDB_TEST_UT_PRMDB_TESTER_HPP_ */
