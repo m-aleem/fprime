@@ -16,7 +16,7 @@ namespace Svc {
 
     class ActiveLoggerTester: public Svc::ActiveLoggerGTestBase {
         public:
-            ActiveLoggerTester(Svc::ActiveLoggerImpl& inst);
+            explicit ActiveLoggerTester(Svc::ActiveLoggerImpl& inst);
             virtual ~ActiveLoggerTester();
 
             void runEventNominal();
