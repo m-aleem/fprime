@@ -1,10 +1,10 @@
 // ======================================================================
-// \title  ActiveTest/test/ut/Tester.cpp
+// \title  ActiveTest/test/ut/ActiveTestActiveTestTester.cpp
 // \author tiffany
 // \brief  cpp file for ActiveTest test harness implementation class
 // ======================================================================
 
-#include "Tester.hpp"
+#include "ActiveTestTester.hpp"
 #include "STest/Pick/Pick.hpp"
 
 
@@ -12,8 +12,8 @@
 // Construction and destruction
 // ----------------------------------------------------------------------
 
-Tester ::Tester()
-    : ActiveTestGTestBase("Tester", Tester::MAX_HISTORY_SIZE),
+ActiveTestTester ::ActiveTestTester()
+    : ActiveTestGTestBase("ActiveTestTester", ActiveTestTester::MAX_HISTORY_SIZE),
       component("ActiveTest"),
       primitiveBuf(primitiveData, sizeof(primitiveData)),
       stringBuf(stringData, sizeof(stringData)),
@@ -28,14 +28,14 @@ Tester ::Tester()
     this->component.registerExternalParameters(&this->paramTesterDelegate);
 }
 
-Tester ::~Tester() {}
+ActiveTestTester ::~ActiveTestTester() {}
 
-void Tester ::initComponents() {
+void ActiveTestTester ::initComponents() {
     this->init();
-    this->component.init(Tester::TEST_INSTANCE_QUEUE_DEPTH, Tester::TEST_INSTANCE_ID);
+    this->component.init(ActiveTestTester::TEST_INSTANCE_QUEUE_DEPTH, ActiveTestTester::TEST_INSTANCE_ID);
 }
 
-Fw::ParamValid Tester ::from_prmGetIn_handler(const FwIndexType portNum, FwPrmIdType id, Fw::ParamBuffer& val) {
+Fw::ParamValid ActiveTestTester ::from_prmGetIn_handler(const FwIndexType portNum, FwPrmIdType id, Fw::ParamBuffer& val) {
     val.resetSer();
 
     Fw::SerializeStatus status;
@@ -80,7 +80,7 @@ Fw::ParamValid Tester ::from_prmGetIn_handler(const FwIndexType portNum, FwPrmId
     return prmValid;
 }
 
-void Tester ::from_prmSetIn_handler(const FwIndexType portNum, FwPrmIdType id, Fw::ParamBuffer& val) {
+void ActiveTestTester ::from_prmSetIn_handler(const FwIndexType portNum, FwPrmIdType id, Fw::ParamBuffer& val) {
     Fw::SerializeStatus status;
     U32 id_base = component.getIdBase();
 
@@ -126,7 +126,7 @@ void Tester ::from_prmSetIn_handler(const FwIndexType portNum, FwPrmIdType id, F
 // Unit test implementation of external parameter delegate serialization/deserialization
 // ----------------------------------------------------------------------
 
-Fw::SerializeStatus Tester::ActiveTestComponentBaseParamExternalDelegate ::
+Fw::SerializeStatus ActiveTestTester::ActiveTestComponentBaseParamExternalDelegate ::
   deserializeParam(
       const FwPrmIdType base_id,
       const FwPrmIdType local_id,
@@ -172,7 +172,7 @@ Fw::SerializeStatus Tester::ActiveTestComponentBaseParamExternalDelegate ::
   return stat;
 }
 
-Fw::SerializeStatus Tester::ActiveTestComponentBaseParamExternalDelegate ::
+Fw::SerializeStatus ActiveTestTester::ActiveTestComponentBaseParamExternalDelegate ::
   serializeParam(
       const FwPrmIdType base_id,
       const FwPrmIdType local_id,

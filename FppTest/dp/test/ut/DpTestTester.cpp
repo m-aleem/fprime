@@ -1,5 +1,5 @@
 // ======================================================================
-// \title  DpTest.hpp
+// \title  DpTestTester.hpp
 // \author bocchino
 // \brief  cpp file for DpTest test harness implementation class
 // ======================================================================
@@ -7,7 +7,7 @@
 #include <cstring>
 
 #include "FppTest/dp/FppConstantsAc.hpp"
-#include "FppTest/dp/test/ut/Tester.hpp"
+#include "FppTest/dp/test/ut/DpTestTester.hpp"
 #include "Fw/Types/ExternalString.hpp"
 #include "STest/Pick/Pick.hpp"
 
@@ -17,8 +17,8 @@ namespace FppTest {
 // Construction and destruction
 // ----------------------------------------------------------------------
 
-Tester::Tester()
-    : DpTestGTestBase("Tester", Tester::MAX_HISTORY_SIZE),
+DpTestTester::DpTestTester()
+    : DpTestGTestBase("DpTestTester", DpTestTester::MAX_HISTORY_SIZE),
       container1Data{},
       container1Buffer(this->container1Data, sizeof this->container1Data),
       container2Data{},
@@ -56,13 +56,13 @@ Tester::Tester()
     generateRandomString(this->stringRecordData);
 }
 
-Tester::~Tester() {}
+DpTestTester::~DpTestTester() {}
 
 // ----------------------------------------------------------------------
 // Tests
 // ----------------------------------------------------------------------
 
-void Tester::schedIn_OK() {
+void DpTestTester::schedIn_OK() {
     this->clearHistory();
     this->invoke_to_schedIn(0, 0);
     this->component.doDispatch();
@@ -81,7 +81,7 @@ void Tester::schedIn_OK() {
     ASSERT_PRODUCT_GET(4, ID_BASE + DpTest::ContainerId::Container5, FwSizeType(DpTest::CONTAINER_5_PACKET_SIZE));
 }
 
-void Tester::productRecvIn_Container1_SUCCESS() {
+void DpTestTester::productRecvIn_Container1_SUCCESS() {
     Fw::Buffer buffer;
     FwSizeType expectedNumElts;
     // Clear the history
@@ -111,12 +111,12 @@ void Tester::productRecvIn_Container1_SUCCESS() {
     }
 }
 
-void Tester::productRecvIn_Container1_FAILURE() {
+void DpTestTester::productRecvIn_Container1_FAILURE() {
     this->clearHistory();
     productRecvIn_CheckFailure(DpTest::ContainerId::Container1, this->container1Buffer);
 }
 
-void Tester::productRecvIn_Container2_SUCCESS() {
+void DpTestTester::productRecvIn_Container2_SUCCESS() {
     Fw::Buffer buffer;
     FwSizeType expectedNumElts;
     // Clear the history
@@ -146,12 +146,12 @@ void Tester::productRecvIn_Container2_SUCCESS() {
     }
 }
 
-void Tester::productRecvIn_Container2_FAILURE() {
+void DpTestTester::productRecvIn_Container2_FAILURE() {
     this->clearHistory();
     productRecvIn_CheckFailure(DpTest::ContainerId::Container2, this->container2Buffer);
 }
 
-void Tester::productRecvIn_Container3_SUCCESS() {
+void DpTestTester::productRecvIn_Container3_SUCCESS() {
     Fw::Buffer buffer;
     FwSizeType expectedNumElts;
     // Clear the history
@@ -191,12 +191,12 @@ void Tester::productRecvIn_Container3_SUCCESS() {
     }
 }
 
-void Tester::productRecvIn_Container3_FAILURE() {
+void DpTestTester::productRecvIn_Container3_FAILURE() {
     this->clearHistory();
     productRecvIn_CheckFailure(DpTest::ContainerId::Container3, this->container3Buffer);
 }
 
-void Tester::productRecvIn_Container4_SUCCESS() {
+void DpTestTester::productRecvIn_Container4_SUCCESS() {
     Fw::Buffer buffer;
     FwSizeType expectedNumElts;
     // Clear the history
@@ -236,12 +236,12 @@ void Tester::productRecvIn_Container4_SUCCESS() {
     }
 }
 
-void Tester::productRecvIn_Container4_FAILURE() {
+void DpTestTester::productRecvIn_Container4_FAILURE() {
     productRecvIn_CheckFailure(DpTest::ContainerId::Container4, this->container4Buffer);
     this->clearHistory();
 }
 
-void Tester::productRecvIn_Container5_SUCCESS() {
+void DpTestTester::productRecvIn_Container5_SUCCESS() {
     Fw::Buffer buffer;
     FwSizeType expectedNumElts;
     // Clear the history
@@ -281,12 +281,12 @@ void Tester::productRecvIn_Container5_SUCCESS() {
     }
 }
 
-void Tester::productRecvIn_Container5_FAILURE() {
+void DpTestTester::productRecvIn_Container5_FAILURE() {
     this->clearHistory();
     productRecvIn_CheckFailure(DpTest::ContainerId::Container5, this->container5Buffer);
 }
 
-void Tester::productRecvIn_Container6_SUCCESS() {
+void DpTestTester::productRecvIn_Container6_SUCCESS() {
     Fw::Buffer buffer;
     FwSizeType expectedNumElts;
     // Clear the history
@@ -319,12 +319,12 @@ void Tester::productRecvIn_Container6_SUCCESS() {
     }
 }
 
-void Tester::productRecvIn_Container6_FAILURE() {
+void DpTestTester::productRecvIn_Container6_FAILURE() {
     this->clearHistory();
     productRecvIn_CheckFailure(DpTest::ContainerId::Container6, this->container6Buffer);
 }
 
-void Tester::productRecvIn_Container7_SUCCESS() {
+void DpTestTester::productRecvIn_Container7_SUCCESS() {
     Fw::Buffer buffer;
     FwSizeType expectedNumElts;
     // Clear the history
@@ -367,7 +367,7 @@ void Tester::productRecvIn_Container7_SUCCESS() {
     }
 }
 
-void Tester::productRecvIn_Container7_FAILURE() {
+void DpTestTester::productRecvIn_Container7_FAILURE() {
     this->clearHistory();
     productRecvIn_CheckFailure(DpTest::ContainerId::Container7, this->container7Buffer);
 }
@@ -376,7 +376,7 @@ void Tester::productRecvIn_Container7_FAILURE() {
 // Helper methods
 // ----------------------------------------------------------------------
 
-Fw::Time Tester::randomizeTestTime() {
+Fw::Time DpTestTester::randomizeTestTime() {
     const U32 seconds = STest::Pick::any();
     const U32 useconds = STest::Pick::startLength(0, 1000000);
     const Fw::Time time(seconds, useconds);
@@ -385,7 +385,7 @@ Fw::Time Tester::randomizeTestTime() {
     return time;
 }
 
-void Tester::generateRandomString(Fw::StringBase& str) {
+void DpTestTester::generateRandomString(Fw::StringBase& str) {
     char buffer[Fw::StringBase::BUFFER_SIZE(MAX_STRING_LENGTH)];
     // Pick a random string length
     const FwSizeType length = STest::Pick::lowerUpper(0, MAX_STRING_LENGTH);
@@ -401,7 +401,7 @@ void Tester::generateRandomString(Fw::StringBase& str) {
     str.format("%s", buffer);
 }
 
-void Tester::productRecvIn_InvokeAndCheckHeader(FwDpIdType id,
+void DpTestTester::productRecvIn_InvokeAndCheckHeader(FwDpIdType id,
                                                 FwSizeType dataEltSize,
                                                 FwDpPriorityType priority,
                                                 Fw::Buffer inputBuffer,
@@ -434,7 +434,7 @@ void Tester::productRecvIn_InvokeAndCheckHeader(FwDpIdType id,
     ASSERT_PRODUCT_SEND(0, globalId, priority, timeTag, 0, userData, dpState, expectedDataSize, outputBuffer);
 }
 
-void Tester::productRecvIn_CheckFailure(FwDpIdType id, Fw::Buffer buffer) {
+void DpTestTester::productRecvIn_CheckFailure(FwDpIdType id, Fw::Buffer buffer) {
     // Invoke the port
     const auto globalId = ID_BASE + id;
     this->sendProductResponse(globalId, buffer, Fw::Success::FAILURE);
@@ -447,7 +447,7 @@ void Tester::productRecvIn_CheckFailure(FwDpIdType id, Fw::Buffer buffer) {
 // Handlers for typed from ports
 // ----------------------------------------------------------------------
 
-Fw::Success::T Tester::productGet_handler(FwDpIdType id, FwSizeType size, Fw::Buffer& buffer) {
+Fw::Success::T DpTestTester::productGet_handler(FwDpIdType id, FwSizeType size, Fw::Buffer& buffer) {
     this->pushProductGetEntry(id, size);
     Fw::Success status = Fw::Success::FAILURE;
     FW_ASSERT(id >= ID_BASE, static_cast<FwAssertArgType>(id), static_cast<FwAssertArgType>(ID_BASE));

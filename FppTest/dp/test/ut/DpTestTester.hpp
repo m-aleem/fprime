@@ -1,11 +1,11 @@
 // ======================================================================
-// \title  DpTest/test/ut/Tester.hpp
+// \title  DpTest/test/ut/DpTestTester.hpp
 // \author bocchino
 // \brief  hpp file for DpTest test harness implementation class
 // ======================================================================
 
-#ifndef FppTest_DpTest_Tester_HPP
-#define FppTest_DpTest_Tester_HPP
+#ifndef FppTest_DpTest_DpTestTester_HPP
+#define FppTest_DpTest_DpTestTester_HPP
 
 #include "DpTestGTestBase.hpp"
 #include "FppTest/dp/DpTest.hpp"
@@ -14,7 +14,7 @@
 
 namespace FppTest {
 
-class Tester : public DpTestGTestBase {
+class DpTestTester : public DpTestGTestBase {
     // ----------------------------------------------------------------------
     // Construction and destruction
     // ----------------------------------------------------------------------
@@ -31,13 +31,13 @@ class Tester : public DpTestGTestBase {
     // The max string length for string data
     static constexpr FwSizeType MAX_STRING_LENGTH = 100;
 
-    //! Construct object Tester
+    //! Construct object DpTestTester
     //!
-    Tester();
+    DpTestTester();
 
-    //! Destroy object Tester
+    //! Destroy object DpTestTester
     //!
-    ~Tester();
+    ~DpTestTester();
 
   public:
     // ----------------------------------------------------------------------

@@ -1,19 +1,19 @@
 // ======================================================================
-// \title  DpTest/test/ut/TesterHelpers.cpp
+// \title  DpTest/test/ut/DpTestTesterHelpers.cpp
 // \author Auto-generated
 // \brief  cpp file for DpTest component test harness base class
 //
 // NOTE: this file was automatically generated
 //
 // ======================================================================
-#include "Tester.hpp"
+#include "DpTestTester.hpp"
 
 namespace FppTest {
 // ----------------------------------------------------------------------
 // Helper methods
 // ----------------------------------------------------------------------
 
-void Tester ::connectPorts() {
+void DpTestTester ::connectPorts() {
     // productRecvIn
     this->connect_to_productRecvIn(0, this->component.get_productRecvIn_InputPort(0));
 
@@ -33,9 +33,9 @@ void Tester ::connectPorts() {
     this->component.set_timeGetOut_OutputPort(0, this->get_from_timeGetOut(0));
 }
 
-void Tester ::initComponents() {
+void DpTestTester ::initComponents() {
     this->init();
-    this->component.init(Tester::TEST_INSTANCE_QUEUE_DEPTH, Tester::TEST_INSTANCE_ID);
+    this->component.init(DpTestTester::TEST_INSTANCE_QUEUE_DEPTH, DpTestTester::TEST_INSTANCE_ID);
 }
 
 }  // end namespace FppTest
