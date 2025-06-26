@@ -1,11 +1,11 @@
 #ifndef FPPTEST_STATE_MACHINE_INTERNAL_INSTANCE_STATE_BASICGUARDTESTER_HPP
-#define FPPTEST_STATE_MACHINE_INTERNAL_INSTANCE_STATE_BASICGUARDTESTER_HPP
-
-#include "FppTest/state_machine/internal_instance/state/BasicGuard.hpp"
+// \title  BasicGuardTester.hpp
+// \author m-aleem
+// \brief  hpp file for BasicGuardTester class
 
 namespace FppTest {
-
-namespace SmInstanceState {
+#ifndef FppTest_SmInstanceState_BasicGuardTester_HPP
+#define FppTest_SmInstanceState_BasicGuardTester_HPP
 
 class BasicGuardTester {
 
