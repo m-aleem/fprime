@@ -607,7 +607,7 @@ TEST_F(FpySequencerTester, cmd_VALIDATE) {
 
 TEST_F(FpySequencerTester, cmd_RUN_VALIDATED) {
     // should fail because in idle
-    cmp.m_stateMachine_sequencer.m_state = State::IDLE;
+    this->tester_setState(State::IDLE);
     sendCmd_RUN_VALIDATED(0, 0, FpySequencer_BlockState::NO_BLOCK);
     dispatchCurrentMessages(cmp);
     ASSERT_CMD_RESPONSE_SIZE(1);
