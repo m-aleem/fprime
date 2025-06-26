@@ -1,4 +1,3 @@
-#ifndef FPPTEST_STATE_MACHINE_INTERNAL_INSTANCE_STATE_BASICGUARDTESTER_HPP
 // \title  BasicGuardTester.hpp
 // \author m-aleem
 // \brief  hpp file for BasicGuardTester class
