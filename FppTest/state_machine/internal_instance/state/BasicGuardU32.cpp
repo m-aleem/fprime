@@ -46,51 +46,6 @@ bool BasicGuardU32::FppTest_SmState_BasicGuardU32_guard_g(SmId smId,
     return this->m_smStateBasicGuardU32_guard_g.call(signal, value);
 }
 
-// ----------------------------------------------------------------------
-// Tests
-// ----------------------------------------------------------------------
-
-void BasicGuardU32::testFalse() {
-    this->m_smStateBasicGuardU32_action_a_history.clear();
-    this->m_smStateBasicGuardU32_guard_g.reset();
-    this->init(queueDepth, instanceId);
-    ASSERT_EQ(this->smStateBasicGuardU32_getState(), SmState_BasicGuardU32::State::S);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_action_a_history.getSize(), 0);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_guard_g.getCallHistory().getSize(), 0);
-    const U32 value = STest::Pick::any();
-    this->smStateBasicGuardU32_sendSignal_s(value);
-    const auto status = this->doDispatch();
-    ASSERT_EQ(status, MSG_DISPATCH_OK);
-    ASSERT_EQ(this->smStateBasicGuardU32_getState(), SmState_BasicGuardU32::State::S);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_guard_g.getCallHistory().getSize(), 1);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_guard_g.getCallHistory().getSignals().getItemAt(0),
-              SmState_BasicGuardU32::Signal::s);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_guard_g.getCallHistory().getValues().getItemAt(0), value);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_action_a_history.getSize(), 0);
-}
-
-void BasicGuardU32::testTrue() {
-    this->m_smStateBasicGuardU32_action_a_history.clear();
-    this->m_smStateBasicGuardU32_guard_g.reset();
-    this->m_smStateBasicGuardU32_guard_g.setReturnValue(true);
-    this->init(queueDepth, instanceId);
-    ASSERT_EQ(this->smStateBasicGuardU32_getState(), SmState_BasicGuardU32::State::S);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_action_a_history.getSize(), 0);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_guard_g.getCallHistory().getSize(), 0);
-    const U32 value = STest::Pick::any();
-    this->smStateBasicGuardU32_sendSignal_s(value);
-    const auto status = this->doDispatch();
-    ASSERT_EQ(status, MSG_DISPATCH_OK);
-    ASSERT_EQ(this->smStateBasicGuardU32_getState(), SmState_BasicGuardU32::State::T);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_guard_g.getCallHistory().getSize(), 1);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_guard_g.getCallHistory().getSignals().getItemAt(0),
-              SmState_BasicGuardU32::Signal::s);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_guard_g.getCallHistory().getValues().getItemAt(0), value);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_action_a_history.getSize(), 1);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_action_a_history.getSignals().getItemAt(0),
-              SmState_BasicGuardU32::Signal::s);
-    ASSERT_EQ(this->m_smStateBasicGuardU32_action_a_history.getValues().getItemAt(0), value);
-}
 
 }  // namespace SmInstanceState
 

@@ -14,7 +14,16 @@ namespace FppTest {
 
 namespace SmInstanceState {
 
+class BasicGuardTestArrayTester;
+
 class BasicGuardTestArray : public BasicGuardTestArrayComponentBase {
+  public:
+    // ----------------------------------------------------------------------
+    // Friend classes
+    // ----------------------------------------------------------------------
+
+    //! Friend class for white-box testing
+    friend class BasicGuardTestArrayTester;
   private:
     // ----------------------------------------------------------------------
     // Constants
@@ -77,16 +86,6 @@ class BasicGuardTestArray : public BasicGuardTestArrayComponentBase {
         const SmHarness::TestArray& value                    //!< The value
     ) const override;
 
-  public:
-    // ----------------------------------------------------------------------
-    // Tests
-    // ----------------------------------------------------------------------
-
-    //! Test with true guard
-    void testTrue();
-
-    //! Test with false guard
-    void testFalse();
 
   private:
     // ----------------------------------------------------------------------

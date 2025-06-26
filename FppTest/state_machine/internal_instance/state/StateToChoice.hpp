@@ -14,7 +14,16 @@ namespace FppTest {
 
 namespace SmInstanceState {
 
+class StateToChoiceTester;
+
 class StateToChoice : public StateToChoiceComponentBase {
+  public:
+    // ----------------------------------------------------------------------
+    // Friend classes
+    // ----------------------------------------------------------------------
+
+    //! Friend class for white-box testing
+    friend class StateToChoiceTester;
     // ----------------------------------------------------------------------
     // Constants
     // ----------------------------------------------------------------------
@@ -124,28 +133,6 @@ class StateToChoice : public StateToChoiceComponentBase {
                                                FppTest_SmState_StateToChoice::Signal signal  //!< The signal
     ) const override;
 
-  public:
-    // ----------------------------------------------------------------------
-    // Tests
-    // ----------------------------------------------------------------------
-
-    //! Test initial transition
-    void testInit();
-
-    //! Test transition S2 to C
-    void testS2_to_C();
-
-    //! Test transition S2 to S3
-    void testS2_to_S3();
-
-    //! Test transition S2 to S4
-    void testS2_to_S4();
-
-    //! Test transition S3 to C
-    void testS3_to_C();
-
-    //! Test transition S3 to S4
-    void testS3_to_S4();
 
   private:
     // ----------------------------------------------------------------------

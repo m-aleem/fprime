@@ -14,7 +14,16 @@ namespace FppTest {
 
 namespace SmInstanceState {
 
+class StateToChildTester;
+
 class StateToChild : public StateToChildComponentBase {
+  public:
+    // ----------------------------------------------------------------------
+    // Friend classes
+    // ----------------------------------------------------------------------
+
+    //! Friend class for white-box testing
+    friend class StateToChildTester;
     // ----------------------------------------------------------------------
     // Constants
     // ----------------------------------------------------------------------
@@ -91,22 +100,6 @@ class StateToChild : public StateToChildComponentBase {
                                                      FppTest_SmState_StateToChild::Signal signal  //!< The signal
                                                      ) override;
 
-  public:
-    // ----------------------------------------------------------------------
-    // Tests
-    // ----------------------------------------------------------------------
-
-    //! Test initial transition
-    void testInit();
-
-    //! Test transition from S2 to S2
-    void testS2_to_S2();
-
-    //! Test transition from S2 to S3
-    void testS2_to_S3();
-
-    //! Test transition from S3 to S2
-    void testS3_to_S2();
 
   private:
     // ----------------------------------------------------------------------

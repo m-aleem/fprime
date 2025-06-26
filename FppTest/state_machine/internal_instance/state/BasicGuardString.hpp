@@ -14,7 +14,16 @@ namespace FppTest {
 
 namespace SmInstanceState {
 
+class BasicGuardStringTester;
+
 class BasicGuardString : public BasicGuardStringComponentBase {
+  public:
+    // ----------------------------------------------------------------------
+    // Friend classes
+    // ----------------------------------------------------------------------
+
+    //! Friend class for white-box testing
+    friend class BasicGuardStringTester;
   private:
     // ----------------------------------------------------------------------
     // Constants
@@ -75,16 +84,6 @@ class BasicGuardString : public BasicGuardStringComponentBase {
                                                   const Fw::StringBase& value                       //!< The value
     ) const override;
 
-  public:
-    // ----------------------------------------------------------------------
-    // Tests
-    // ----------------------------------------------------------------------
-
-    //! Test with true guard
-    void testTrue();
-
-    //! Test with false guard
-    void testFalse();
 
   private:
     // ----------------------------------------------------------------------

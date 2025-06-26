@@ -14,7 +14,16 @@ namespace FppTest {
 
 namespace SmInstanceState {
 
+class BasicTester;
+
 class Basic : public BasicComponentBase {
+  public:
+    // ----------------------------------------------------------------------
+    // Friend classes
+    // ----------------------------------------------------------------------
+
+    //! Friend class for white-box testing
+    friend class BasicTester;
   private:
     // ----------------------------------------------------------------------
     // Constants
@@ -82,13 +91,6 @@ class Basic : public BasicComponentBase {
                                         FppTest_SmState_Basic::Signal signal  //!< The signal
                                         ) override;
 
-  public:
-    // ----------------------------------------------------------------------
-    // Tests
-    // ----------------------------------------------------------------------
-
-    //! Run the test
-    void test();
 
   private:
     // ----------------------------------------------------------------------
