@@ -2,9 +2,15 @@
 // \author m-aleem
 // \brief  hpp file for BasicGuardTester class
 
-namespace FppTest {
+
 #ifndef FppTest_SmInstanceState_BasicGuardTester_HPP
 #define FppTest_SmInstanceState_BasicGuardTester_HPP
+
+#include "FppTest/state_machine/internal_instance/state/BasicGuard.hpp"
+
+namespace FppTest {
+
+namespace SmInstanceState {
 
 class BasicGuardTester {
 
@@ -43,8 +49,8 @@ class BasicGuardTester {
 
 };
 
-}
+} // end namespace SmInstanceState
 
-}
+} // end namespace FppTest
 
 #endif
