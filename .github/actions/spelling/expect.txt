@@ -557,10 +557,13 @@ setprotocol
 setschedparam
 setschedpolicy
 setstacksize
+setser
 settime
 sev
 sfregoso
+SGE
 SGN
+SGT
 SHAREDSTATEDIR
 SHELLCOMMAND
 showinitializer
@@ -663,6 +666,8 @@ typedef'ed
 typedef
 uart
 UDPSOCKET
+UGE
+ulhs
 UML
 UNEXP
 unistd
@@ -670,6 +675,7 @@ UNITTESTASSERT
 unittests
 useconds
 usecs
+urhs
 valgrind
 vbai
 VCA
