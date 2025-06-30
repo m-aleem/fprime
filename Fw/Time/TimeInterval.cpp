@@ -95,11 +95,4 @@ namespace Fw {
         this->set(new_seconds, new_useconds);
     }
 
-#ifdef BUILD_UT
-    std::ostream& operator<<(std::ostream& os, const TimeInterval& val) {
-        os << "(" << val.getseconds() << "s," << val.getuseconds() << "us)";
-        return os;
-    }
-#endif
-
 }

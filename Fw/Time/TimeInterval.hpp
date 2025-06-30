@@ -32,7 +32,7 @@ namespace Fw {
             bool operator>=(const TimeInterval& other) const;
             bool operator<=(const TimeInterval& other) const;
 
-            // Addd seconds and microseconds to existing time interval
+            // Add seconds and microseconds to existing time interval
             void add(U32 seconds, U32 mseconds); 
 
             //! The type of a comparison result
