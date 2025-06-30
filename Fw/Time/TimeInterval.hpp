@@ -3,42 +3,37 @@
 
 #include <Fw/FPrimeBasicTypes.hpp>
 #include <Fw/Types/Assert.hpp>
-#include <Fw/Types/Serializable.hpp>
+#include <Fw/Time/TimeIntervalTypeSerializableAc.hpp>
 
 //!
 //! @class TimeInterval
 //! @brief A class to represent a time interval holding two U32 seconds and microseconds values.
 //!
 //! The TimeInterval class is designed to hold a time interval and provides various methods
-//! to manipulate and compare time intervals. It supports serialization and deserialization
-//! for easy storage and transmission.
+//! to manipulate and compare time intervals. It derives from the auto-generated TimeIntervalType
+//! which supports serialization and extends it with additional functionality.
 //!
+
 namespace Fw {
 
-    class TimeInterval: public Serializable {
+    // Extend the auto-generated class with additional functionality
+    class TimeInterval : public TimeIntervalType {
         public:
+            // Inherit all constructors from TimeIntervalType
+            using TimeIntervalType::TimeIntervalType;
 
-            enum {
-                SERIALIZED_SIZE = sizeof(U32) * 2
-            };
+            // For backward compatibility
+            U32 getSeconds() const { return this->getseconds(); }
+            U32 getUSeconds() const { return this->getuseconds(); }
 
-            TimeInterval() = default; // !< Default constructor
-            ~TimeInterval() = default; // !< Default destructor
-            TimeInterval(const TimeInterval& other); // !< Copy constructor
-            TimeInterval(U32 seconds, U32 useconds); // !< Constructor with member values as arguments
-            void set(U32 seconds, U32 useconds); // !< Sets value of time stored
-            U32 getSeconds() const; // !< Gets seconds part of time
-            U32 getUSeconds() const; // !< Gets microseconds part of time
-            SerializeStatus serialize(SerializeBufferBase& buffer) const; // !< Serialize method
-            SerializeStatus deserialize(SerializeBufferBase& buffer); // !< Deserialize method
-            void add(U32 seconds, U32 mseconds); // !< Add seconds and microseconds to existing time interval
-            bool operator==(const TimeInterval& other) const;
-            bool operator!=(const TimeInterval& other) const;
+            // Additional operators not provided by auto-generated code
             bool operator>(const TimeInterval& other) const;
             bool operator<(const TimeInterval& other) const;
             bool operator>=(const TimeInterval& other) const;
             bool operator<=(const TimeInterval& other) const;
-            TimeInterval& operator=(const TimeInterval& other);
+
+            // Addd seconds and microseconds to existing time interval
+            void add(U32 seconds, U32 mseconds); 
 
             //! The type of a comparison result
             typedef enum {
@@ -75,14 +70,6 @@ namespace Fw {
                 const TimeInterval& t2 //!< TimeInterval 2
             );
 
-
-
-#ifdef BUILD_UT // Stream operators to support Googletest
-            friend std::ostream& operator<<(std::ostream& os,  const TimeInterval& val);
-#endif
-        private:
-            U32 m_seconds; // !< seconds portion of TimeInterval
-            U32 m_useconds; // !< microseconds portion of TimeInterval
     };
 
 }
