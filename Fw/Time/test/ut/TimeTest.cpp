@@ -218,6 +218,35 @@ namespace Fw {
                 ASSERT_EQ(Fw::TimeInterval::compare(t4, t1), Fw::TimeInterval::GT);
             }
 
+            void test_TimeIntervalSubtractionTest()
+            {
+                Fw::TimeInterval t1(5, 500000);
+                Fw::TimeInterval t2(2, 300000);
+                Fw::TimeInterval result1 = Fw::TimeInterval::sub(t1, t2);
+                // 5s - 2s = 3s, 500000us - 300000us = 200000us
+                ASSERT_EQ(result1.getseconds(), 3);
+                ASSERT_EQ(result1.getuseconds(), 200000);
+                
+                // should be the same due to absolute value
+                Fw::TimeInterval result2 = Fw::TimeInterval::sub(t2, t1);
+                ASSERT_EQ(result2.getseconds(), 3);
+                ASSERT_EQ(result2.getuseconds(), 200000);
+                
+                Fw::TimeInterval t3(5, 200000);
+                Fw::TimeInterval t4(2, 500000);
+                Fw::TimeInterval result3 = Fw::TimeInterval::sub(t3, t4);
+                // 5s - 2s = 3s, 200000us - 500000us requires borrow
+                // So it's 2s + 700000us
+                ASSERT_EQ(result3.getseconds(), 2);
+                ASSERT_EQ(result3.getuseconds(), 700000);
+                
+                Fw::TimeInterval t5(3, 400000);
+                Fw::TimeInterval t6(3, 400000);
+                Fw::TimeInterval result4 = Fw::TimeInterval::sub(t5, t6);
+                ASSERT_EQ(result4.getseconds(), 0);
+                ASSERT_EQ(result4.getuseconds(), 0);
+            }
+
         };
 }
 
@@ -253,14 +282,19 @@ TEST(TimeIntervalTestNominal,test_TimeIntervalComparisonTest) {
     tester.test_TimeIntervalComparisonTest();
 }
 
+TEST(TimeIntervalTestNominal,test_TimeIntervalCompareStaticTest) {
+    Fw::TimeTester tester;
+    tester.test_TimeIntervalCompareStaticTest();
+}
+
 TEST(TimeIntervalTestNominal,test_TimeIntervalAdditionTest) {
     Fw::TimeTester tester;
     tester.test_TimeIntervalAdditionTest();
 }
 
-TEST(TimeIntervalTestNominal,test_TimeIntervalCompareStaticTest) {
+TEST(TimeIntervalTestNominal,test_TimeIntervalSubtractionTest) {
     Fw::TimeTester tester;
-    tester.test_TimeIntervalCompareStaticTest();
+    tester.test_TimeIntervalSubtractionTest();
 }
 
 int main(int argc, char* argv[]) {
