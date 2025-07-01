@@ -8,14 +8,16 @@ module Fw {
   )
 
   @ Data structure for Time Interval
-  struct TimeIntervalType {
+  struct TimeIntervalValue {
     seconds: U32  @< seconds portion of TimeInterval
     useconds: U32  @< microseconds portion of TimeInterval
   }
 
+  type TimeInterval
+
   @ Time interval port
   port TimeInterval(
-    ref timeInterval: Fw.TimeIntervalType @< Reference to TimeInterval object
+    ref timeInterval: Fw.TimeInterval @< Reference to TimeInterval object
   )
 
 }

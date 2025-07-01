@@ -26,7 +26,6 @@ register_fprime_module(
     "${CMAKE_CURRENT_LIST_DIR}/error.hpp"
   DEPENDS
     Fw_Types
-    Fw_Time
 )
 
 # Set up Posix implementations
@@ -77,7 +76,6 @@ register_fprime_ut(
     "${CMAKE_CURRENT_LIST_DIR}/../test/ut/task/TaskRules.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/test/ut/PosixTaskTests.cpp"   
   DEPENDS
-    Fw_Time
     Fw_Types
     STest
   CHOOSES_IMPLEMENTATIONS

@@ -2,6 +2,32 @@
 #include <Fw/FPrimeBasicTypes.hpp>
 
 namespace Fw {
+    TimeInterval::TimeInterval(const TimeInterval& other) : Serializable() {
+        this->m_val = other.m_val;
+    }
+
+    TimeInterval::TimeInterval(U32 seconds, U32 useconds) : Serializable() {
+        this->set(seconds,useconds);
+    }
+
+    void TimeInterval::set(U32 seconds, U32 useconds) {
+        this->m_val.set(seconds, useconds);
+    }
+
+    TimeInterval& TimeInterval::operator=(const TimeInterval& other) {
+        if (this != &other) {
+            this->m_val = other.m_val;
+        }
+        return *this;
+    }
+
+    bool TimeInterval::operator==(const TimeInterval& other) const {
+        return (TimeInterval::compare(*this, other) == EQ);
+    }
+
+    bool TimeInterval::operator!=(const TimeInterval& other) const {
+        return (TimeInterval::compare(*this, other) != EQ);
+    }
 
     bool TimeInterval::operator>(const TimeInterval& other) const {
         return (TimeInterval::compare(*this, other) == GT);
@@ -21,16 +47,34 @@ namespace Fw {
         return ((LT == c) or (EQ == c));
     }
 
+    SerializeStatus TimeInterval::serialize(SerializeBufferBase& buffer) const {
+        // Use TimeIntervalValue's built-in serialization
+        return this->m_val.serialize(buffer);
+    }
+
+    SerializeStatus TimeInterval::deserialize(SerializeBufferBase& buffer) {
+        // Use TimeIntervalValue's built-in deserialization
+        return this->m_val.deserialize(buffer);
+    }
+
+    U32 TimeInterval::getSeconds() const {
+        return this->m_val.getseconds();
+    }
+
+    U32 TimeInterval::getUSeconds() const {
+        return this->m_val.getuseconds();
+    }
+
     TimeInterval::Comparison TimeInterval ::
       compare(
           const TimeInterval &time1,
           const TimeInterval &time2
       )
     {
-      const U32 s1 = time1.getseconds();
-      const U32 s2 = time2.getseconds();
-      const U32 us1 = time1.getuseconds();
-      const U32 us2 = time2.getuseconds();
+      const U32 s1 = time1.getSeconds();
+      const U32 s2 = time2.getSeconds();
+      const U32 us1 = time1.getUSeconds();
+      const U32 us2 = time2.getUSeconds();
 
       if (s1 < s2) {
         return LT;
@@ -51,14 +95,14 @@ namespace Fw {
         const TimeInterval& b
       )
     {
-      U32 seconds = a.getseconds() + b.getseconds();
-      U32 uSeconds = a.getuseconds() + b.getuseconds();
+      U32 seconds = a.getSeconds() + b.getSeconds();
+      U32 uSeconds = a.getUSeconds() + b.getUSeconds();
       FW_ASSERT(uSeconds < 1999999);
       if (uSeconds >= 1000000) {
         ++seconds;
         uSeconds -= 1000000;
       }
-      TimeInterval c(seconds, uSeconds);
+      TimeInterval c(seconds,uSeconds);
       return c;
     }
 
@@ -71,28 +115,34 @@ namespace Fw {
       const TimeInterval& minuend = (t1 > t2) ? t1 : t2;
       const TimeInterval& subtrahend = (t1 > t2) ? t2 : t1;
 
-      U32 seconds = minuend.getseconds() - subtrahend.getseconds();
+      U32 seconds = minuend.getSeconds() - subtrahend.getSeconds();
       U32 uSeconds;
-      if (subtrahend.getuseconds() > minuend.getuseconds()) {
+      if (subtrahend.getUSeconds() > minuend.getUSeconds()) {
           seconds--;
-          uSeconds = minuend.getuseconds() + 1000000 - subtrahend.getuseconds();
+          uSeconds = minuend.getUSeconds() + 1000000 - subtrahend.getUSeconds();
       } else {
-          uSeconds = minuend.getuseconds() - subtrahend.getuseconds();
+          uSeconds = minuend.getUSeconds() - subtrahend.getUSeconds();
       }
       return TimeInterval(seconds, static_cast<U32>(uSeconds));
     }
 
     void TimeInterval::add(U32 seconds, U32 useconds) {
-        U32 new_seconds = this->getseconds() + seconds;
-        U32 new_useconds = this->getuseconds() + useconds;
-        
-        FW_ASSERT(new_useconds < 1999999, static_cast<FwAssertArgType>(new_useconds));
-        if (new_useconds >= 1000000) {
-          new_seconds += 1;
-          new_useconds -= 1000000;
+        U32 newSeconds = this->m_val.getseconds() + seconds;
+        U32 newUSeconds = this->m_val.getuseconds() + useconds;
+        FW_ASSERT(newUSeconds < 1999999, static_cast<FwAssertArgType>(newUSeconds));
+        if (newUSeconds >= 1000000) {
+          newSeconds += 1;
+          newUSeconds -= 1000000;
         }
-        
-        this->set(new_seconds, new_useconds);
+        this->m_val.set(newSeconds, newUSeconds);
     }
+
+#ifdef BUILD_UT
+    std::ostream& operator<<(std::ostream& os, const TimeInterval& val) {
+
+        os << "(" << val.getSeconds() << "s," << val.getUSeconds() << "us)";
+        return os;
+    }
+#endif
 
 }

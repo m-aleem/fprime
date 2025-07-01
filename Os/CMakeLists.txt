@@ -37,7 +37,6 @@ function(add_named_os_module NAMES)
         HEADERS
           ${HEADER_INPUTS}
         DEPENDS
-          Fw_Time
           Fw_Types ${ARGN}
     )
     fprime_target_dependencies(Os PUBLIC "${OS_MODULE_NAME}")
@@ -90,7 +89,6 @@ function(add_fprime_supplied_os_module NAMES SUFFIX)
         ${HEADER_INPUTS}
       DEPENDS
         Fw_Types
-        Fw_Time
         "Os_${FIRST_ITEM}"
         ${ARGN}
     )
@@ -102,7 +100,6 @@ function(add_fprime_supplied_os_module NAMES SUFFIX)
         "Os_${FIRST_ITEM}"
       DEPENDS
         Fw_Types
-        Fw_Time
         "${OS_MODULE_NAME}_Implementation"
     )
 endfunction()
@@ -128,7 +125,6 @@ register_fprime_module(
       "${CMAKE_CURRENT_LIST_DIR}/Os.hpp"
     DEPENDS
       Fw_Types
-      Fw_Time
 )
 
 add_named_os_module(Console Fw_Logger)

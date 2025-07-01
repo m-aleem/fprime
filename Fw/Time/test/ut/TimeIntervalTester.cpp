@@ -19,13 +19,13 @@ namespace Fw {
 
     void TimeIntervalTester::test_TimeIntervalInstantiateTest() {
         Fw::TimeInterval time(1,2);
-        ASSERT_EQ(time.getseconds(), 1);
-        ASSERT_EQ(time.getuseconds(), 2);
+        ASSERT_EQ(time.getSeconds(), 1);
+        ASSERT_EQ(time.getUSeconds(), 2);
         std::cout << time << std::endl;
 
         Fw::TimeInterval time2(time);
-        ASSERT_EQ(time.getseconds(), 1);
-        ASSERT_EQ(time.getuseconds(), 2);
+        ASSERT_EQ(time.getSeconds(), 1);
+        ASSERT_EQ(time.getUSeconds(), 2);
         std::cout << time2 << std::endl;
     }
 
@@ -73,14 +73,14 @@ namespace Fw {
         // Test instance add method
         t1.add(3, 700000);
         // 1 + 3 = 4s, 500000us + 700000us = 1s + 200000us -> 5s, 200000us
-        ASSERT_EQ(t1.getseconds(), 5); 
-        ASSERT_EQ(t1.getuseconds(), 200000);
+        ASSERT_EQ(t1.getSeconds(), 5); 
+        ASSERT_EQ(t1.getUSeconds(), 200000);
         
         // Test static add method
         Fw::TimeInterval result = Fw::TimeInterval::add(t1, t2);
         // 5 + 2 = 7s, 200000us + 600000us = 800000us
-        ASSERT_EQ(result.getseconds(), 7);
-        ASSERT_EQ(result.getuseconds(), 800000);
+        ASSERT_EQ(result.getSeconds(), 7);
+        ASSERT_EQ(result.getUSeconds(), 800000);
     }
     
     void TimeIntervalTester::test_TimeIntervalCompareStaticTest() {
@@ -102,27 +102,27 @@ namespace Fw {
         Fw::TimeInterval t2(2, 300000);
         Fw::TimeInterval result1 = Fw::TimeInterval::sub(t1, t2);
         // 5s - 2s = 3s, 500000us - 300000us = 200000us
-        ASSERT_EQ(result1.getseconds(), 3);
-        ASSERT_EQ(result1.getuseconds(), 200000);
+        ASSERT_EQ(result1.getSeconds(), 3);
+        ASSERT_EQ(result1.getUSeconds(), 200000);
         
         // should be the same due to absolute value
         Fw::TimeInterval result2 = Fw::TimeInterval::sub(t2, t1);
-        ASSERT_EQ(result2.getseconds(), 3);
-        ASSERT_EQ(result2.getuseconds(), 200000);
+        ASSERT_EQ(result2.getSeconds(), 3);
+        ASSERT_EQ(result2.getUSeconds(), 200000);
         
         Fw::TimeInterval t3(5, 200000);
         Fw::TimeInterval t4(2, 500000);
         Fw::TimeInterval result3 = Fw::TimeInterval::sub(t3, t4);
         // 5s - 2s = 3s, 200000us - 500000us requires borrow
         // So it's 2s + 700000us
-        ASSERT_EQ(result3.getseconds(), 2);
-        ASSERT_EQ(result3.getuseconds(), 700000);
+        ASSERT_EQ(result3.getSeconds(), 2);
+        ASSERT_EQ(result3.getUSeconds(), 700000);
         
         Fw::TimeInterval t5(3, 400000);
         Fw::TimeInterval t6(3, 400000);
         Fw::TimeInterval result4 = Fw::TimeInterval::sub(t5, t6);
-        ASSERT_EQ(result4.getseconds(), 0);
-        ASSERT_EQ(result4.getuseconds(), 0);
+        ASSERT_EQ(result4.getSeconds(), 0);
+        ASSERT_EQ(result4.getUSeconds(), 0);
     }
 
 } // namespace Fw
