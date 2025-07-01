@@ -5,6 +5,7 @@ register_fprime_implementation(
     SOURCES
         "${CMAKE_CURRENT_LIST_DIR}/RawTimeTester.cpp"
     DEPENDS
+        Fw_Time
         Fw_Types
 )
 
