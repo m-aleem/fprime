@@ -18,6 +18,9 @@ namespace Fw {
 
     // Extend the auto-generated class with additional functionality
     class TimeInterval : public TimeIntervalType {
+
+        friend class TimeIntervalTester;
+
         public:
             // Inherit all constructors from TimeIntervalType
             using TimeIntervalType::TimeIntervalType;
