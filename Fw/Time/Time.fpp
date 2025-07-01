@@ -9,8 +9,8 @@ module Fw {
 
   @ Data structure for Time Interval
   struct TimeIntervalType {
-    seconds: U32  # seconds portion of TimeInterval
-    useconds: U32  # microseconds portion of TimeInterval
+    seconds: U32  @< seconds portion of TimeInterval
+    useconds: U32  @< microseconds portion of TimeInterval
   }
 
   @ Time interval port
