@@ -258,8 +258,10 @@ gcov
 gdiplus
 GENHUB
 getfooter
+getseconds
 getstatements
 gettime
+getuseconds
 getty
 ghprb
 gitmodules
