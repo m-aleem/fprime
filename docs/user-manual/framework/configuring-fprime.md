@@ -110,24 +110,9 @@ can produce a time tag. It lets users of the system see which clock was used whe
 
 Time contexts are another value associated with time.
 
-> [!WARNING]
-> Changes to this value must be done in tandem with the F´ GDS for F´ GDS features to work. Thus most projects don't modify these settings just like the types defined above.
+Time base and time context are now always used in the Fw::Time class implementation. The TimeBase enum defines the 
+possible time base values used by the system and is set in the FpConfig.fpp file.
 
-```cpp
-enum TimeBase {
-    TB_NONE, //!< No time base has been established
-    TB_PROC_TIME, //!< Indicates time is processor cycle time. Not tied to external time
-    TB_WORKSTATION_TIME, //!< Time as reported on workstation where software is running. For testing.
-    TB_DONT_CARE = 0xFFFF //!< Don't care value for sequences. If FwTimeBaseStoreType is changed, value should be changed
-};
-```
-
-Time base and time context usage may be turned on and off using the macros shown below:
-
-| Macro                    | Definition                                  | Default | Valid Values      |
-| ------------------------ | ------------------------------------------- |---------|-------------------|
-| FW_USE_TIME_BASE         | Enables the time base Fw::time field        | 1 (on)  | 0 (off) 1 (on)    |
-| FW_USE_TIME_CONTEXT      | Enables the time context Fw::time field     | 1 (on)  | 0 (off) 1 (on)    |
 
 ### Object Settings
 
