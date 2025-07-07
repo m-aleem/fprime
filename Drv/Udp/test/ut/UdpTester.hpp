@@ -16,6 +16,7 @@
 #include "UdpGTestBase.hpp"
 #include "Drv/Udp/UdpComponentImpl.hpp"
 #include "Drv/Ip/TcpServerSocket.hpp"
+#include "Os/Atomic.hpp"
 
 #define SEND_DATA_BUFFER_SIZE 1024
 
@@ -124,7 +125,7 @@ namespace Drv {
       Fw::Buffer m_data_buffer;
       Fw::Buffer m_data_buffer2;
       U8 m_data_storage[SEND_DATA_BUFFER_SIZE];
-      std::atomic<bool> m_spinner;
+      Os::AtomicBool m_spinner;
   };
 
 } // end namespace Drv

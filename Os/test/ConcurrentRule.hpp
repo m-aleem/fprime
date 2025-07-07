@@ -7,6 +7,7 @@
 #include "Os/Task.hpp"
 #include "Os/Mutex.hpp"
 #include "Os/Condition.hpp"
+#include "Os/Atomic.hpp"
 #include <list>
 #include <map>
 #include <iterator>
@@ -96,7 +97,7 @@ template<typename State> class ConcurrentRule : public STest::Rule<State> {
     Os::ConditionVariable m_condition;
 
     //! Condition guarded by condition variable
-    std::atomic<bool> m_condition_value;
+    Os::AtomicBool m_condition_value;
 
     //! A check to ensure this rule was launched asynchronously when using the blocking wait function
     bool is_asynchronous = false;

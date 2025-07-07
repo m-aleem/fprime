@@ -3,8 +3,7 @@
 // \brief stub definitions for Os::Mutex
 // ======================================================================
 #include "Os/Mutex.hpp"
-
-#include <atomic>
+#include "Os/Atomic.hpp"
 
 #ifndef OS_STUB_MUTEX_HPP
 #define OS_STUB_MUTEX_HPP
@@ -14,7 +13,7 @@ namespace Mutex {
 
 struct StubMutexHandle : public MutexHandle {
     //! True if the mutex has been acquired without being released.
-    std::atomic<bool> m_mutex_taken = {false};
+    Os::AtomicBool m_mutex_taken{false};
 };
 
 //! \brief Nonblocking stub implementation of Os::Mutex

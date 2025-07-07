@@ -17,7 +17,7 @@
 namespace Os {
 namespace Posix {
 namespace Task {
-    std::atomic<bool> PosixTask::s_permissions_reported(false);
+    Os::AtomicBool PosixTask::s_permissions_reported(false);
     static const int SCHED_POLICY = SCHED_RR;
 
     typedef void* (*pthread_func_ptr)(void*);

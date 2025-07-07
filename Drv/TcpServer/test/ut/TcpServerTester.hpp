@@ -16,6 +16,7 @@
 #include "TcpServerGTestBase.hpp"
 #include "Drv/TcpServer/TcpServerComponentImpl.hpp"
 #include "Drv/Ip/TcpClientSocket.hpp"
+#include "Os/Atomic.hpp"
 
 #define SEND_DATA_BUFFER_SIZE 1024
 
@@ -127,7 +128,7 @@ namespace Drv {
       TcpServerComponentImpl component;
       Fw::Buffer m_data_buffer;
       U8 m_data_storage[SEND_DATA_BUFFER_SIZE];
-      std::atomic<bool> m_spinner;
+      Os::AtomicBool m_spinner;
 
   };
 

@@ -7,7 +7,7 @@
 #ifndef Svc_DpManager_HPP
 #define Svc_DpManager_HPP
 
-#include <atomic>
+#include "Os/Atomic.hpp"
 
 #include "Svc/DpManager/DpManagerComponentAc.hpp"
 #include "config/FppConstantsAc.hpp"
@@ -117,10 +117,10 @@ class DpManager final : public DpManagerComponentBase {
     // ----------------------------------------------------------------------
 
     //! The number of successful buffer allocations
-    std::atomic<U32> numSuccessfulAllocations;
+    Os::AtomicU32 numSuccessfulAllocations;
 
     //! The number of failed buffer allocations
-    std::atomic<U32> numFailedAllocations;
+    Os::AtomicU32 numFailedAllocations;
 
     //! The number of data products handled
     U32 numDataProducts;
