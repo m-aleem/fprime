@@ -117,9 +117,9 @@ namespace Fw {
       if (time1.getTimeBase() != time2.getTimeBase()) {
           return INCOMPARABLE;
       }
-      if (time1.getContext() != time2.getContext()) {
-          return INCOMPARABLE;
-      }
+
+      // Do not compare time context
+
       const U32 s1 = time1.getSeconds();
       const U32 s2 = time2.getSeconds();
       const U32 us1 = time1.getUSeconds();

@@ -479,12 +479,7 @@ Signal FpySequencer::checkShouldWake() {
         return Signal::result_timeOpFailed;
     }
 
-    if (currentTime.getContext() != this->m_runtime.wakeupTime.getContext()) {
-        // cannot compare these times.
-        this->log_WARNING_HI_MismatchedTimeContext(currentTime.getContext(), this->m_runtime.wakeupTime.getContext());
-
-        return Signal::result_timeOpFailed;
-    }
+    // Do not compare time context
 
     if (currentTime < this->m_runtime.wakeupTime) {
         // not time to wake up!
@@ -513,12 +508,7 @@ Signal FpySequencer::checkStatementTimeout() {
         return Signal::result_timeOpFailed;
     }
 
-    if (currentTime.getContext() != this->m_runtime.currentStatementDispatchTime.getContext()) {
-        // can't compare time ctx. must have changed
-        this->log_WARNING_HI_MismatchedTimeContext(currentTime.getContext(),
-                                                   this->m_runtime.currentStatementDispatchTime.getContext());
-        return Signal::result_timeOpFailed;
-    }
+    // Do not compare time context
 
     if (this->m_runtime.currentStatementDispatchTime.getSeconds() > currentTime.getSeconds()) {
         // somehow we've gone back in time... just ignore it and move on. should get fixed
