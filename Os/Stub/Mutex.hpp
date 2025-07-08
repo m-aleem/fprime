@@ -4,7 +4,7 @@
 // ======================================================================
 #include "Os/Mutex.hpp"
 
-#include <atomic>
+#include "Os/std/atomic.hpp"
 
 #ifndef OS_STUB_MUTEX_HPP
 #define OS_STUB_MUTEX_HPP

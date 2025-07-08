@@ -7,8 +7,7 @@
 #ifndef Svc_DpManager_HPP
 #define Svc_DpManager_HPP
 
-#include <atomic>
-
+#include "Os/std/atomic.hpp"
 #include "Svc/DpManager/DpManagerComponentAc.hpp"
 #include "config/FppConstantsAc.hpp"
 

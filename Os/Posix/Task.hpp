@@ -5,7 +5,7 @@
 #ifndef Os_Posix_Task_hpp_
 #define Os_Posix_Task_hpp_
 
-#include <atomic>
+#include "Os/std/atomic.hpp"
 #include <pthread.h>
 #include <Os/Task.hpp>
 

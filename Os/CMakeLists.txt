@@ -113,6 +113,7 @@ add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Posix")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Generic")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Linux")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Darwin")
+add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/std")
 
 register_fprime_module(
       Os
