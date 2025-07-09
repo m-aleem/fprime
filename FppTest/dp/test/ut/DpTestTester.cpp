@@ -1,5 +1,5 @@
 // ======================================================================
-// \title  DpTestTester.hpp
+// \title  DpTestTester.cpp
 // \author bocchino
 // \brief  cpp file for DpTest test harness implementation class
 // ======================================================================
