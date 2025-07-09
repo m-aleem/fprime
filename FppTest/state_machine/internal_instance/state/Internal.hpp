@@ -14,16 +14,7 @@ namespace FppTest {
 
 namespace SmInstanceState {
 
-class InternalTester;
-
 class Internal : public InternalComponentBase {
-  public:
-    // ----------------------------------------------------------------------
-    // Friend classes
-    // ----------------------------------------------------------------------
-
-    //! Friend class for white-box testing
-    friend class InternalTester;
     // ----------------------------------------------------------------------
     // Constants
     // ----------------------------------------------------------------------
@@ -69,6 +60,22 @@ class Internal : public InternalComponentBase {
                                            FppTest_SmState_Internal::Signal signal  //!< The signal
                                            ) override;
 
+  public:
+    // ----------------------------------------------------------------------
+    // Tests
+    // ----------------------------------------------------------------------
+
+    //! Test initial transition
+    void testInit();
+
+    //! Test internal transition in S2
+    void testS2_internal();
+
+    //! Test transition S2 to S3
+    void testS2_to_S3();
+
+    //! Test internal transition in S3
+    void testS3_internal();
 
   private:
     // ----------------------------------------------------------------------

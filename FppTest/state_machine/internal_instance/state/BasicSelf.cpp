@@ -30,6 +30,28 @@ void BasicSelf::FppTest_SmState_BasicSelf_action_a(SmId smId, FppTest_SmState_Ba
     this->m_smStateBasicSelf_action_a_history.push(signal);
 }
 
+// ----------------------------------------------------------------------
+// Tests
+// ----------------------------------------------------------------------
+
+void BasicSelf::test() {
+    this->m_smStateBasicSelf_action_a_history.clear();
+    this->init(queueDepth, instanceId);
+    ASSERT_EQ(this->smStateBasicSelf_getState(), SmState_BasicSelf::State::S);
+    ASSERT_EQ(this->m_smStateBasicSelf_action_a_history.getSize(), 1);
+    ASSERT_EQ(this->m_smStateBasicSelf_action_a_history.getItemAt(0),
+              SmState_BasicSelf::Signal::__FPRIME_AC_INITIAL_TRANSITION);
+    this->m_smStateBasicSelf_action_a_history.clear();
+    this->smStateBasicSelf_sendSignal_s();
+    const auto status = this->doDispatch();
+    ASSERT_EQ(status, MSG_DISPATCH_OK);
+    ASSERT_EQ(this->smStateBasicSelf_getState(), SmState_BasicSelf::State::S);
+    const FwIndexType expectedSize = 6;
+    ASSERT_EQ(this->m_smStateBasicSelf_action_a_history.getSize(), expectedSize);
+    for (FwIndexType i = 0; i < expectedSize; i++) {
+        ASSERT_EQ(this->m_smStateBasicSelf_action_a_history.getItemAt(i), SmState_BasicSelf::Signal::s);
+    }
+}
 
 }  // namespace SmInstanceState
 

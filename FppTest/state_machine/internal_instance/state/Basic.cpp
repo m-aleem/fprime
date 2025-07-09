@@ -52,6 +52,68 @@ void Basic ::FppTest_SmState_Basic_action_a(SmId smId, FppTest_SmState_Basic::Si
     }
 }
 
+// ----------------------------------------------------------------------
+// Tests
+// ----------------------------------------------------------------------
+
+void Basic::test() {
+    this->m_basic1_action_a_history.clear();
+    this->m_smStateBasic1_action_a_history.clear();
+    this->init(queueDepth, instanceId);
+    ASSERT_EQ(this->basic1_getState(), Basic_Basic::State::S);
+    ASSERT_EQ(this->smStateBasic1_getState(), SmState_Basic::State::S);
+    ASSERT_EQ(this->m_basic1_action_a_history.getSize(), 0);
+    ASSERT_EQ(this->m_basic2_action_a_history.getSize(), 0);
+    ASSERT_EQ(this->m_smStateBasic1_action_a_history.getSize(), 0);
+    {
+        // Send signal s to basic1
+        this->basic1_sendSignal_s();
+        const auto status = this->doDispatch();
+        ASSERT_EQ(status, MSG_DISPATCH_OK);
+        ASSERT_EQ(this->basic1_getState(), Basic_Basic::State::T);
+        const FwIndexType expectedSize = 6;
+        ASSERT_EQ(this->m_basic1_action_a_history.getSize(), expectedSize);
+        for (FwIndexType i = 0; i < expectedSize; i++) {
+            ASSERT_EQ(this->m_basic1_action_a_history.getItemAt(i), Basic_Basic::Signal::s);
+        }
+    }
+    {
+        // Send signal s to basic2
+        this->basic2_sendSignal_s();
+        const auto status = this->doDispatch();
+        ASSERT_EQ(status, MSG_DISPATCH_OK);
+        ASSERT_EQ(this->basic2_getState(), Basic_Basic::State::T);
+        const FwIndexType expectedSize = 6;
+        ASSERT_EQ(this->m_basic2_action_a_history.getSize(), expectedSize);
+        for (FwIndexType i = 0; i < expectedSize; i++) {
+            ASSERT_EQ(this->m_basic2_action_a_history.getItemAt(i), Basic_Basic::Signal::s);
+        }
+    }
+    {
+        // Send signal s to smStateBasic1
+        this->smStateBasic1_sendSignal_s();
+        const auto status = this->doDispatch();
+        ASSERT_EQ(status, MSG_DISPATCH_OK);
+        ASSERT_EQ(this->smStateBasic1_getState(), SmState_Basic::State::T);
+        const FwIndexType expectedSize = 6;
+        ASSERT_EQ(this->m_smStateBasic1_action_a_history.getSize(), expectedSize);
+        for (FwIndexType i = 0; i < expectedSize; i++) {
+            ASSERT_EQ(this->m_smStateBasic1_action_a_history.getItemAt(i), SmState_Basic::Signal::s);
+        }
+    }
+    {
+        // Send signal s to smStateBasic2
+        this->smStateBasic2_sendSignal_s();
+        const auto status = this->doDispatch();
+        ASSERT_EQ(status, MSG_DISPATCH_OK);
+        ASSERT_EQ(this->smStateBasic2_getState(), SmState_Basic::State::T);
+        const FwIndexType expectedSize = 6;
+        ASSERT_EQ(this->m_smStateBasic2_action_a_history.getSize(), expectedSize);
+        for (FwIndexType i = 0; i < expectedSize; i++) {
+            ASSERT_EQ(this->m_smStateBasic2_action_a_history.getItemAt(i), SmState_Basic::Signal::s);
+        }
+    }
+}
 
 }  // namespace SmInstanceState
 

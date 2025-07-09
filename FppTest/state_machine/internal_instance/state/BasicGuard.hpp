@@ -14,10 +14,7 @@ namespace FppTest {
 
 namespace SmInstanceState {
 
-class BasicGuardTester;
-
 class BasicGuard : public BasicGuardComponentBase {
-  friend class BasicGuardTester;
   private:
     // ----------------------------------------------------------------------
     // Constants
@@ -76,7 +73,16 @@ class BasicGuard : public BasicGuardComponentBase {
                                             FppTest_SmState_BasicGuard::Signal signal  //!< The signal
     ) const override;
 
+  public:
+    // ----------------------------------------------------------------------
+    // Tests
+    // ----------------------------------------------------------------------
 
+    //! Test with true guard
+    void testTrue();
+
+    //! Test with false guard
+    void testFalse();
 
   private:
     // ----------------------------------------------------------------------

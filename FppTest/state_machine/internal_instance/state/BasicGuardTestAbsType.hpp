@@ -14,16 +14,7 @@ namespace FppTest {
 
 namespace SmInstanceState {
 
-class BasicGuardTestAbsTypeTester;
-
 class BasicGuardTestAbsType : public BasicGuardTestAbsTypeComponentBase {
-  public:
-    // ----------------------------------------------------------------------
-    // Friend classes
-    // ----------------------------------------------------------------------
-
-    //! Friend class for white-box testing
-    friend class BasicGuardTestAbsTypeTester;
   private:
     // ----------------------------------------------------------------------
     // Constants
@@ -97,6 +88,19 @@ class BasicGuardTestAbsType : public BasicGuardTestAbsTypeComponentBase {
                                                                Fw::SerializeBufferBase& buffer  //!< The message buffer
                                                                ) override;
 
+  public:
+    // ----------------------------------------------------------------------
+    // Tests
+    // ----------------------------------------------------------------------
+
+    //! Test with true guard
+    void testTrue();
+
+    //! Test with false guard
+    void testFalse();
+
+    //! Test with queue overflow
+    void testOverflow();
 
   private:
     // ----------------------------------------------------------------------

@@ -14,16 +14,7 @@ namespace FppTest {
 
 namespace SmInstanceState {
 
-class PolymorphismTester;
-
 class Polymorphism : public PolymorphismComponentBase {
-  public:
-    // ----------------------------------------------------------------------
-    // Friend classes
-    // ----------------------------------------------------------------------
-
-    //! Friend class for white-box testing
-    friend class PolymorphismTester;
     // ----------------------------------------------------------------------
     // Constants
     // ----------------------------------------------------------------------
@@ -54,6 +45,22 @@ class Polymorphism : public PolymorphismComponentBase {
     //! The type FppTest_SmState_Polymorphism
     using SmState_Polymorphism = FppTest_SmState_Polymorphism;
 
+  public:
+    // ----------------------------------------------------------------------
+    // Tests
+    // ----------------------------------------------------------------------
+
+    //! Test initial transition
+    void testInit();
+
+    //! Test polymorphic transition in S2
+    void testS2_poly();
+
+    //! Test transition from S2 to S3
+    void testS2_to_S3();
+
+    //! Test polymorphic transition in S3
+    void testS3_poly();
 };
 
 }  // namespace SmInstanceState

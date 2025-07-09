@@ -66,6 +66,64 @@ void BasicGuardTestAbsType::smStateBasicGuardTestAbsType_stateMachineOverflowHoo
     ASSERT_EQ(value, this->m_value);
 }
 
+// ----------------------------------------------------------------------
+// Tests
+// ----------------------------------------------------------------------
+
+void BasicGuardTestAbsType::testFalse() {
+    this->m_smStateBasicGuardTestAbsType_action_a_history.clear();
+    this->m_smStateBasicGuardTestAbsType_guard_g.reset();
+    this->init(queueDepth, instanceId);
+    ASSERT_EQ(this->smStateBasicGuardTestAbsType_getState(), SmState_BasicGuardTestAbsType::State::S);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_action_a_history.getSize(), 0);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_guard_g.getCallHistory().getSize(), 0);
+    this->m_value = SmHarness::Pick::testAbsType();
+    this->smStateBasicGuardTestAbsType_sendSignal_s(this->m_value);
+    ASSERT_FALSE(this->m_hookCalled);
+    const auto status = this->doDispatch();
+    ASSERT_EQ(status, MSG_DISPATCH_OK);
+    ASSERT_EQ(this->smStateBasicGuardTestAbsType_getState(), SmState_BasicGuardTestAbsType::State::S);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_guard_g.getCallHistory().getSize(), 1);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_guard_g.getCallHistory().getSignals().getItemAt(0),
+              SmState_BasicGuardTestAbsType::Signal::s);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_guard_g.getCallHistory().getValues().getItemAt(0), this->m_value);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_action_a_history.getSize(), 0);
+}
+
+void BasicGuardTestAbsType::testTrue() {
+    this->m_smStateBasicGuardTestAbsType_action_a_history.clear();
+    this->m_smStateBasicGuardTestAbsType_guard_g.reset();
+    this->m_smStateBasicGuardTestAbsType_guard_g.setReturnValue(true);
+    this->init(queueDepth, instanceId);
+    ASSERT_EQ(this->smStateBasicGuardTestAbsType_getState(), SmState_BasicGuardTestAbsType::State::S);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_action_a_history.getSize(), 0);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_guard_g.getCallHistory().getSize(), 0);
+    this->m_value = SmHarness::Pick::testAbsType();
+    this->smStateBasicGuardTestAbsType_sendSignal_s(this->m_value);
+    ASSERT_FALSE(this->m_hookCalled);
+    const auto status = this->doDispatch();
+    ASSERT_EQ(status, MSG_DISPATCH_OK);
+    ASSERT_EQ(this->smStateBasicGuardTestAbsType_getState(), SmState_BasicGuardTestAbsType::State::T);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_guard_g.getCallHistory().getSize(), 1);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_guard_g.getCallHistory().getSignals().getItemAt(0),
+              SmState_BasicGuardTestAbsType::Signal::s);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_guard_g.getCallHistory().getValues().getItemAt(0), this->m_value);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_action_a_history.getSize(), 1);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_action_a_history.getSignals().getItemAt(0),
+              SmState_BasicGuardTestAbsType::Signal::s);
+    ASSERT_EQ(this->m_smStateBasicGuardTestAbsType_action_a_history.getValues().getItemAt(0), this->m_value);
+}
+
+void BasicGuardTestAbsType::testOverflow() {
+    this->init(queueDepth, instanceId);
+    this->m_value = SmHarness::Pick::testAbsType();
+    for (FwSizeType i = 0; i < queueDepth; i++) {
+        this->smStateBasicGuardTestAbsType_sendSignal_s(this->m_value);
+        ASSERT_FALSE(this->m_hookCalled);
+    }
+    this->smStateBasicGuardTestAbsType_sendSignal_s(this->m_value);
+    ASSERT_TRUE(this->m_hookCalled);
+}
 
 }  // namespace SmInstanceState
 

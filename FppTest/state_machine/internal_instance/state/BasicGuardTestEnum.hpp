@@ -14,16 +14,7 @@ namespace FppTest {
 
 namespace SmInstanceState {
 
-class BasicGuardTestEnumTester;
-
 class BasicGuardTestEnum : public BasicGuardTestEnumComponentBase {
-  public:
-    // ----------------------------------------------------------------------
-    // Friend classes
-    // ----------------------------------------------------------------------
-
-    //! Friend class for white-box testing
-    friend class BasicGuardTestEnumTester;
   private:
     // ----------------------------------------------------------------------
     // Constants
@@ -84,6 +75,16 @@ class BasicGuardTestEnum : public BasicGuardTestEnumComponentBase {
                                                     const SmHarness::TestEnum& value                    //!< The value
     ) const override;
 
+  public:
+    // ----------------------------------------------------------------------
+    // Tests
+    // ----------------------------------------------------------------------
+
+    //! Test with true guard
+    void testTrue();
+
+    //! Test with false guard
+    void testFalse();
 
   private:
     // ----------------------------------------------------------------------

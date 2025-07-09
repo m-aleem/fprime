@@ -40,7 +40,38 @@ bool BasicGuard ::FppTest_SmState_BasicGuard_guard_g(SmId smId, FppTest_SmState_
     return this->m_smStateBasicGuard_guard_g.call(signal);
 }
 
+// ----------------------------------------------------------------------
+// Tests
+// ----------------------------------------------------------------------
 
+void BasicGuard::testFalse() {
+    this->m_smStateBasicGuard_action_a_history.clear();
+    this->m_smStateBasicGuard_guard_g.reset();
+    this->init(queueDepth, instanceId);
+    ASSERT_EQ(this->smStateBasicGuard_getState(), SmState_BasicGuard::State::S);
+    ASSERT_EQ(this->m_smStateBasicGuard_action_a_history.getSize(), 0);
+    ASSERT_EQ(this->m_smStateBasicGuard_guard_g.getCallHistory().getSize(), 0);
+    this->smStateBasicGuard_sendSignal_s();
+    const auto status = this->doDispatch();
+    ASSERT_EQ(status, MSG_DISPATCH_OK);
+    ASSERT_EQ(this->smStateBasicGuard_getState(), SmState_BasicGuard::State::S);
+    this->checkActionsAndGuards(0, 1);
+}
+
+void BasicGuard::testTrue() {
+    this->m_smStateBasicGuard_action_a_history.clear();
+    this->m_smStateBasicGuard_guard_g.reset();
+    this->m_smStateBasicGuard_guard_g.setReturnValue(true);
+    this->init(queueDepth, instanceId);
+    ASSERT_EQ(this->smStateBasicGuard_getState(), SmState_BasicGuard::State::S);
+    ASSERT_EQ(this->m_smStateBasicGuard_action_a_history.getSize(), 0);
+    ASSERT_EQ(this->m_smStateBasicGuard_guard_g.getCallHistory().getSize(), 0);
+    this->smStateBasicGuard_sendSignal_s();
+    const auto status = this->doDispatch();
+    ASSERT_EQ(status, MSG_DISPATCH_OK);
+    ASSERT_EQ(this->smStateBasicGuard_getState(), SmState_BasicGuard::State::T);
+    this->checkActionsAndGuards(6, 1);
+}
 
 // ----------------------------------------------------------------------
 // Helper functions

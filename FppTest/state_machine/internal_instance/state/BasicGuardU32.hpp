@@ -14,16 +14,7 @@ namespace FppTest {
 
 namespace SmInstanceState {
 
-class BasicGuardU32Tester;
-
 class BasicGuardU32 : public BasicGuardU32ComponentBase {
-  public:
-    // ----------------------------------------------------------------------
-    // Friend classes
-    // ----------------------------------------------------------------------
-
-    //! Friend class for white-box testing
-    friend class BasicGuardU32Tester;
   private:
     // ----------------------------------------------------------------------
     // Constants
@@ -84,6 +75,16 @@ class BasicGuardU32 : public BasicGuardU32ComponentBase {
                                                U32 value                                      //!< The value
     ) const override;
 
+  public:
+    // ----------------------------------------------------------------------
+    // Tests
+    // ----------------------------------------------------------------------
+
+    //! Test with true guard
+    void testTrue();
+
+    //! Test with false guard
+    void testFalse();
 
   private:
     // ----------------------------------------------------------------------
