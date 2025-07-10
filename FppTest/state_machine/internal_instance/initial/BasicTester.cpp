@@ -1,12 +1,12 @@
 // ======================================================================
-// \title  Basic.cpp
+// \title  BasicTester.cpp
 // \author bocchino
-// \brief  cpp file for Basic component implementation class
+// \brief  cpp file for BasicTester component implementation class
 // ======================================================================
 
 #include <gtest/gtest.h>
 
-#include "FppTest/state_machine/internal_instance/initial/Basic.hpp"
+#include "FppTest/state_machine/internal_instance/initial/BasicTester.hpp"
 
 namespace FppTest {
 
@@ -16,16 +16,16 @@ namespace SmInstanceInitial {
 // Component construction and destruction
 // ----------------------------------------------------------------------
 
-Basic::Basic(const char* const compName)
+BasicTester::BasicTester(const char* const compName)
     : BasicComponentBase(compName), m_basic1_action_a_history(), m_smInitialBasic1_action_a_history() {}
 
-Basic::~Basic() {}
+BasicTester::~BasicTester() {}
 
 // ----------------------------------------------------------------------
 // Handler implementations for typed input ports
 // ----------------------------------------------------------------------
 
-void Basic::schedIn_handler(FwIndexType portNum, U32 context) {
+void BasicTester::schedIn_handler(FwIndexType portNum, U32 context) {
     // Nothing to do
 }
 
@@ -33,7 +33,7 @@ void Basic::schedIn_handler(FwIndexType portNum, U32 context) {
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void Basic::FppTest_SmInitial_Basic_action_a(SmId smId, FppTest_SmInitial_Basic::Signal signal) {
+void BasicTester::FppTest_SmInitial_Basic_action_a(SmId smId, FppTest_SmInitial_Basic::Signal signal) {
     ASSERT_TRUE((smId == SmId::smInitialBasic1) || (smId == SmId::smInitialBasic2));
     if (smId == SmId::smInitialBasic1) {
         this->m_smInitialBasic1_action_a_history.push(signal);
@@ -42,7 +42,7 @@ void Basic::FppTest_SmInitial_Basic_action_a(SmId smId, FppTest_SmInitial_Basic:
     }
 }
 
-void Basic::FppTest_SmInstanceInitial_Basic_Basic_action_a(SmId smId,
+void BasicTester::FppTest_SmInstanceInitial_Basic_Basic_action_a(SmId smId,
                                                            FppTest_SmInstanceInitial_Basic_Basic::Signal signal) {
     ASSERT_TRUE((smId == SmId::basic1) || (smId == SmId::basic2));
     if (smId == SmId::basic1) {
@@ -56,7 +56,7 @@ void Basic::FppTest_SmInstanceInitial_Basic_Basic_action_a(SmId smId,
 // Tests
 // ----------------------------------------------------------------------
 
-void Basic::test() {
+void BasicTester::test() {
     this->m_basic1_action_a_history.clear();
     this->m_smInitialBasic1_action_a_history.clear();
     ASSERT_EQ(this->basic1_getState(), Basic_Basic::State::__FPRIME_AC_UNINITIALIZED);

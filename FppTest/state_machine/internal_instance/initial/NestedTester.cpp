@@ -1,12 +1,12 @@
 // ======================================================================
-// \title  Nested.cpp
+// \title  NestedTester.cpp
 // \author bocchino
-// \brief  cpp file for Nested component implementation class
+// \brief  cpp file for NestedTester component implementation class
 // ======================================================================
 
 #include <gtest/gtest.h>
 
-#include "FppTest/state_machine/internal_instance/initial/Nested.hpp"
+#include "FppTest/state_machine/internal_instance/initial/NestedTester.hpp"
 
 namespace FppTest {
 
@@ -16,21 +16,21 @@ namespace SmInstanceInitial {
 // Component construction and destruction
 // ----------------------------------------------------------------------
 
-Nested::Nested(const char* const compName)
+NestedTester::NestedTester(const char* const compName)
     : NestedComponentBase(compName), m_nested_action_a_history(), m_smInitialNested_action_a_history() {}
 
-Nested::~Nested() {}
+NestedTester::~NestedTester() {}
 
 // ----------------------------------------------------------------------
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void Nested::FppTest_SmInitial_Nested_action_a(SmId smId, FppTest_SmInitial_Nested::Signal signal) {
+void NestedTester::FppTest_SmInitial_Nested_action_a(SmId smId, FppTest_SmInitial_Nested::Signal signal) {
     ASSERT_EQ(smId, SmId::smInitialNested);
     this->m_smInitialNested_action_a_history.push(signal);
 }
 
-void Nested::FppTest_SmInstanceInitial_Nested_Nested_action_a(SmId smId,
+void NestedTester::FppTest_SmInstanceInitial_Nested_Nested_action_a(SmId smId,
                                                               FppTest_SmInstanceInitial_Nested_Nested::Signal signal) {
     ASSERT_EQ(smId, SmId::nested);
     this->m_nested_action_a_history.push(signal);
@@ -40,7 +40,7 @@ void Nested::FppTest_SmInstanceInitial_Nested_Nested_action_a(SmId smId,
 // Overflow hook implementations for internal state machines
 // ----------------------------------------------------------------------
 
-void Nested ::smInitialNested_stateMachineOverflowHook(SmId smId,
+void NestedTester ::smInitialNested_stateMachineOverflowHook(SmId smId,
                                                        FwEnumStoreType signal,
                                                        Fw::SerializeBufferBase& buffer) {
     // Nothing to do
@@ -50,7 +50,7 @@ void Nested ::smInitialNested_stateMachineOverflowHook(SmId smId,
 // Tests
 // ----------------------------------------------------------------------
 
-void Nested::test() {
+void NestedTester::test() {
     this->m_nested_action_a_history.clear();
     this->m_smInitialNested_action_a_history.clear();
     this->init(queueDepth, instanceId);

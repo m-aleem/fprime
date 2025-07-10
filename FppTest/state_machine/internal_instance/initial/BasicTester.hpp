@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  Basic.hpp
+// \title  BasicTester.hpp
 // \author bocchino
-// \brief  hpp file for Basic component implementation class
+// \brief  hpp file for BasicTester component implementation class
 // ======================================================================
 
 #ifndef FppTest_SmInstanceInitial_Basic_HPP
@@ -14,7 +14,7 @@ namespace FppTest {
 
 namespace SmInstanceInitial {
 
-class Basic : public BasicComponentBase {
+class BasicTester : public BasicComponentBase {
   private:
     // ----------------------------------------------------------------------
     // Constants
@@ -45,12 +45,12 @@ class Basic : public BasicComponentBase {
     // Component construction and destruction
     // ----------------------------------------------------------------------
 
-    //! Construct Basic object
-    Basic(const char* const compName  //!< The component name
+    //! Construct BasicTester object
+    BasicTester(const char* const compName  //!< The component name
     );
 
-    //! Destroy Basic object
-    ~Basic();
+    //! Destroy BasicTester object
+    ~BasicTester();
 
   private:
     // ----------------------------------------------------------------------

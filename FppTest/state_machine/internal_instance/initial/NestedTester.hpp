@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  Nested.hpp
+// \title  NestedTester.hpp
 // \author bocchino
-// \brief  hpp file for Nested component implementation class
+// \brief  hpp file for NestedTester component implementation class
 // ======================================================================
 
 #ifndef FppTest_SmInstanceInitial_Nested_HPP
@@ -14,7 +14,7 @@ namespace FppTest {
 
 namespace SmInstanceInitial {
 
-class Nested : public NestedComponentBase {
+class NestedTester : public NestedComponentBase {
   private:
     // ----------------------------------------------------------------------
     // Constants
@@ -45,12 +45,12 @@ class Nested : public NestedComponentBase {
     // Component construction and destruction
     // ----------------------------------------------------------------------
 
-    //! Construct Nested object
-    Nested(const char* const compName  //!< The component name
+    //! Construct NestedTester object
+    NestedTester(const char* const compName  //!< The component name
     );
 
-    //! Destroy Nested object
-    ~Nested();
+    //! Destroy NestedTester object
+    ~NestedTester();
 
   private:
     // ----------------------------------------------------------------------
