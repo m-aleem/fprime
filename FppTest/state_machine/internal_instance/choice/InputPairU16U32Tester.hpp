@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  InputPairU16U32.hpp
+// \title  InputPairU16U32Tester.hpp
 // \author bocchino
-// \brief  hpp file for InputPairU16U32 component implementation class
+// \brief  hpp file for InputPairU16U32Tester component implementation class
 // ======================================================================
 
 #ifndef FppTest_SmInstanceChoice_InputPairU16U32_HPP
@@ -14,7 +14,7 @@ namespace FppTest {
 
 namespace SmInstanceChoice {
 
-class InputPairU16U32 : public InputPairU16U32ComponentBase {
+class InputPairU16U32Tester : public InputPairU16U32ComponentBase {
   private:
     // ----------------------------------------------------------------------
     // Constants
@@ -42,12 +42,12 @@ class InputPairU16U32 : public InputPairU16U32ComponentBase {
     // Component construction and destruction
     // ----------------------------------------------------------------------
 
-    //! Construct InputPairU16U32 object
-    InputPairU16U32(const char* const compName  //!< The component name
+    //! Construct InputPairU16U32Tester object
+    InputPairU16U32Tester(const char* const compName  //!< The component name
     );
 
-    //! Destroy InputPairU16U32 object
-    ~InputPairU16U32();
+    //! Destroy InputPairU16U32Tester object
+    ~InputPairU16U32Tester();
 
   private:
     // ----------------------------------------------------------------------

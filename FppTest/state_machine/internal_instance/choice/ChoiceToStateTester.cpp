@@ -1,12 +1,12 @@
 // ======================================================================
-// \title  ChoiceToState.cpp
+// \title  ChoiceToStateTester.cpp
 // \author bocchino
-// \brief  cpp file for ChoiceToState component implementation class
+// \brief  cpp file for ChoiceToStateTester component implementation class
 // ======================================================================
 
 #include <gtest/gtest.h>
 
-#include "FppTest/state_machine/internal_instance/choice/ChoiceToState.hpp"
+#include "FppTest/state_machine/internal_instance/choice/ChoiceToStateTester.hpp"
 #include "Fw/Types/Assert.hpp"
 
 namespace FppTest {
@@ -17,35 +17,35 @@ namespace SmInstanceChoice {
 // Component construction and destruction
 // ----------------------------------------------------------------------
 
-ChoiceToState::ChoiceToState(const char* const compName)
+ChoiceToStateTester::ChoiceToStateTester(const char* const compName)
     : ChoiceToStateComponentBase(compName),
       m_smChoiceChoiceToState_actionHistory(),
       m_smChoiceChoiceToState_guard_g() {}
 
-ChoiceToState::~ChoiceToState() {}
+ChoiceToStateTester::~ChoiceToStateTester() {}
 
 // ----------------------------------------------------------------------
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void ChoiceToState::FppTest_SmChoice_ChoiceToState_action_exitS1(SmId smId,
+void ChoiceToStateTester::FppTest_SmChoice_ChoiceToState_action_exitS1(SmId smId,
                                                                  FppTest_SmChoice_ChoiceToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceChoiceToState);
     this->m_smChoiceChoiceToState_actionHistory.push(signal, ActionId::EXIT_S1);
 }
 
-void ChoiceToState::FppTest_SmChoice_ChoiceToState_action_a(SmId smId, FppTest_SmChoice_ChoiceToState::Signal signal) {
+void ChoiceToStateTester::FppTest_SmChoice_ChoiceToState_action_a(SmId smId, FppTest_SmChoice_ChoiceToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceChoiceToState);
     this->m_smChoiceChoiceToState_actionHistory.push(signal, ActionId::A);
 }
 
-void ChoiceToState::FppTest_SmChoice_ChoiceToState_action_enterS2(SmId smId,
+void ChoiceToStateTester::FppTest_SmChoice_ChoiceToState_action_enterS2(SmId smId,
                                                                   FppTest_SmChoice_ChoiceToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceChoiceToState);
     this->m_smChoiceChoiceToState_actionHistory.push(signal, ActionId::ENTER_S2);
 }
 
-void ChoiceToState::FppTest_SmChoice_ChoiceToState_action_enterS3(SmId smId,
+void ChoiceToStateTester::FppTest_SmChoice_ChoiceToState_action_enterS3(SmId smId,
                                                                   FppTest_SmChoice_ChoiceToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceChoiceToState);
     this->m_smChoiceChoiceToState_actionHistory.push(signal, ActionId::ENTER_S3);
@@ -55,7 +55,7 @@ void ChoiceToState::FppTest_SmChoice_ChoiceToState_action_enterS3(SmId smId,
 // Implementations for internal state machine guards
 // ----------------------------------------------------------------------
 
-bool ChoiceToState::FppTest_SmChoice_ChoiceToState_guard_g(SmId smId,
+bool ChoiceToStateTester::FppTest_SmChoice_ChoiceToState_guard_g(SmId smId,
                                                            FppTest_SmChoice_ChoiceToState::Signal signal) const {
     FW_ASSERT(smId == SmId::smChoiceChoiceToState, static_cast<FwAssertArgType>(smId));
     return this->m_smChoiceChoiceToState_guard_g.call(signal);
@@ -65,7 +65,7 @@ bool ChoiceToState::FppTest_SmChoice_ChoiceToState_guard_g(SmId smId,
 // Tests
 // ----------------------------------------------------------------------
 
-void ChoiceToState::testTrue() {
+void ChoiceToStateTester::testTrue() {
     this->m_smChoiceChoiceToState_actionHistory.clear();
     this->m_smChoiceChoiceToState_guard_g.reset();
     this->m_smChoiceChoiceToState_guard_g.setReturnValue(true);
@@ -93,7 +93,7 @@ void ChoiceToState::testTrue() {
     ASSERT_EQ(this->smChoiceChoiceToState_getState(), SmChoice_ChoiceToState::State::S2_S3);
 }
 
-void ChoiceToState::testFalse() {
+void ChoiceToStateTester::testFalse() {
     this->m_smChoiceChoiceToState_actionHistory.clear();
     this->m_smChoiceChoiceToState_guard_g.reset();
     this->init(queueDepth, instanceId);

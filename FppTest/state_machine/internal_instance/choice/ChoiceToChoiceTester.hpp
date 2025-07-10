@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  ChoiceToChoice.hpp
+// \title  ChoiceToChoiceTester.hpp
 // \author bocchino
-// \brief  hpp file for ChoiceToChoice component implementation class
+// \brief  hpp file for ChoiceToChoiceTester component implementation class
 // ======================================================================
 
 #ifndef FppTest_SmInstanceChoice_ChoiceToChoice_HPP
@@ -14,7 +14,7 @@ namespace FppTest {
 
 namespace SmInstanceChoice {
 
-class ChoiceToChoice : public ChoiceToChoiceComponentBase {
+class ChoiceToChoiceTester : public ChoiceToChoiceComponentBase {
   private:
     // ----------------------------------------------------------------------
     // Constants
@@ -49,12 +49,12 @@ class ChoiceToChoice : public ChoiceToChoiceComponentBase {
     // Component construction and destruction
     // ----------------------------------------------------------------------
 
-    //! Construct ChoiceToChoice object
-    ChoiceToChoice(const char* const compName  //!< The component name
+    //! Construct ChoiceToChoiceTester object
+    ChoiceToChoiceTester(const char* const compName  //!< The component name
     );
 
-    //! Destroy ChoiceToChoice object
-    ~ChoiceToChoice();
+    //! Destroy ChoiceToChoiceTester object
+    ~ChoiceToChoiceTester();
 
   private:
     // ----------------------------------------------------------------------

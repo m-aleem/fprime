@@ -1,7 +1,7 @@
 // ======================================================================
-// \title  BasicU32.hpp
+// \title  BasicU32Tester.hpp
 // \author bocchino
-// \brief  hpp file for BasicU32 component implementation class
+// \brief  hpp file for BasicU32Tester component implementation class
 // ======================================================================
 
 #ifndef FppTest_SmInstanceChoice_BasicU32_HPP
@@ -14,7 +14,7 @@ namespace FppTest {
 
 namespace SmInstanceChoice {
 
-class BasicU32 : public BasicU32ComponentBase {
+class BasicU32Tester : public BasicU32ComponentBase {
   private:
     // ----------------------------------------------------------------------
     // Constants
@@ -42,12 +42,12 @@ class BasicU32 : public BasicU32ComponentBase {
     // Component construction and destruction
     // ----------------------------------------------------------------------
 
-    //! Construct BasicU32 object
-    BasicU32(const char* const compName  //!< The component name
+    //! Construct BasicU32Tester object
+    BasicU32Tester(const char* const compName  //!< The component name
     );
 
-    //! Destroy BasicU32 object
-    ~BasicU32();
+    //! Destroy BasicU32Tester object
+    ~BasicU32Tester();
 
   private:
     // ----------------------------------------------------------------------

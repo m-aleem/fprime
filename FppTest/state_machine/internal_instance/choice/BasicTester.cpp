@@ -1,12 +1,12 @@
 // ======================================================================
-// \title  Basic.cpp
+// \title  BasicTester.cpp
 // \author bocchino
-// \brief  cpp file for Basic component implementation class
+// \brief  cpp file for BasicTester component implementation class
 // ======================================================================
 
 #include <gtest/gtest.h>
 
-#include "FppTest/state_machine/internal_instance/choice/Basic.hpp"
+#include "FppTest/state_machine/internal_instance/choice/BasicTester.hpp"
 #include "Fw/Types/Assert.hpp"
 
 namespace FppTest {
@@ -17,7 +17,7 @@ namespace SmInstanceChoice {
 // Component construction and destruction
 // ----------------------------------------------------------------------
 
-Basic::Basic(const char* const compName)
+BasicTester::BasicTester(const char* const compName)
     : BasicComponentBase(compName),
       m_basic_action_a_history(),
       m_basic_action_b_history(),
@@ -26,13 +26,13 @@ Basic::Basic(const char* const compName)
       m_smChoiceBasic_action_b_history(),
       m_smChoiceBasic_guard_g() {}
 
-Basic::~Basic() {}
+BasicTester::~BasicTester() {}
 
 // ----------------------------------------------------------------------
 // Handler implementations for typed input ports
 // ----------------------------------------------------------------------
 
-void Basic::schedIn_handler(FwIndexType portNum, U32 context) {
+void BasicTester::schedIn_handler(FwIndexType portNum, U32 context) {
     // Nothing to do
 }
 
@@ -40,24 +40,24 @@ void Basic::schedIn_handler(FwIndexType portNum, U32 context) {
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void Basic::FppTest_SmInstanceChoice_Basic_Basic_action_a(SmId smId,
+void BasicTester::FppTest_SmInstanceChoice_Basic_Basic_action_a(SmId smId,
                                                           FppTest_SmInstanceChoice_Basic_Basic::Signal signal) {
     ASSERT_EQ(smId, SmId::basic);
     this->m_basic_action_a_history.push(signal);
 }
 
-void Basic::FppTest_SmInstanceChoice_Basic_Basic_action_b(SmId smId,
+void BasicTester::FppTest_SmInstanceChoice_Basic_Basic_action_b(SmId smId,
                                                           FppTest_SmInstanceChoice_Basic_Basic::Signal signal) {
     ASSERT_EQ(smId, SmId::basic);
     this->m_basic_action_b_history.push(signal);
 }
 
-void Basic::FppTest_SmChoice_Basic_action_a(SmId smId, FppTest_SmChoice_Basic::Signal signal) {
+void BasicTester::FppTest_SmChoice_Basic_action_a(SmId smId, FppTest_SmChoice_Basic::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceBasic);
     this->m_smChoiceBasic_action_a_history.push(signal);
 }
 
-void Basic::FppTest_SmChoice_Basic_action_b(SmId smId, FppTest_SmChoice_Basic::Signal signal) {
+void BasicTester::FppTest_SmChoice_Basic_action_b(SmId smId, FppTest_SmChoice_Basic::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceBasic);
     this->m_smChoiceBasic_action_b_history.push(signal);
 }
@@ -66,13 +66,13 @@ void Basic::FppTest_SmChoice_Basic_action_b(SmId smId, FppTest_SmChoice_Basic::S
 // Implementations for internal state machine guards
 // ----------------------------------------------------------------------
 
-bool Basic::FppTest_SmInstanceChoice_Basic_Basic_guard_g(SmId smId,
+bool BasicTester::FppTest_SmInstanceChoice_Basic_Basic_guard_g(SmId smId,
                                                          FppTest_SmInstanceChoice_Basic_Basic::Signal signal) const {
     FW_ASSERT(smId == SmId::basic, static_cast<FwAssertArgType>(smId));
     return this->m_basic_guard_g.call(signal);
 }
 
-bool Basic::FppTest_SmChoice_Basic_guard_g(SmId smId, FppTest_SmChoice_Basic::Signal signal) const {
+bool BasicTester::FppTest_SmChoice_Basic_guard_g(SmId smId, FppTest_SmChoice_Basic::Signal signal) const {
     FW_ASSERT(smId == SmId::smChoiceBasic, static_cast<FwAssertArgType>(smId));
     return this->m_smChoiceBasic_guard_g.call(signal);
 }
@@ -81,7 +81,7 @@ bool Basic::FppTest_SmChoice_Basic_guard_g(SmId smId, FppTest_SmChoice_Basic::Si
 // Tests
 // ----------------------------------------------------------------------
 
-void Basic::testBasicTrue() {
+void BasicTester::testBasicTrue() {
     this->m_basic_action_a_history.clear();
     this->m_basic_action_b_history.clear();
     this->m_basic_guard_g.reset();
@@ -102,7 +102,7 @@ void Basic::testBasicTrue() {
     ASSERT_EQ(this->basic_getState(), Basic_Basic::State::S2);
 }
 
-void Basic::testBasicFalse() {
+void BasicTester::testBasicFalse() {
     this->m_basic_action_a_history.clear();
     this->m_basic_action_b_history.clear();
     this->m_basic_guard_g.reset();
@@ -122,7 +122,7 @@ void Basic::testBasicFalse() {
     ASSERT_EQ(this->basic_getState(), Basic_Basic::State::S3);
 }
 
-void Basic::testSmChoiceBasicTrue() {
+void BasicTester::testSmChoiceBasicTrue() {
     this->m_smChoiceBasic_action_a_history.clear();
     this->m_smChoiceBasic_action_b_history.clear();
     this->m_smChoiceBasic_guard_g.reset();
@@ -143,7 +143,7 @@ void Basic::testSmChoiceBasicTrue() {
     ASSERT_EQ(this->smChoiceBasic_getState(), SmChoice_Basic::State::S2);
 }
 
-void Basic::testSmChoiceBasicFalse() {
+void BasicTester::testSmChoiceBasicFalse() {
     this->m_smChoiceBasic_action_a_history.clear();
     this->m_smChoiceBasic_action_b_history.clear();
     this->m_smChoiceBasic_guard_g.reset();

@@ -1,12 +1,12 @@
 // ======================================================================
-// \title  InputPairU16U32.cpp
+// \title  InputPairU16U32Tester.cpp
 // \author bocchino
-// \brief  cpp file for InputPairU16U32 component implementation class
+// \brief  cpp file for InputPairU16U32Tester component implementation class
 // ======================================================================
 
 #include <gtest/gtest.h>
 
-#include "FppTest/state_machine/internal_instance/choice/InputPairU16U32.hpp"
+#include "FppTest/state_machine/internal_instance/choice/InputPairU16U32Tester.hpp"
 #include "Fw/Types/Assert.hpp"
 
 namespace FppTest {
@@ -17,18 +17,18 @@ namespace SmInstanceChoice {
 // Component construction and destruction
 // ----------------------------------------------------------------------
 
-InputPairU16U32 ::InputPairU16U32(const char* const compName)
+InputPairU16U32Tester ::InputPairU16U32Tester(const char* const compName)
     : InputPairU16U32ComponentBase(compName),
       m_smChoiceInputPairU16U32_action_a_history(),
       m_smChoiceInputPairU16U32_guard_g() {}
 
-InputPairU16U32 ::~InputPairU16U32() {}
+InputPairU16U32Tester ::~InputPairU16U32Tester() {}
 
 // ----------------------------------------------------------------------
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void InputPairU16U32 ::FppTest_SmChoice_InputPairU16U32_action_a(SmId smId,
+void InputPairU16U32Tester ::FppTest_SmChoice_InputPairU16U32_action_a(SmId smId,
                                                                  FppTest_SmChoice_InputPairU16U32::Signal signal,
                                                                  U32 value) {
     ASSERT_EQ(smId, SmId::smChoiceInputPairU16U32);
@@ -39,7 +39,7 @@ void InputPairU16U32 ::FppTest_SmChoice_InputPairU16U32_action_a(SmId smId,
 // Implementations for internal state machine guards
 // ----------------------------------------------------------------------
 
-bool InputPairU16U32 ::FppTest_SmChoice_InputPairU16U32_guard_g(SmId smId,
+bool InputPairU16U32Tester ::FppTest_SmChoice_InputPairU16U32_guard_g(SmId smId,
                                                                 FppTest_SmChoice_InputPairU16U32::Signal signal,
                                                                 U32 value) const {
     FW_ASSERT(smId == SmId::smChoiceInputPairU16U32, static_cast<FwAssertArgType>(smId));
@@ -50,7 +50,7 @@ bool InputPairU16U32 ::FppTest_SmChoice_InputPairU16U32_guard_g(SmId smId,
 // Tests
 // ----------------------------------------------------------------------
 
-void InputPairU16U32::testS1True() {
+void InputPairU16U32Tester::testS1True() {
     this->m_smChoiceInputPairU16U32_action_a_history.clear();
     this->m_smChoiceInputPairU16U32_guard_g.reset();
     this->m_smChoiceInputPairU16U32_guard_g.setReturnValue(true);
@@ -73,7 +73,7 @@ void InputPairU16U32::testS1True() {
     ASSERT_EQ(this->smChoiceInputPairU16U32_getState(), SmChoice_InputPairU16U32::State::S2);
 }
 
-void InputPairU16U32::testS1False() {
+void InputPairU16U32Tester::testS1False() {
     this->m_smChoiceInputPairU16U32_action_a_history.clear();
     this->m_smChoiceInputPairU16U32_guard_g.reset();
     this->init(queueDepth, instanceId);
@@ -95,7 +95,7 @@ void InputPairU16U32::testS1False() {
     ASSERT_EQ(this->smChoiceInputPairU16U32_getState(), SmChoice_InputPairU16U32::State::S3);
 }
 
-void InputPairU16U32::testS2True() {
+void InputPairU16U32Tester::testS2True() {
     this->m_smChoiceInputPairU16U32_action_a_history.clear();
     this->m_smChoiceInputPairU16U32_guard_g.reset();
     this->m_smChoiceInputPairU16U32_guard_g.setReturnValue(true);
@@ -118,7 +118,7 @@ void InputPairU16U32::testS2True() {
     ASSERT_EQ(this->smChoiceInputPairU16U32_getState(), SmChoice_InputPairU16U32::State::S2);
 }
 
-void InputPairU16U32::testS2False() {
+void InputPairU16U32Tester::testS2False() {
     this->m_smChoiceInputPairU16U32_action_a_history.clear();
     this->m_smChoiceInputPairU16U32_guard_g.reset();
     this->init(queueDepth, instanceId);

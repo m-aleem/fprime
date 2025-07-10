@@ -1,12 +1,12 @@
 // ======================================================================
-// \title  ChoiceToChoice.cpp
+// \title  ChoiceToChoiceTester.cpp
 // \author bocchino
-// \brief  cpp file for ChoiceToChoice component implementation class
+// \brief  cpp file for ChoiceToChoiceTester component implementation class
 // ======================================================================
 
 #include <gtest/gtest.h>
 
-#include "FppTest/state_machine/internal_instance/choice/ChoiceToChoice.hpp"
+#include "FppTest/state_machine/internal_instance/choice/ChoiceToChoiceTester.hpp"
 #include "Fw/Types/Assert.hpp"
 
 namespace FppTest {
@@ -17,31 +17,31 @@ namespace SmInstanceChoice {
 // Component construction and destruction
 // ----------------------------------------------------------------------
 
-ChoiceToChoice ::ChoiceToChoice(const char* const compName)
+ChoiceToChoiceTester ::ChoiceToChoiceTester(const char* const compName)
     : ChoiceToChoiceComponentBase(compName),
       m_smChoiceChoiceToChoice_actionHistory(),
       m_smChoiceChoiceToChoice_guard_g1(),
       m_smChoiceChoiceToChoice_guard_g2() {}
 
-ChoiceToChoice ::~ChoiceToChoice() {}
+ChoiceToChoiceTester ::~ChoiceToChoiceTester() {}
 
 // ----------------------------------------------------------------------
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void ChoiceToChoice ::FppTest_SmChoice_ChoiceToChoice_action_exitS1(SmId smId,
+void ChoiceToChoiceTester ::FppTest_SmChoice_ChoiceToChoice_action_exitS1(SmId smId,
                                                                     FppTest_SmChoice_ChoiceToChoice::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceChoiceToChoice);
     this->m_smChoiceChoiceToChoice_actionHistory.push(signal, ActionId::EXIT_S1);
 }
 
-void ChoiceToChoice ::FppTest_SmChoice_ChoiceToChoice_action_a(SmId smId,
+void ChoiceToChoiceTester ::FppTest_SmChoice_ChoiceToChoice_action_a(SmId smId,
                                                                FppTest_SmChoice_ChoiceToChoice::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceChoiceToChoice);
     this->m_smChoiceChoiceToChoice_actionHistory.push(signal, ActionId::A);
 }
 
-void ChoiceToChoice ::FppTest_SmChoice_ChoiceToChoice_action_enterS2(SmId smId,
+void ChoiceToChoiceTester ::FppTest_SmChoice_ChoiceToChoice_action_enterS2(SmId smId,
                                                                      FppTest_SmChoice_ChoiceToChoice::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceChoiceToChoice);
     this->m_smChoiceChoiceToChoice_actionHistory.push(signal, ActionId::ENTER_S2);
@@ -51,13 +51,13 @@ void ChoiceToChoice ::FppTest_SmChoice_ChoiceToChoice_action_enterS2(SmId smId,
 // Implementations for internal state machine guards
 // ----------------------------------------------------------------------
 
-bool ChoiceToChoice ::FppTest_SmChoice_ChoiceToChoice_guard_g1(SmId smId,
+bool ChoiceToChoiceTester ::FppTest_SmChoice_ChoiceToChoice_guard_g1(SmId smId,
                                                                FppTest_SmChoice_ChoiceToChoice::Signal signal) const {
     FW_ASSERT(smId == SmId::smChoiceChoiceToChoice, static_cast<FwAssertArgType>(smId));
     return this->m_smChoiceChoiceToChoice_guard_g1.call(signal);
 }
 
-bool ChoiceToChoice ::FppTest_SmChoice_ChoiceToChoice_guard_g2(SmId smId,
+bool ChoiceToChoiceTester ::FppTest_SmChoice_ChoiceToChoice_guard_g2(SmId smId,
                                                                FppTest_SmChoice_ChoiceToChoice::Signal signal) const {
     FW_ASSERT(smId == SmId::smChoiceChoiceToChoice, static_cast<FwAssertArgType>(smId));
     return this->m_smChoiceChoiceToChoice_guard_g2.call(signal);
@@ -67,7 +67,7 @@ bool ChoiceToChoice ::FppTest_SmChoice_ChoiceToChoice_guard_g2(SmId smId,
 // Overflow hook implementations for internal state machines
 // ----------------------------------------------------------------------
 
-void ChoiceToChoice ::smChoiceChoiceToChoice_stateMachineOverflowHook(SmId smId,
+void ChoiceToChoiceTester ::smChoiceChoiceToChoice_stateMachineOverflowHook(SmId smId,
                                                                       FwEnumStoreType signal,
                                                                       Fw::SerializeBufferBase& buffer) {
     this->m_hookCalled = true;
@@ -80,7 +80,7 @@ void ChoiceToChoice ::smChoiceChoiceToChoice_stateMachineOverflowHook(SmId smId,
 // Tests
 // ----------------------------------------------------------------------
 
-void ChoiceToChoice::testG1True() {
+void ChoiceToChoiceTester::testG1True() {
     this->m_smChoiceChoiceToChoice_actionHistory.clear();
     this->m_smChoiceChoiceToChoice_guard_g1.reset();
     this->m_smChoiceChoiceToChoice_guard_g2.reset();
@@ -112,7 +112,7 @@ void ChoiceToChoice::testG1True() {
     ASSERT_EQ(this->smChoiceChoiceToChoice_getState(), SmChoice_ChoiceToChoice::State::S2_S3);
 }
 
-void ChoiceToChoice::testG1FalseG2True() {
+void ChoiceToChoiceTester::testG1FalseG2True() {
     this->m_smChoiceChoiceToChoice_actionHistory.clear();
     this->m_smChoiceChoiceToChoice_guard_g1.reset();
     this->m_smChoiceChoiceToChoice_guard_g2.reset();
@@ -146,7 +146,7 @@ void ChoiceToChoice::testG1FalseG2True() {
     ASSERT_EQ(this->smChoiceChoiceToChoice_getState(), SmChoice_ChoiceToChoice::State::S2_S3);
 }
 
-void ChoiceToChoice::testG1FalseG2False() {
+void ChoiceToChoiceTester::testG1FalseG2False() {
     this->m_smChoiceChoiceToChoice_actionHistory.clear();
     this->m_smChoiceChoiceToChoice_guard_g1.reset();
     this->m_smChoiceChoiceToChoice_guard_g2.reset();
@@ -179,7 +179,7 @@ void ChoiceToChoice::testG1FalseG2False() {
     ASSERT_EQ(this->smChoiceChoiceToChoice_getState(), SmChoice_ChoiceToChoice::State::S2_S4);
 }
 
-void ChoiceToChoice::testOverflow() {
+void ChoiceToChoiceTester::testOverflow() {
     this->m_hookCalled = false;
     this->init(queueDepth, instanceId);
     for (FwSizeType i = 0; i < queueDepth; i++) {
