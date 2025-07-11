@@ -29,7 +29,9 @@ BasicU32Tester ::~BasicU32Tester() {}
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void BasicU32Tester ::FppTest_SmChoice_BasicU32_action_a(SmId smId, FppTest_SmChoice_BasicU32::Signal signal, U32 value) {
+void BasicU32Tester ::FppTest_SmChoice_BasicU32_action_a(SmId smId,
+                                                         FppTest_SmChoice_BasicU32::Signal signal,
+                                                         U32 value) {
     ASSERT_EQ(smId, SmId::smChoiceBasicU32);
     this->m_smChoiceBasicU32_action_a_history.push(signal, value);
 }
@@ -44,8 +46,8 @@ void BasicU32Tester ::FppTest_SmChoice_BasicU32_action_b(SmId smId, FppTest_SmCh
 // ----------------------------------------------------------------------
 
 bool BasicU32Tester ::FppTest_SmChoice_BasicU32_guard_g(SmId smId,
-                                                  FppTest_SmChoice_BasicU32::Signal signal,
-                                                  U32 value) const {
+                                                        FppTest_SmChoice_BasicU32::Signal signal,
+                                                        U32 value) const {
     FW_ASSERT(smId == SmId::smChoiceBasicU32, static_cast<FwAssertArgType>(smId));
     return this->m_smChoiceBasicU32_guard_g.call(signal, value);
 }

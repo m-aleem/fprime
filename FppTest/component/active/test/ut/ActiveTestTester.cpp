@@ -7,7 +7,6 @@
 #include "ActiveTestTester.hpp"
 #include "STest/Pick/Pick.hpp"
 
-
 // ----------------------------------------------------------------------
 // Construction and destruction
 // ----------------------------------------------------------------------
@@ -35,7 +34,9 @@ void ActiveTestTester ::initComponents() {
     this->component.init(ActiveTestTester::TEST_INSTANCE_QUEUE_DEPTH, ActiveTestTester::TEST_INSTANCE_ID);
 }
 
-Fw::ParamValid ActiveTestTester ::from_prmGetIn_handler(const FwIndexType portNum, FwPrmIdType id, Fw::ParamBuffer& val) {
+Fw::ParamValid ActiveTestTester ::from_prmGetIn_handler(const FwIndexType portNum,
+                                                        FwPrmIdType id,
+                                                        Fw::ParamBuffer& val) {
     val.resetSer();
 
     Fw::SerializeStatus status;
@@ -121,98 +122,89 @@ void ActiveTestTester ::from_prmSetIn_handler(const FwIndexType portNum, FwPrmId
     this->pushFromPortEntry_prmSetIn(id, val);
 }
 
-
 // ----------------------------------------------------------------------
 // Unit test implementation of external parameter delegate serialization/deserialization
 // ----------------------------------------------------------------------
 
-Fw::SerializeStatus ActiveTestTester::ActiveTestComponentBaseParamExternalDelegate ::
-  deserializeParam(
-      const FwPrmIdType base_id,
-      const FwPrmIdType local_id,
-      const Fw::ParamValid prmStat,
-      Fw::SerializeBufferBase& buff
-  )
-{
-  Fw::SerializeStatus stat;
-  (void) base_id;
+Fw::SerializeStatus ActiveTestTester::ActiveTestComponentBaseParamExternalDelegate ::deserializeParam(
+    const FwPrmIdType base_id,
+    const FwPrmIdType local_id,
+    const Fw::ParamValid prmStat,
+    Fw::SerializeBufferBase& buff) {
+    Fw::SerializeStatus stat;
+    (void)base_id;
 
-  // Serialize the parameter based on ID
-  switch(local_id)
-  {
-    // ParamBoolExternal
-    case ActiveTestComponentBase::PARAMID_PARAMBOOLEXTERNAL:
-      stat = buff.deserialize(this->m_param_ParamBoolExternal);
-      break;
-    // ParamI32External
-    case ActiveTestComponentBase::PARAMID_PARAMI32EXTERNAL:
-      stat = buff.deserialize(this->m_param_ParamI32External);
-      break;
-    // ParamStringExternal
-    case ActiveTestComponentBase::PARAMID_PARAMSTRINGEXTERNAL:
-      stat = buff.deserialize(this->m_param_ParamStringExternal);
-      break;
-    // ParamEnumExternal
-    case ActiveTestComponentBase::PARAMID_PARAMENUMEXTERNAL:
-      stat = buff.deserialize(this->m_param_ParamEnumExternal);
-      break;
-    // ParamArrayExternal
-    case ActiveTestComponentBase::PARAMID_PARAMARRAYEXTERNAL:
-      stat = buff.deserialize(this->m_param_ParamArrayExternal);
-      break;
-    // ParamStructExternal
-    case ActiveTestComponentBase::PARAMID_PARAMSTRUCTEXTERNAL:
-      stat = buff.deserialize(this->m_param_ParamStructExternal);
-      break;
-    default:
-      // Unknown ID should not have gotten here
-      FW_ASSERT(false, static_cast<FwAssertArgType>(local_id));
-  }
+    // Serialize the parameter based on ID
+    switch (local_id) {
+        // ParamBoolExternal
+        case ActiveTestComponentBase::PARAMID_PARAMBOOLEXTERNAL:
+            stat = buff.deserialize(this->m_param_ParamBoolExternal);
+            break;
+        // ParamI32External
+        case ActiveTestComponentBase::PARAMID_PARAMI32EXTERNAL:
+            stat = buff.deserialize(this->m_param_ParamI32External);
+            break;
+        // ParamStringExternal
+        case ActiveTestComponentBase::PARAMID_PARAMSTRINGEXTERNAL:
+            stat = buff.deserialize(this->m_param_ParamStringExternal);
+            break;
+        // ParamEnumExternal
+        case ActiveTestComponentBase::PARAMID_PARAMENUMEXTERNAL:
+            stat = buff.deserialize(this->m_param_ParamEnumExternal);
+            break;
+        // ParamArrayExternal
+        case ActiveTestComponentBase::PARAMID_PARAMARRAYEXTERNAL:
+            stat = buff.deserialize(this->m_param_ParamArrayExternal);
+            break;
+        // ParamStructExternal
+        case ActiveTestComponentBase::PARAMID_PARAMSTRUCTEXTERNAL:
+            stat = buff.deserialize(this->m_param_ParamStructExternal);
+            break;
+        default:
+            // Unknown ID should not have gotten here
+            FW_ASSERT(false, static_cast<FwAssertArgType>(local_id));
+    }
 
-  return stat;
+    return stat;
 }
 
-Fw::SerializeStatus ActiveTestTester::ActiveTestComponentBaseParamExternalDelegate ::
-  serializeParam(
-      const FwPrmIdType base_id,
-      const FwPrmIdType local_id,
-      Fw::SerializeBufferBase& buff
-  ) const
-{
-  Fw::SerializeStatus stat;
-  (void) base_id;
+Fw::SerializeStatus ActiveTestTester::ActiveTestComponentBaseParamExternalDelegate ::serializeParam(
+    const FwPrmIdType base_id,
+    const FwPrmIdType local_id,
+    Fw::SerializeBufferBase& buff) const {
+    Fw::SerializeStatus stat;
+    (void)base_id;
 
-  // Serialize the parameter based on ID
-  switch(local_id)
-  {
-    // ParamBoolExternal
-    case ActiveTestComponentBase::PARAMID_PARAMBOOLEXTERNAL:
-      stat = buff.serialize(this->m_param_ParamBoolExternal);
-      break;
-    // ParamI32External
-    case ActiveTestComponentBase::PARAMID_PARAMI32EXTERNAL:
-      stat = buff.serialize(this->m_param_ParamI32External);
-      break;
-    // ParamStringExternal
-    case ActiveTestComponentBase::PARAMID_PARAMSTRINGEXTERNAL:
-      stat = buff.serialize(this->m_param_ParamStringExternal);
-      break;
-    // ParamEnumExternal
-    case ActiveTestComponentBase::PARAMID_PARAMENUMEXTERNAL:
-      stat = buff.serialize(this->m_param_ParamEnumExternal);
-      break;
-    // ParamArrayExternal
-    case ActiveTestComponentBase::PARAMID_PARAMARRAYEXTERNAL:
-      stat = buff.serialize(this->m_param_ParamArrayExternal);
-      break;
-    // ParamStructExternal
-    case ActiveTestComponentBase::PARAMID_PARAMSTRUCTEXTERNAL:
-      stat = buff.serialize(this->m_param_ParamStructExternal);
-      break;
-    default:
-      // Unknown ID should not have gotten here
-      FW_ASSERT(false, static_cast<FwAssertArgType>(local_id));
-  }
+    // Serialize the parameter based on ID
+    switch (local_id) {
+        // ParamBoolExternal
+        case ActiveTestComponentBase::PARAMID_PARAMBOOLEXTERNAL:
+            stat = buff.serialize(this->m_param_ParamBoolExternal);
+            break;
+        // ParamI32External
+        case ActiveTestComponentBase::PARAMID_PARAMI32EXTERNAL:
+            stat = buff.serialize(this->m_param_ParamI32External);
+            break;
+        // ParamStringExternal
+        case ActiveTestComponentBase::PARAMID_PARAMSTRINGEXTERNAL:
+            stat = buff.serialize(this->m_param_ParamStringExternal);
+            break;
+        // ParamEnumExternal
+        case ActiveTestComponentBase::PARAMID_PARAMENUMEXTERNAL:
+            stat = buff.serialize(this->m_param_ParamEnumExternal);
+            break;
+        // ParamArrayExternal
+        case ActiveTestComponentBase::PARAMID_PARAMARRAYEXTERNAL:
+            stat = buff.serialize(this->m_param_ParamArrayExternal);
+            break;
+        // ParamStructExternal
+        case ActiveTestComponentBase::PARAMID_PARAMSTRUCTEXTERNAL:
+            stat = buff.serialize(this->m_param_ParamStructExternal);
+            break;
+        default:
+            // Unknown ID should not have gotten here
+            FW_ASSERT(false, static_cast<FwAssertArgType>(local_id));
+    }
 
-  return stat;
+    return stat;
 }

@@ -43,7 +43,7 @@ void BasicTester::FppTest_SmInitial_Basic_action_a(SmId smId, FppTest_SmInitial_
 }
 
 void BasicTester::FppTest_SmInstanceInitial_Basic_Basic_action_a(SmId smId,
-                                                           FppTest_SmInstanceInitial_Basic_Basic::Signal signal) {
+                                                                 FppTest_SmInstanceInitial_Basic_Basic::Signal signal) {
     ASSERT_TRUE((smId == SmId::basic1) || (smId == SmId::basic2));
     if (smId == SmId::basic1) {
         this->m_basic1_action_a_history.push(signal);

@@ -27,13 +27,14 @@ BasicTestArrayTester::~BasicTestArrayTester() {}
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void BasicTestArrayTester::FppTest_SmState_BasicTestArray_action_a(SmId smId, FppTest_SmState_BasicTestArray::Signal signal) {
+void BasicTestArrayTester::FppTest_SmState_BasicTestArray_action_a(SmId smId,
+                                                                   FppTest_SmState_BasicTestArray::Signal signal) {
     this->m_smStateBasicTestArray_action_a_history.push(signal);
 }
 
 void BasicTestArrayTester::FppTest_SmState_BasicTestArray_action_b(SmId smId,
-                                                             FppTest_SmState_BasicTestArray::Signal signal,
-                                                             const SmHarness::TestArray& value) {
+                                                                   FppTest_SmState_BasicTestArray::Signal signal,
+                                                                   const SmHarness::TestArray& value) {
     this->m_smStateBasicTestArray_action_b_history.push(signal, value);
 }
 

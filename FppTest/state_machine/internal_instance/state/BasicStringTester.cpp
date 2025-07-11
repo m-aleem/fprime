@@ -33,8 +33,8 @@ void BasicStringTester ::FppTest_SmState_BasicString_action_a(SmId smId, FppTest
 }
 
 void BasicStringTester ::FppTest_SmState_BasicString_action_b(SmId smId,
-                                                        FppTest_SmState_BasicString::Signal signal,
-                                                        const Fw::StringBase& value) {
+                                                              FppTest_SmState_BasicString::Signal signal,
+                                                              const Fw::StringBase& value) {
     this->m_smStateBasicString_action_b_history.push(signal, Fw::String(value));
 }
 

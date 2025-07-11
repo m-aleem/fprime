@@ -402,11 +402,11 @@ void DpTestTester::generateRandomString(Fw::StringBase& str) {
 }
 
 void DpTestTester::productRecvIn_InvokeAndCheckHeader(FwDpIdType id,
-                                                FwSizeType dataEltSize,
-                                                FwDpPriorityType priority,
-                                                Fw::Buffer inputBuffer,
-                                                Fw::Buffer& outputBuffer,
-                                                FwSizeType& expectedNumElts) {
+                                                      FwSizeType dataEltSize,
+                                                      FwDpPriorityType priority,
+                                                      Fw::Buffer inputBuffer,
+                                                      Fw::Buffer& outputBuffer,
+                                                      FwSizeType& expectedNumElts) {
     const auto globalId = ID_BASE + id;
     // Set the test time
     const Fw::Time timeTag = this->randomizeTestTime();

@@ -83,7 +83,7 @@ class DpTest : public DpTestComponentBase {
 
     //! Handler implementation for schedIn
     void schedIn_handler(const FwIndexType portNum,  //!< The port number
-                         U32 context                     //!< The call order
+                         U32 context                 //!< The call order
                          ) final;
 
   private:

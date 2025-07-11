@@ -30,8 +30,9 @@ void NestedTester::FppTest_SmInitial_Nested_action_a(SmId smId, FppTest_SmInitia
     this->m_smInitialNested_action_a_history.push(signal);
 }
 
-void NestedTester::FppTest_SmInstanceInitial_Nested_Nested_action_a(SmId smId,
-                                                              FppTest_SmInstanceInitial_Nested_Nested::Signal signal) {
+void NestedTester::FppTest_SmInstanceInitial_Nested_Nested_action_a(
+    SmId smId,
+    FppTest_SmInstanceInitial_Nested_Nested::Signal signal) {
     ASSERT_EQ(smId, SmId::nested);
     this->m_nested_action_a_history.push(signal);
 }
@@ -41,8 +42,8 @@ void NestedTester::FppTest_SmInstanceInitial_Nested_Nested_action_a(SmId smId,
 // ----------------------------------------------------------------------
 
 void NestedTester ::smInitialNested_stateMachineOverflowHook(SmId smId,
-                                                       FwEnumStoreType signal,
-                                                       Fw::SerializeBufferBase& buffer) {
+                                                             FwEnumStoreType signal,
+                                                             Fw::SerializeBufferBase& buffer) {
     // Nothing to do
 }
 

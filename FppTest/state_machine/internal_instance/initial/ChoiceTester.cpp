@@ -35,8 +35,9 @@ void ChoiceTester::FppTest_SmInitial_Choice_action_a(SmId smId, FppTest_SmInitia
     this->m_smInitialChoice_action_a_history.push(signal);
 }
 
-void ChoiceTester::FppTest_SmInstanceInitial_Choice_Choice_action_a(SmId smId,
-                                                              FppTest_SmInstanceInitial_Choice_Choice::Signal signal) {
+void ChoiceTester::FppTest_SmInstanceInitial_Choice_Choice_action_a(
+    SmId smId,
+    FppTest_SmInstanceInitial_Choice_Choice::Signal signal) {
     ASSERT_EQ(smId, SmId::choice);
     this->m_choice_action_a_history.push(signal);
 }

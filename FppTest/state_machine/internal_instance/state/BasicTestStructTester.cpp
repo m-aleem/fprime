@@ -28,13 +28,13 @@ BasicTestStructTester::~BasicTestStructTester() {}
 // ----------------------------------------------------------------------
 
 void BasicTestStructTester::FppTest_SmState_BasicTestStruct_action_a(SmId smId,
-                                                               FppTest_SmState_BasicTestStruct::Signal signal) {
+                                                                     FppTest_SmState_BasicTestStruct::Signal signal) {
     this->m_smStateBasicTestStruct_action_a_history.push(signal);
 }
 
 void BasicTestStructTester::FppTest_SmState_BasicTestStruct_action_b(SmId smId,
-                                                               FppTest_SmState_BasicTestStruct::Signal signal,
-                                                               const SmHarness::TestStruct& value) {
+                                                                     FppTest_SmState_BasicTestStruct::Signal signal,
+                                                                     const SmHarness::TestStruct& value) {
     this->m_smStateBasicTestStruct_action_b_history.push(signal, value);
 }
 

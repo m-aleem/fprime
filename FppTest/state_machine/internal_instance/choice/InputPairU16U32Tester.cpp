@@ -29,8 +29,8 @@ InputPairU16U32Tester ::~InputPairU16U32Tester() {}
 // ----------------------------------------------------------------------
 
 void InputPairU16U32Tester ::FppTest_SmChoice_InputPairU16U32_action_a(SmId smId,
-                                                                 FppTest_SmChoice_InputPairU16U32::Signal signal,
-                                                                 U32 value) {
+                                                                       FppTest_SmChoice_InputPairU16U32::Signal signal,
+                                                                       U32 value) {
     ASSERT_EQ(smId, SmId::smChoiceInputPairU16U32);
     this->m_smChoiceInputPairU16U32_action_a_history.push(signal, value);
 }
@@ -40,8 +40,8 @@ void InputPairU16U32Tester ::FppTest_SmChoice_InputPairU16U32_action_a(SmId smId
 // ----------------------------------------------------------------------
 
 bool InputPairU16U32Tester ::FppTest_SmChoice_InputPairU16U32_guard_g(SmId smId,
-                                                                FppTest_SmChoice_InputPairU16U32::Signal signal,
-                                                                U32 value) const {
+                                                                      FppTest_SmChoice_InputPairU16U32::Signal signal,
+                                                                      U32 value) const {
     FW_ASSERT(smId == SmId::smChoiceInputPairU16U32, static_cast<FwAssertArgType>(smId));
     return this->m_smChoiceInputPairU16U32_guard_g.call(signal, value);
 }

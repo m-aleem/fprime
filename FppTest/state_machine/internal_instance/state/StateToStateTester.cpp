@@ -25,17 +25,20 @@ StateToStateTester::~StateToStateTester() {}
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void StateToStateTester::FppTest_SmState_StateToState_action_exitS1(SmId smId, FppTest_SmState_StateToState::Signal signal) {
+void StateToStateTester::FppTest_SmState_StateToState_action_exitS1(SmId smId,
+                                                                    FppTest_SmState_StateToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToState);
     this->m_smStateStateToState_actionHistory.push(signal, ActionId::EXIT_S1);
 }
 
-void StateToStateTester::FppTest_SmState_StateToState_action_exitS2(SmId smId, FppTest_SmState_StateToState::Signal signal) {
+void StateToStateTester::FppTest_SmState_StateToState_action_exitS2(SmId smId,
+                                                                    FppTest_SmState_StateToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToState);
     this->m_smStateStateToState_actionHistory.push(signal, ActionId::EXIT_S2);
 }
 
-void StateToStateTester::FppTest_SmState_StateToState_action_exitS3(SmId smId, FppTest_SmState_StateToState::Signal signal) {
+void StateToStateTester::FppTest_SmState_StateToState_action_exitS3(SmId smId,
+                                                                    FppTest_SmState_StateToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToState);
     this->m_smStateStateToState_actionHistory.push(signal, ActionId::EXIT_S3);
 }
@@ -45,27 +48,32 @@ void StateToStateTester::FppTest_SmState_StateToState_action_a(SmId smId, FppTes
     this->m_smStateStateToState_actionHistory.push(signal, ActionId::A);
 }
 
-void StateToStateTester::FppTest_SmState_StateToState_action_enterS1(SmId smId, FppTest_SmState_StateToState::Signal signal) {
+void StateToStateTester::FppTest_SmState_StateToState_action_enterS1(SmId smId,
+                                                                     FppTest_SmState_StateToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToState);
     this->m_smStateStateToState_actionHistory.push(signal, ActionId::ENTER_S1);
 }
 
-void StateToStateTester::FppTest_SmState_StateToState_action_enterS2(SmId smId, FppTest_SmState_StateToState::Signal signal) {
+void StateToStateTester::FppTest_SmState_StateToState_action_enterS2(SmId smId,
+                                                                     FppTest_SmState_StateToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToState);
     this->m_smStateStateToState_actionHistory.push(signal, ActionId::ENTER_S2);
 }
 
-void StateToStateTester::FppTest_SmState_StateToState_action_enterS3(SmId smId, FppTest_SmState_StateToState::Signal signal) {
+void StateToStateTester::FppTest_SmState_StateToState_action_enterS3(SmId smId,
+                                                                     FppTest_SmState_StateToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToState);
     this->m_smStateStateToState_actionHistory.push(signal, ActionId::ENTER_S3);
 }
 
-void StateToStateTester::FppTest_SmState_StateToState_action_enterS4(SmId smId, FppTest_SmState_StateToState::Signal signal) {
+void StateToStateTester::FppTest_SmState_StateToState_action_enterS4(SmId smId,
+                                                                     FppTest_SmState_StateToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToState);
     this->m_smStateStateToState_actionHistory.push(signal, ActionId::ENTER_S4);
 }
 
-void StateToStateTester::FppTest_SmState_StateToState_action_enterS5(SmId smId, FppTest_SmState_StateToState::Signal signal) {
+void StateToStateTester::FppTest_SmState_StateToState_action_enterS5(SmId smId,
+                                                                     FppTest_SmState_StateToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToState);
     this->m_smStateStateToState_actionHistory.push(signal, ActionId::ENTER_S5);
 }

@@ -117,8 +117,8 @@ class DpTestTester : public DpTestGTestBase {
     Fw::Time randomizeTestTime();
 
     //! Generate a random string
-    static void generateRandomString(Fw::StringBase& str //!< The string (output)
-        );
+    static void generateRandomString(Fw::StringBase& str  //!< The string (output)
+    );
 
     //! Invoke productRecvIn and check header
     //! This sets the output buffer to the received buffer and sets the

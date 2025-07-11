@@ -27,48 +27,49 @@ StateToChoiceTester::~StateToChoiceTester() {}
 // ----------------------------------------------------------------------
 
 void StateToChoiceTester::FppTest_SmState_StateToChoice_action_exitS1(SmId smId,
-                                                                FppTest_SmState_StateToChoice::Signal signal) {
+                                                                      FppTest_SmState_StateToChoice::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToChoice);
     this->m_smStateStateToChoice_actionHistory.push(signal, ActionId::EXIT_S1);
 }
 
 void StateToChoiceTester::FppTest_SmState_StateToChoice_action_exitS2(SmId smId,
-                                                                FppTest_SmState_StateToChoice::Signal signal) {
+                                                                      FppTest_SmState_StateToChoice::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToChoice);
     this->m_smStateStateToChoice_actionHistory.push(signal, ActionId::EXIT_S2);
 }
 
 void StateToChoiceTester::FppTest_SmState_StateToChoice_action_exitS3(SmId smId,
-                                                                FppTest_SmState_StateToChoice::Signal signal) {
+                                                                      FppTest_SmState_StateToChoice::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToChoice);
     this->m_smStateStateToChoice_actionHistory.push(signal, ActionId::EXIT_S3);
 }
 
-void StateToChoiceTester::FppTest_SmState_StateToChoice_action_a(SmId smId, FppTest_SmState_StateToChoice::Signal signal) {
+void StateToChoiceTester::FppTest_SmState_StateToChoice_action_a(SmId smId,
+                                                                 FppTest_SmState_StateToChoice::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToChoice);
     this->m_smStateStateToChoice_actionHistory.push(signal, ActionId::A);
 }
 
 void StateToChoiceTester::FppTest_SmState_StateToChoice_action_enterS1(SmId smId,
-                                                                 FppTest_SmState_StateToChoice::Signal signal) {
+                                                                       FppTest_SmState_StateToChoice::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToChoice);
     this->m_smStateStateToChoice_actionHistory.push(signal, ActionId::ENTER_S1);
 }
 
 void StateToChoiceTester::FppTest_SmState_StateToChoice_action_enterS2(SmId smId,
-                                                                 FppTest_SmState_StateToChoice::Signal signal) {
+                                                                       FppTest_SmState_StateToChoice::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToChoice);
     this->m_smStateStateToChoice_actionHistory.push(signal, ActionId::ENTER_S2);
 }
 
 void StateToChoiceTester::FppTest_SmState_StateToChoice_action_enterS3(SmId smId,
-                                                                 FppTest_SmState_StateToChoice::Signal signal) {
+                                                                       FppTest_SmState_StateToChoice::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToChoice);
     this->m_smStateStateToChoice_actionHistory.push(signal, ActionId::ENTER_S3);
 }
 
 void StateToChoiceTester::FppTest_SmState_StateToChoice_action_enterS4(SmId smId,
-                                                                 FppTest_SmState_StateToChoice::Signal signal) {
+                                                                       FppTest_SmState_StateToChoice::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToChoice);
     this->m_smStateStateToChoice_actionHistory.push(signal, ActionId::ENTER_S4);
 }
@@ -78,7 +79,7 @@ void StateToChoiceTester::FppTest_SmState_StateToChoice_action_enterS4(SmId smId
 // ----------------------------------------------------------------------
 
 bool StateToChoiceTester::FppTest_SmState_StateToChoice_guard_g(SmId smId,
-                                                           FppTest_SmState_StateToChoice::Signal signal) const {
+                                                                FppTest_SmState_StateToChoice::Signal signal) const {
     FW_ASSERT(smId == SmId::smStateStateToChoice, static_cast<FwAssertArgType>(smId));
     return this->m_smStateStateToChoice_guard_g.call(signal);
 }

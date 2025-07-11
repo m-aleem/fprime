@@ -4,13 +4,12 @@
 
 #include <gtest/gtest.h>
 
-#include "FppTest/state_machine/internal_instance/state/BasicTester.hpp"
-#include "FppTest/state_machine/internal_instance/state/BasicGuardTester.hpp"
 #include "FppTest/state_machine/internal_instance/state/BasicGuardStringTester.hpp"
 #include "FppTest/state_machine/internal_instance/state/BasicGuardTestAbsTypeTester.hpp"
 #include "FppTest/state_machine/internal_instance/state/BasicGuardTestArrayTester.hpp"
 #include "FppTest/state_machine/internal_instance/state/BasicGuardTestEnumTester.hpp"
 #include "FppTest/state_machine/internal_instance/state/BasicGuardTestStructTester.hpp"
+#include "FppTest/state_machine/internal_instance/state/BasicGuardTester.hpp"
 #include "FppTest/state_machine/internal_instance/state/BasicGuardU32Tester.hpp"
 #include "FppTest/state_machine/internal_instance/state/BasicInternalTester.hpp"
 #include "FppTest/state_machine/internal_instance/state/BasicSelfTester.hpp"
@@ -19,6 +18,7 @@
 #include "FppTest/state_machine/internal_instance/state/BasicTestArrayTester.hpp"
 #include "FppTest/state_machine/internal_instance/state/BasicTestEnumTester.hpp"
 #include "FppTest/state_machine/internal_instance/state/BasicTestStructTester.hpp"
+#include "FppTest/state_machine/internal_instance/state/BasicTester.hpp"
 #include "FppTest/state_machine/internal_instance/state/BasicU32Tester.hpp"
 #include "FppTest/state_machine/internal_instance/state/InternalTester.hpp"
 #include "FppTest/state_machine/internal_instance/state/PolymorphismTester.hpp"

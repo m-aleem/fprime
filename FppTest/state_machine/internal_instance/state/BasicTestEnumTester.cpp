@@ -27,13 +27,14 @@ BasicTestEnumTester::~BasicTestEnumTester() {}
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void BasicTestEnumTester::FppTest_SmState_BasicTestEnum_action_a(SmId smId, FppTest_SmState_BasicTestEnum::Signal signal) {
+void BasicTestEnumTester::FppTest_SmState_BasicTestEnum_action_a(SmId smId,
+                                                                 FppTest_SmState_BasicTestEnum::Signal signal) {
     this->m_smStateBasicTestEnum_action_a_history.push(signal);
 }
 
 void BasicTestEnumTester::FppTest_SmState_BasicTestEnum_action_b(SmId smId,
-                                                           FppTest_SmState_BasicTestEnum::Signal signal,
-                                                           const SmHarness::TestEnum& value) {
+                                                                 FppTest_SmState_BasicTestEnum::Signal signal,
+                                                                 const SmHarness::TestEnum& value) {
     this->m_smStateBasicTestEnum_action_b_history.push(signal, value);
 }
 

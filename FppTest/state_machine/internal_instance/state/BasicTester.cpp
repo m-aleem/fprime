@@ -34,7 +34,7 @@ void BasicTester::schedIn_handler(FwIndexType portNum, U32 context) {
 // ----------------------------------------------------------------------
 
 void BasicTester ::FppTest_SmInstanceState_Basic_Basic_action_a(SmId smId,
-                                                          FppTest_SmInstanceState_Basic_Basic::Signal signal) {
+                                                                FppTest_SmInstanceState_Basic_Basic::Signal signal) {
     ASSERT_TRUE((smId == SmId::basic1) || (smId == SmId::basic2));
     if (smId == SmId::basic1) {
         this->m_basic1_action_a_history.push(signal);

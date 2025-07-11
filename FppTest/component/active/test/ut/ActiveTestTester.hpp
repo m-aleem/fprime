@@ -13,13 +13,12 @@
 #include "FppTest/component/active/TypedPortIndexEnumAc.hpp"
 #include "FppTest/component/tests/CmdTests.hpp"
 #include "FppTest/component/tests/EventTests.hpp"
+#include "FppTest/component/tests/ExternalParamTests.hpp"
 #include "FppTest/component/tests/InternalInterfaceTests.hpp"
 #include "FppTest/component/tests/ParamTests.hpp"
-#include "FppTest/component/tests/ExternalParamTests.hpp"
 #include "FppTest/component/tests/PortTests.hpp"
 #include "FppTest/component/tests/TlmTests.hpp"
 #include "FppTest/component/types/FormalParamTypes.hpp"
-
 
 class ActiveTestTester : public ActiveTestGTestBase {
     // ----------------------------------------------------------------------
@@ -74,8 +73,7 @@ class ActiveTestTester : public ActiveTestGTestBase {
     void testOverflowHook();
 
   private:
-
-    #include "FppTest/component/common/tester.hpp"
+#include "FppTest/component/common/tester.hpp"
 
   private:
     // ----------------------------------------------------------------------
@@ -84,9 +82,9 @@ class ActiveTestTester : public ActiveTestGTestBase {
 
     //! Handler for from_serialOut
     //!
-    void from_serialOut_handler(FwIndexType portNum,        //!< The port number
-                                Fw::SerializeBufferBase& Buffer //!< The serialization buffer
-    ) final;
+    void from_serialOut_handler(FwIndexType portNum,             //!< The port number
+                                Fw::SerializeBufferBase& Buffer  //!< The serialization buffer
+                                ) final;
 
   public:
     // ----------------------------------------------------------------------
@@ -171,12 +169,8 @@ class ActiveTestTester : public ActiveTestGTestBase {
     Fw::Time time;
 
     //! External Parameter Delegate
-    class ActiveTestComponentBaseParamExternalDelegate :
-    public Fw::ParamExternalDelegate
-    {
-
-    public:
-
+    class ActiveTestComponentBaseParamExternalDelegate : public Fw::ParamExternalDelegate {
+      public:
         // ----------------------------------------------------------------------
         // Parameter validity flags
         // ----------------------------------------------------------------------
@@ -199,8 +193,7 @@ class ActiveTestTester : public ActiveTestGTestBase {
         //! True if ParamStructExternal was successfully received
         Fw::ParamValid m_param_ParamStructExternal_valid;
 
-    public:
-
+      public:
         // ----------------------------------------------------------------------
         // Parameter variables
         // ----------------------------------------------------------------------
@@ -223,27 +216,25 @@ class ActiveTestTester : public ActiveTestGTestBase {
         //! Parameter ParamStructExternal
         FormalParamStruct m_param_ParamStructExternal;
 
-    public:
-
+      public:
         // ----------------------------------------------------------------------
         // Unit test implementation of external parameter delegate serialization/deserialization
         // ----------------------------------------------------------------------
 
         //! Parameter deserialization function for external parameter unit testing
         Fw::SerializeStatus deserializeParam(
-            const FwPrmIdType base_id, //!< The component base parameter ID to deserialize
-            const FwPrmIdType local_id, //!< The parameter local ID to deserialize
-            const Fw::ParamValid prmStat, //!< The parameter validity status
-            Fw::SerializeBufferBase& buff //!< The buffer containing the parameter to deserialize
-        ) override;
+            const FwPrmIdType base_id,     //!< The component base parameter ID to deserialize
+            const FwPrmIdType local_id,    //!< The parameter local ID to deserialize
+            const Fw::ParamValid prmStat,  //!< The parameter validity status
+            Fw::SerializeBufferBase& buff  //!< The buffer containing the parameter to deserialize
+            ) override;
 
         //! Parameter serialization function for external parameter unit testing
         Fw::SerializeStatus serializeParam(
-            const FwPrmIdType base_id, //!< The component base parameter ID to serialize
-            const FwPrmIdType local_id, //!< The parameter local ID to serialize
-            Fw::SerializeBufferBase& buff //!< The buffer to serialize the parameter into
+            const FwPrmIdType base_id,     //!< The component base parameter ID to serialize
+            const FwPrmIdType local_id,    //!< The parameter local ID to serialize
+            Fw::SerializeBufferBase& buff  //!< The buffer to serialize the parameter into
         ) const override;
-
     };
 
     // ----------------------------------------------------------------------
@@ -252,7 +243,6 @@ class ActiveTestTester : public ActiveTestGTestBase {
 
     //! Delegate to serialize/deserialize an externally stored parameter
     ActiveTestComponentBaseParamExternalDelegate paramTesterDelegate;
-
 };
 
 typedef ActiveTestTester Tester;

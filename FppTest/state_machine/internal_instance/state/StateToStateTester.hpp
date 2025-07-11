@@ -52,9 +52,9 @@ class StateToStateTester : public StateToStateComponentBase {
     enum class ActionId { EXIT_S1, EXIT_S2, EXIT_S3, A, ENTER_S1, ENTER_S2, ENTER_S3, ENTER_S4, ENTER_S5 };
 
   private:
-            // ----------------------------------------------------------------------
-            // Implementations for internal state machine actions
-            // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Implementations for internal state machine actions
+    // ----------------------------------------------------------------------
     //! Implementation for action exitS1 of state machine FppTest_SmState_StateToState
     //!
     //! Exit S1

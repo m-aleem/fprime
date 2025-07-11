@@ -30,8 +30,8 @@ BasicGuardStringTester ::~BasicGuardStringTester() {}
 // ----------------------------------------------------------------------
 
 void BasicGuardStringTester ::FppTest_SmState_BasicGuardString_action_a(SmId smId,
-                                                                  FppTest_SmState_BasicGuardString::Signal signal,
-                                                                  const Fw::StringBase& value) {
+                                                                        FppTest_SmState_BasicGuardString::Signal signal,
+                                                                        const Fw::StringBase& value) {
     ASSERT_EQ(smId, SmId::smStateBasicGuardString);
     this->m_smStateBasicGuardString_action_a_history.push(signal, Fw::String(value));
 }
@@ -41,8 +41,8 @@ void BasicGuardStringTester ::FppTest_SmState_BasicGuardString_action_a(SmId smI
 // ----------------------------------------------------------------------
 
 bool BasicGuardStringTester ::FppTest_SmState_BasicGuardString_guard_g(SmId smId,
-                                                                 FppTest_SmState_BasicGuardString::Signal signal,
-                                                                 const Fw::StringBase& value) const {
+                                                                       FppTest_SmState_BasicGuardString::Signal signal,
+                                                                       const Fw::StringBase& value) const {
     FW_ASSERT(smId == SmId::smStateBasicGuardString, static_cast<FwAssertArgType>(smId));
     return this->m_smStateBasicGuardString_guard_g.call(signal, Fw::String(value));
 }

@@ -41,13 +41,13 @@ void BasicTester::schedIn_handler(FwIndexType portNum, U32 context) {
 // ----------------------------------------------------------------------
 
 void BasicTester::FppTest_SmInstanceChoice_Basic_Basic_action_a(SmId smId,
-                                                          FppTest_SmInstanceChoice_Basic_Basic::Signal signal) {
+                                                                FppTest_SmInstanceChoice_Basic_Basic::Signal signal) {
     ASSERT_EQ(smId, SmId::basic);
     this->m_basic_action_a_history.push(signal);
 }
 
 void BasicTester::FppTest_SmInstanceChoice_Basic_Basic_action_b(SmId smId,
-                                                          FppTest_SmInstanceChoice_Basic_Basic::Signal signal) {
+                                                                FppTest_SmInstanceChoice_Basic_Basic::Signal signal) {
     ASSERT_EQ(smId, SmId::basic);
     this->m_basic_action_b_history.push(signal);
 }
@@ -66,8 +66,9 @@ void BasicTester::FppTest_SmChoice_Basic_action_b(SmId smId, FppTest_SmChoice_Ba
 // Implementations for internal state machine guards
 // ----------------------------------------------------------------------
 
-bool BasicTester::FppTest_SmInstanceChoice_Basic_Basic_guard_g(SmId smId,
-                                                         FppTest_SmInstanceChoice_Basic_Basic::Signal signal) const {
+bool BasicTester::FppTest_SmInstanceChoice_Basic_Basic_guard_g(
+    SmId smId,
+    FppTest_SmInstanceChoice_Basic_Basic::Signal signal) const {
     FW_ASSERT(smId == SmId::basic, static_cast<FwAssertArgType>(smId));
     return this->m_basic_guard_g.call(signal);
 }

@@ -25,7 +25,8 @@ BasicInternalTester::~BasicInternalTester() {}
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void BasicInternalTester::FppTest_SmState_BasicInternal_action_a(SmId smId, FppTest_SmState_BasicInternal::Signal signal) {
+void BasicInternalTester::FppTest_SmState_BasicInternal_action_a(SmId smId,
+                                                                 FppTest_SmState_BasicInternal::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateBasicInternal);
     this->m_smStateBasicInternal_action_a_history.push(signal);
 }

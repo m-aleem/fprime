@@ -27,14 +27,15 @@ BasicTestAbsTypeTester ::~BasicTestAbsTypeTester() {}
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void BasicTestAbsTypeTester ::FppTest_SmState_BasicTestAbsType_action_a(SmId smId,
-                                                                  FppTest_SmState_BasicTestAbsType::Signal signal) {
+void BasicTestAbsTypeTester ::FppTest_SmState_BasicTestAbsType_action_a(
+    SmId smId,
+    FppTest_SmState_BasicTestAbsType::Signal signal) {
     this->m_smStateBasicTestAbsType_action_a_history.push(signal);
 }
 
 void BasicTestAbsTypeTester ::FppTest_SmState_BasicTestAbsType_action_b(SmId smId,
-                                                                  FppTest_SmState_BasicTestAbsType::Signal signal,
-                                                                  const SmHarness::TestAbsType& value) {
+                                                                        FppTest_SmState_BasicTestAbsType::Signal signal,
+                                                                        const SmHarness::TestAbsType& value) {
     this->m_smStateBasicTestAbsType_action_b_history.push(signal, value);
 }
 

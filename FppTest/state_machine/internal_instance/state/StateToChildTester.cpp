@@ -25,12 +25,14 @@ StateToChildTester::~StateToChildTester() {}
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void StateToChildTester::FppTest_SmState_StateToChild_action_exitS2(SmId smId, FppTest_SmState_StateToChild::Signal signal) {
+void StateToChildTester::FppTest_SmState_StateToChild_action_exitS2(SmId smId,
+                                                                    FppTest_SmState_StateToChild::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToChild);
     this->m_smStateStateToChild_actionHistory.push(signal, ActionId::EXIT_S2);
 }
 
-void StateToChildTester::FppTest_SmState_StateToChild_action_exitS3(SmId smId, FppTest_SmState_StateToChild::Signal signal) {
+void StateToChildTester::FppTest_SmState_StateToChild_action_exitS3(SmId smId,
+                                                                    FppTest_SmState_StateToChild::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToChild);
     this->m_smStateStateToChild_actionHistory.push(signal, ActionId::EXIT_S3);
 }
@@ -40,12 +42,14 @@ void StateToChildTester::FppTest_SmState_StateToChild_action_a(SmId smId, FppTes
     this->m_smStateStateToChild_actionHistory.push(signal, ActionId::A);
 }
 
-void StateToChildTester::FppTest_SmState_StateToChild_action_enterS2(SmId smId, FppTest_SmState_StateToChild::Signal signal) {
+void StateToChildTester::FppTest_SmState_StateToChild_action_enterS2(SmId smId,
+                                                                     FppTest_SmState_StateToChild::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToChild);
     this->m_smStateStateToChild_actionHistory.push(signal, ActionId::ENTER_S2);
 }
 
-void StateToChildTester::FppTest_SmState_StateToChild_action_enterS3(SmId smId, FppTest_SmState_StateToChild::Signal signal) {
+void StateToChildTester::FppTest_SmState_StateToChild_action_enterS3(SmId smId,
+                                                                     FppTest_SmState_StateToChild::Signal signal) {
     ASSERT_EQ(smId, SmId::smStateStateToChild);
     this->m_smStateStateToChild_actionHistory.push(signal, ActionId::ENTER_S3);
 }

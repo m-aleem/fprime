@@ -12,8 +12,8 @@
 #include "FppTest/component/passive/PassiveTest.hpp"
 #include "FppTest/component/tests/CmdTests.hpp"
 #include "FppTest/component/tests/EventTests.hpp"
-#include "FppTest/component/tests/ParamTests.hpp"
 #include "FppTest/component/tests/ExternalParamTests.hpp"
+#include "FppTest/component/tests/ParamTests.hpp"
 #include "FppTest/component/tests/PortTests.hpp"
 #include "FppTest/component/tests/TlmTests.hpp"
 #include "FppTest/component/types/FormalParamTypes.hpp"
@@ -62,8 +62,7 @@ class PassiveTestTester : public PassiveTestGTestBase {
     void testTime();
 
   private:
-
-    #include "FppTest/component/common/tester.hpp"
+#include "FppTest/component/common/tester.hpp"
 
   private:
     // ----------------------------------------------------------------------
@@ -72,8 +71,8 @@ class PassiveTestTester : public PassiveTestGTestBase {
 
     //! Handler for from_serialOut
     //!
-    void from_serialOut_handler(FwIndexType portNum,        //!< The port number
-                                Fw::SerializeBufferBase& Buffer //!< The serialization buffer
+    void from_serialOut_handler(FwIndexType portNum,             //!< The port number
+                                Fw::SerializeBufferBase& Buffer  //!< The serialization buffer
     );
 
   public:
@@ -154,12 +153,8 @@ class PassiveTestTester : public PassiveTestGTestBase {
     Fw::Time time;
 
     //! External Parameter Delegate
-    class PassiveTestComponentBaseParamExternalDelegate :
-    public Fw::ParamExternalDelegate
-    {
-
-    public:
-
+    class PassiveTestComponentBaseParamExternalDelegate : public Fw::ParamExternalDelegate {
+      public:
         // ----------------------------------------------------------------------
         // Parameter validity flags
         // ----------------------------------------------------------------------
@@ -182,8 +177,7 @@ class PassiveTestTester : public PassiveTestGTestBase {
         //! True if ParamStructExternal was successfully received
         Fw::ParamValid m_param_ParamStructExternal_valid;
 
-    public:
-
+      public:
         // ----------------------------------------------------------------------
         // Parameter variables
         // ----------------------------------------------------------------------
@@ -206,27 +200,25 @@ class PassiveTestTester : public PassiveTestGTestBase {
         //! Parameter ParamStructExternal
         FormalParamStruct m_param_ParamStructExternal;
 
-    public:
-
+      public:
         // ----------------------------------------------------------------------
         // Unit test implementation of external parameter delegate serialization/deserialization
         // ----------------------------------------------------------------------
 
         //! Parameter deserialization function for external parameter unit testing
         Fw::SerializeStatus deserializeParam(
-            const FwPrmIdType base_id, //!< The component base parameter ID to deserialize
-            const FwPrmIdType local_id, //!< The parameter local ID to deserialize
-            const Fw::ParamValid prmStat, //!< The parameter validity status
-            Fw::SerializeBufferBase& buff //!< The buffer containing the parameter to deserialize
-        ) override;
+            const FwPrmIdType base_id,     //!< The component base parameter ID to deserialize
+            const FwPrmIdType local_id,    //!< The parameter local ID to deserialize
+            const Fw::ParamValid prmStat,  //!< The parameter validity status
+            Fw::SerializeBufferBase& buff  //!< The buffer containing the parameter to deserialize
+            ) override;
 
         //! Parameter serialization function for external parameter unit testing
         Fw::SerializeStatus serializeParam(
-            const FwPrmIdType base_id, //!< The component base parameter ID to serialize
-            const FwPrmIdType local_id, //!< The parameter local ID to serialize
-            Fw::SerializeBufferBase& buff //!< The buffer to serialize the parameter into
+            const FwPrmIdType base_id,     //!< The component base parameter ID to serialize
+            const FwPrmIdType local_id,    //!< The parameter local ID to serialize
+            Fw::SerializeBufferBase& buff  //!< The buffer to serialize the parameter into
         ) const override;
-
     };
 
     // ----------------------------------------------------------------------

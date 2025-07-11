@@ -29,24 +29,25 @@ ChoiceToStateTester::~ChoiceToStateTester() {}
 // ----------------------------------------------------------------------
 
 void ChoiceToStateTester::FppTest_SmChoice_ChoiceToState_action_exitS1(SmId smId,
-                                                                 FppTest_SmChoice_ChoiceToState::Signal signal) {
+                                                                       FppTest_SmChoice_ChoiceToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceChoiceToState);
     this->m_smChoiceChoiceToState_actionHistory.push(signal, ActionId::EXIT_S1);
 }
 
-void ChoiceToStateTester::FppTest_SmChoice_ChoiceToState_action_a(SmId smId, FppTest_SmChoice_ChoiceToState::Signal signal) {
+void ChoiceToStateTester::FppTest_SmChoice_ChoiceToState_action_a(SmId smId,
+                                                                  FppTest_SmChoice_ChoiceToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceChoiceToState);
     this->m_smChoiceChoiceToState_actionHistory.push(signal, ActionId::A);
 }
 
 void ChoiceToStateTester::FppTest_SmChoice_ChoiceToState_action_enterS2(SmId smId,
-                                                                  FppTest_SmChoice_ChoiceToState::Signal signal) {
+                                                                        FppTest_SmChoice_ChoiceToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceChoiceToState);
     this->m_smChoiceChoiceToState_actionHistory.push(signal, ActionId::ENTER_S2);
 }
 
 void ChoiceToStateTester::FppTest_SmChoice_ChoiceToState_action_enterS3(SmId smId,
-                                                                  FppTest_SmChoice_ChoiceToState::Signal signal) {
+                                                                        FppTest_SmChoice_ChoiceToState::Signal signal) {
     ASSERT_EQ(smId, SmId::smChoiceChoiceToState);
     this->m_smChoiceChoiceToState_actionHistory.push(signal, ActionId::ENTER_S3);
 }
@@ -56,7 +57,7 @@ void ChoiceToStateTester::FppTest_SmChoice_ChoiceToState_action_enterS3(SmId smI
 // ----------------------------------------------------------------------
 
 bool ChoiceToStateTester::FppTest_SmChoice_ChoiceToState_guard_g(SmId smId,
-                                                           FppTest_SmChoice_ChoiceToState::Signal signal) const {
+                                                                 FppTest_SmChoice_ChoiceToState::Signal signal) const {
     FW_ASSERT(smId == SmId::smChoiceChoiceToState, static_cast<FwAssertArgType>(smId));
     return this->m_smChoiceChoiceToState_guard_g.call(signal);
 }

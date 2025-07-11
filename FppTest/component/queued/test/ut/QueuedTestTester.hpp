@@ -12,9 +12,9 @@
 #include "FppTest/component/queued/QueuedTest.hpp"
 #include "FppTest/component/tests/CmdTests.hpp"
 #include "FppTest/component/tests/EventTests.hpp"
+#include "FppTest/component/tests/ExternalParamTests.hpp"
 #include "FppTest/component/tests/InternalInterfaceTests.hpp"
 #include "FppTest/component/tests/ParamTests.hpp"
-#include "FppTest/component/tests/ExternalParamTests.hpp"
 #include "FppTest/component/tests/PortTests.hpp"
 #include "FppTest/component/tests/TlmTests.hpp"
 #include "FppTest/component/types/FormalParamTypes.hpp"
@@ -72,9 +72,8 @@ class QueuedTestTester : public QueuedTestGTestBase {
 
     void testOverflowHook();
 
-    private:
-
-    #include "FppTest/component/common/tester.hpp"
+  private:
+#include "FppTest/component/common/tester.hpp"
 
   private:
     // ----------------------------------------------------------------------
@@ -83,8 +82,8 @@ class QueuedTestTester : public QueuedTestGTestBase {
 
     //! Handler for from_serialOut
     //!
-    void from_serialOut_handler(FwIndexType portNum,        //!< The port number
-                                Fw::SerializeBufferBase& Buffer //!< The serialization buffer
+    void from_serialOut_handler(FwIndexType portNum,             //!< The port number
+                                Fw::SerializeBufferBase& Buffer  //!< The serialization buffer
     );
 
   public:
@@ -170,14 +169,9 @@ class QueuedTestTester : public QueuedTestGTestBase {
     // Time test values
     Fw::Time time;
 
-
     //! External Parameter Delegate
-    class QueuedTestComponentBaseParamExternalDelegate :
-    public Fw::ParamExternalDelegate
-    {
-
-    public:
-
+    class QueuedTestComponentBaseParamExternalDelegate : public Fw::ParamExternalDelegate {
+      public:
         // ----------------------------------------------------------------------
         // Parameter validity flags
         // ----------------------------------------------------------------------
@@ -200,8 +194,7 @@ class QueuedTestTester : public QueuedTestGTestBase {
         //! True if ParamStructExternal was successfully received
         Fw::ParamValid m_param_ParamStructExternal_valid;
 
-    public:
-
+      public:
         // ----------------------------------------------------------------------
         // Parameter variables
         // ----------------------------------------------------------------------
@@ -224,27 +217,25 @@ class QueuedTestTester : public QueuedTestGTestBase {
         //! Parameter ParamStructExternal
         FormalParamStruct m_param_ParamStructExternal;
 
-    public:
-
+      public:
         // ----------------------------------------------------------------------
         // Unit test implementation of external parameter delegate serialization/deserialization
         // ----------------------------------------------------------------------
 
         //! Parameter deserialization function for external parameter unit testing
         Fw::SerializeStatus deserializeParam(
-            const FwPrmIdType base_id, //!< The component base parameter ID to deserialize
-            const FwPrmIdType local_id, //!< The parameter local ID to deserialize
-            const Fw::ParamValid prmStat, //!< The parameter validity status
-            Fw::SerializeBufferBase& buff //!< The buffer containing the parameter to deserialize
-        ) override;
+            const FwPrmIdType base_id,     //!< The component base parameter ID to deserialize
+            const FwPrmIdType local_id,    //!< The parameter local ID to deserialize
+            const Fw::ParamValid prmStat,  //!< The parameter validity status
+            Fw::SerializeBufferBase& buff  //!< The buffer containing the parameter to deserialize
+            ) override;
 
         //! Parameter serialization function for external parameter unit testing
         Fw::SerializeStatus serializeParam(
-            const FwPrmIdType base_id, //!< The component base parameter ID to serialize
-            const FwPrmIdType local_id, //!< The parameter local ID to serialize
-            Fw::SerializeBufferBase& buff //!< The buffer to serialize the parameter into
+            const FwPrmIdType base_id,     //!< The component base parameter ID to serialize
+            const FwPrmIdType local_id,    //!< The parameter local ID to serialize
+            Fw::SerializeBufferBase& buff  //!< The buffer to serialize the parameter into
         ) const override;
-
     };
 
     // ----------------------------------------------------------------------

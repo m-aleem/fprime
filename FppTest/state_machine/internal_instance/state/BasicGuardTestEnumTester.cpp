@@ -28,9 +28,10 @@ BasicGuardTestEnumTester::~BasicGuardTestEnumTester() {}
 // Implementations for internal state machine actions
 // ----------------------------------------------------------------------
 
-void BasicGuardTestEnumTester::FppTest_SmState_BasicGuardTestEnum_action_a(SmId smId,
-                                                                     FppTest_SmState_BasicGuardTestEnum::Signal signal,
-                                                                     const SmHarness::TestEnum& value) {
+void BasicGuardTestEnumTester::FppTest_SmState_BasicGuardTestEnum_action_a(
+    SmId smId,
+    FppTest_SmState_BasicGuardTestEnum::Signal signal,
+    const SmHarness::TestEnum& value) {
     ASSERT_EQ(smId, SmId::smStateBasicGuardTestEnum);
     this->m_smStateBasicGuardTestEnum_action_a_history.push(signal, value);
 }
@@ -39,9 +40,10 @@ void BasicGuardTestEnumTester::FppTest_SmState_BasicGuardTestEnum_action_a(SmId 
 // Implementations for internal state machine guards
 // ----------------------------------------------------------------------
 
-bool BasicGuardTestEnumTester::FppTest_SmState_BasicGuardTestEnum_guard_g(SmId smId,
-                                                                    FppTest_SmState_BasicGuardTestEnum::Signal signal,
-                                                                    const SmHarness::TestEnum& value) const {
+bool BasicGuardTestEnumTester::FppTest_SmState_BasicGuardTestEnum_guard_g(
+    SmId smId,
+    FppTest_SmState_BasicGuardTestEnum::Signal signal,
+    const SmHarness::TestEnum& value) const {
     FW_ASSERT(smId == SmId::smStateBasicGuardTestEnum, static_cast<FwAssertArgType>(smId));
     return this->m_smStateBasicGuardTestEnum_guard_g.call(signal, value);
 }
