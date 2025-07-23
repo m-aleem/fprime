@@ -9,7 +9,7 @@
 // This allows us to test the stub on any platform without namespace conflicts
 namespace TestStub {
     namespace std {
-        #include "Os/Stub/atomic_impl.hpp"
+        #include "Os/Stub/atomic/atomic_impl.hpp"
     } // namespace std
 } // namespace TestStub
 
