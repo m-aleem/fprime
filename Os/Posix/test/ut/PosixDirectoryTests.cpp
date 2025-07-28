@@ -11,6 +11,7 @@
 #include "Fw/Types/String.hpp"
 
 #include <fcntl.h> // for ::open()
+#include <unistd.h> // for ::close()
 
 namespace Os {
 namespace Test {
@@ -35,7 +36,10 @@ void setUp(Os::Test::Directory::Tester* tester) {
         tester->m_filenames.push_back(FILENAME_PREFIX + std::to_string(i));
     }
     for (auto filename : tester->m_filenames) {
-        ::open((tester->m_path + "/" + filename).c_str(), O_CREAT);
+        int fd = ::open((tester->m_path + "/" + filename).c_str(), O_CREAT | O_WRONLY, 0644);
+        if (fd >= 0) {
+            ::close(fd);
+        }
     }
 }
 

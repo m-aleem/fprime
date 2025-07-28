@@ -96,7 +96,7 @@ namespace Utils {
       Fw::Time nextTriggerTime(0, 0);
       srand(0x30931842);
       for (U32 iter = 0; iter < numIter; iter++) {
-        curTime.add(0, (rand() % 5 + 1) * 100000);
+        curTime.add(0, (arc4random() % 5 + 1) * 100000);
         bool shouldTrigger = (cycles == 0) || (curTime >= nextTriggerTime);
         bool triggered = limiter.trigger(curTime);
         ASSERT_EQ(shouldTrigger, triggered) << " for cycles " << cycles << " at " << curTime.getSeconds() << "." << curTime.getUSeconds();
@@ -129,7 +129,7 @@ namespace Utils {
       Fw::Time nextTriggerTime(0, 0);
       srand(0x28E1ACC2);
       for (U32 iter = 0; iter < numIter; iter++) {
-        curTime.add(0, (rand() % 5 + 1) * 100000);
+        curTime.add(0, (arc4random() % 5 + 1) * 100000);
         bool shouldTrigger = ((iter-lastTriggerIter) % counterCycles == 0) || (curTime >= nextTriggerTime);
         bool triggered = limiter.trigger(curTime);
         ASSERT_EQ(shouldTrigger, triggered) << " for cycles " << counterCycles << "/" << timeCycles << " at " << iter << "/" << curTime.getSeconds() << "." << curTime.getUSeconds();

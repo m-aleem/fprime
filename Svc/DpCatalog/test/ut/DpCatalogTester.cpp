@@ -315,16 +315,16 @@ namespace Svc {
 
                 // fill the input entries with random priorities
                 for (FwIndexType entry = 0; entry < static_cast<FwIndexType>(FW_NUM_ARRAY_ELEMENTS(inputs)); entry++) {
-                    U32 randVal = rand()%NUM_ENTRIES;
+                    U32 randVal = arc4random()%NUM_ENTRIES;
                     inputs[entry].record.set_priority(randVal);
-                    randVal = rand()%NUM_ENTRIES;
+                    randVal = arc4random()%NUM_ENTRIES;
                     inputs[entry].record.set_id(randVal);
-                    randVal = rand()%NUM_ENTRIES;
+                    randVal = arc4random()%NUM_ENTRIES;
                     inputs[entry].record.set_tSec(randVal);
                     inputs[entry].record.set_tSub(1500);
                     inputs[entry].record.set_size(100);
                     // randomly set if it is transmitted or not
-                    randVal = rand()%2;
+                    randVal = arc4random()%2;
                     if (randVal == 0) {
                         inputs[entry].record.set_state(Fw::DpState::UNTRANSMITTED);
                         // only put untransmitted products in list, since the catalog algorithm only returns untransmitted product IDs
@@ -622,7 +622,7 @@ namespace Svc {
 
                 // fill the input entries with random priorities
                 for (FwIndexType entry = 0; entry < static_cast<FwIndexType>(FW_NUM_ARRAY_ELEMENTS(inputs)); entry++) {
-                    U32 randVal = rand()%NUM_ENTRIES;
+                    U32 randVal = arc4random()%NUM_ENTRIES;
                     inputs[entry].record.set_priority(randVal);
                     inputs[entry].record.set_id(entry);
                     inputs[entry].record.set_state(Fw::DpState::UNTRANSMITTED);
@@ -675,7 +675,7 @@ namespace Svc {
 
                 // fill the input entries with random priorities
                 for (FwIndexType entry = 0; entry < static_cast<FwIndexType>(FW_NUM_ARRAY_ELEMENTS(inputs)); entry++) {
-                    U32 randVal = rand()%NUM_ENTRIES;
+                    U32 randVal = arc4random()%NUM_ENTRIES;
                     inputs[entry].record.set_priority(100);
                     inputs[entry].record.set_id(entry);
                     inputs[entry].record.set_state(Fw::DpState::UNTRANSMITTED);
@@ -730,7 +730,7 @@ namespace Svc {
 
                 // fill the input entries with random priorities
                 for (FwIndexType entry = 0; entry < static_cast<FwIndexType>(FW_NUM_ARRAY_ELEMENTS(inputs)); entry++) {
-                    U32 randVal = rand()%NUM_ENTRIES;
+                    U32 randVal = arc4random()%NUM_ENTRIES;
                     inputs[entry].record.set_priority(100);
                     inputs[entry].record.set_id(randVal);
                     inputs[entry].record.set_state(Fw::DpState::UNTRANSMITTED);
@@ -783,12 +783,12 @@ namespace Svc {
 
                 // fill the input entries with random priorities
                 for (FwIndexType entry = 0; entry < static_cast<FwIndexType>(FW_NUM_ARRAY_ELEMENTS(inputs)); entry++) {
-                    U32 randVal = rand()%NUM_ENTRIES;
+                    U32 randVal = arc4random()%NUM_ENTRIES;
                     inputs[entry].record.set_priority(randVal);
-                    randVal = rand()%NUM_ENTRIES;
+                    randVal = arc4random()%NUM_ENTRIES;
                     inputs[entry].record.set_id(randVal);
                     inputs[entry].record.set_state(Fw::DpState::UNTRANSMITTED);
-                    randVal = rand()%NUM_ENTRIES;
+                    randVal = arc4random()%NUM_ENTRIES;
                     inputs[entry].record.set_tSec(randVal);
                     inputs[entry].record.set_tSub(1500);
                     inputs[entry].record.set_size(100);

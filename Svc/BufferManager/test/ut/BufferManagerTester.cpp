@@ -243,7 +243,7 @@ namespace Svc {
       for (U16 b=0; b<BIN1_NUM_BUFFERS; b++) {
           U16 entry;
           while (true) {
-              entry = rand() % BIN1_NUM_BUFFERS;
+              entry = arc4random() % BIN1_NUM_BUFFERS;
               if (not returned[entry]) {
                   returned[entry] = true;
                   break;
