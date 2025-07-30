@@ -14,7 +14,6 @@
 #include <Fw/Types/MallocAllocator.hpp>
 #include <Fw/Test/UnitTest.hpp>
 #include <cstdlib>
-#include <random>
 
 #define INSTANCE 0
 #define MAX_HISTORY_SIZE 100
@@ -94,8 +93,7 @@ namespace Svc {
   BufferManagerTester ::
     BufferManagerTester() :
       BufferManagerGTestBase("Tester", MAX_HISTORY_SIZE),
-      component("BufferManager"),
-      m_rng(std::random_device{}())
+      component("BufferManager")
   {
     this->initComponents();
     this->connectPorts();
@@ -237,16 +235,12 @@ namespace Svc {
       REQUIREMENT("FPRIME-BM-006");
 
       // randomly return buffers
-      time_t t;
-      srand(static_cast<unsigned>(time(&t)));
-
       bool returned[BIN1_NUM_BUFFERS] = {false};
 
       for (U16 b=0; b<BIN1_NUM_BUFFERS; b++) {
           U16 entry;
           while (true) {
-              std::uniform_int_distribution<U16> dis(0, BIN1_NUM_BUFFERS - 1);
-              entry = dis(this->m_rng);
+              entry = STest::Pick::lowerUpper(0, BIN1_NUM_BUFFERS - 1);
               if (not returned[entry]) {
                   returned[entry] = true;
                   break;

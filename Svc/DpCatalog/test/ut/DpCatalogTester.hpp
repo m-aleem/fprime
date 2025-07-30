@@ -9,7 +9,7 @@
 
 #include "Svc/DpCatalog/DpCatalogGTestBase.hpp"
 #include "Svc/DpCatalog/DpCatalog.hpp"
-#include <random>
+#include <STest/Pick/Pick.hpp>
 
 namespace Svc {
 
@@ -148,8 +148,7 @@ namespace Svc {
         //! The component under test
         DpCatalog component;
 
-        //! Random number generator for tests
-        std::mt19937 m_rng;
+
 
     public:
         // ----------------------------------------------------------------------
