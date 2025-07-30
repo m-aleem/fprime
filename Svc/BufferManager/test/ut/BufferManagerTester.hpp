@@ -15,6 +15,7 @@
 
 #include "BufferManagerGTestBase.hpp"
 #include "Svc/BufferManager/BufferManagerComponentImpl.hpp"
+#include <random>
 
 namespace Svc {
 
@@ -75,6 +76,10 @@ namespace Svc {
       //! The component under test
       //!
       BufferManagerComponentImpl component;
+
+      //! Random number generator for tests
+      //!
+      std::mt19937 m_rng;
 
       void textLogIn(
           const FwEventIdType id, //!< The event ID

@@ -419,6 +419,8 @@ ncsl
 newtio
 nmsgs
 NOBLOCK
+NOLINT
+NOLINTNEXTLINE
 noparent
 norecords
 NOSPEC
@@ -441,6 +443,7 @@ openmct
 openpyxl
 openssldir
 optarg
+optin
 optind
 orgslist
 ortega
@@ -683,8 +686,8 @@ TPP
 trinomials
 tts
 TXD
-typedef'ed
 typedef
+typedef'ed
 uart
 UDPSOCKET
 uge

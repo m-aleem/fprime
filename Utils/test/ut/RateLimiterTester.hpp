@@ -17,6 +17,7 @@
 #include "Utils/RateLimiter.hpp"
 #include <Fw/FPrimeBasicTypes.hpp>
 #include "gtest/gtest.h"
+#include <random>
 
 namespace Utils {
 
@@ -62,6 +63,10 @@ namespace Utils {
       // ----------------------------------------------------------------------
       // Variables
       // ----------------------------------------------------------------------
+
+      //! Random number generator for tests
+      //!
+      std::mt19937 m_rng;
 
   };
 

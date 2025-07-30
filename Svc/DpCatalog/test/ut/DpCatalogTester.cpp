@@ -13,6 +13,7 @@
 #include "Fw/Types/FileNameString.hpp"
 #include "config/DpCfg.hpp"
 #include <list>
+#include <random>
 
 namespace Svc {
 
@@ -23,7 +24,8 @@ namespace Svc {
     DpCatalogTester ::
         DpCatalogTester() :
         DpCatalogGTestBase("DpCatalogTester", DpCatalogTester::MAX_HISTORY_SIZE),
-        component("DpCatalog")
+        component("DpCatalog"),
+        m_rng(std::random_device{}())
     {
         this->initComponents();
         this->connectPorts();
@@ -315,16 +317,18 @@ namespace Svc {
 
                 // fill the input entries with random priorities
                 for (FwIndexType entry = 0; entry < static_cast<FwIndexType>(FW_NUM_ARRAY_ELEMENTS(inputs)); entry++) {
-                    U32 randVal = arc4random()%NUM_ENTRIES;
+                    std::uniform_int_distribution<U32> numEntriesDis(0, NUM_ENTRIES - 1);
+                    U32 randVal = numEntriesDis(this->m_rng);
                     inputs[entry].record.set_priority(randVal);
-                    randVal = arc4random()%NUM_ENTRIES;
+                    randVal = numEntriesDis(this->m_rng);
                     inputs[entry].record.set_id(randVal);
-                    randVal = arc4random()%NUM_ENTRIES;
+                    randVal = numEntriesDis(this->m_rng);
                     inputs[entry].record.set_tSec(randVal);
                     inputs[entry].record.set_tSub(1500);
                     inputs[entry].record.set_size(100);
                     // randomly set if it is transmitted or not
-                    randVal = arc4random()%2;
+                    std::uniform_int_distribution<U32> binaryDis(0, 1);
+                    randVal = binaryDis(this->m_rng);
                     if (randVal == 0) {
                         inputs[entry].record.set_state(Fw::DpState::UNTRANSMITTED);
                         // only put untransmitted products in list, since the catalog algorithm only returns untransmitted product IDs
@@ -622,7 +626,8 @@ namespace Svc {
 
                 // fill the input entries with random priorities
                 for (FwIndexType entry = 0; entry < static_cast<FwIndexType>(FW_NUM_ARRAY_ELEMENTS(inputs)); entry++) {
-                    U32 randVal = arc4random()%NUM_ENTRIES;
+                    std::uniform_int_distribution<U32> numEntriesDis(0, NUM_ENTRIES - 1);
+                    U32 randVal = numEntriesDis(this->m_rng);
                     inputs[entry].record.set_priority(randVal);
                     inputs[entry].record.set_id(entry);
                     inputs[entry].record.set_state(Fw::DpState::UNTRANSMITTED);
@@ -675,7 +680,8 @@ namespace Svc {
 
                 // fill the input entries with random priorities
                 for (FwIndexType entry = 0; entry < static_cast<FwIndexType>(FW_NUM_ARRAY_ELEMENTS(inputs)); entry++) {
-                    U32 randVal = arc4random()%NUM_ENTRIES;
+                    std::uniform_int_distribution<U32> numEntriesDis(0, NUM_ENTRIES - 1);
+                    U32 randVal = numEntriesDis(this->m_rng);
                     inputs[entry].record.set_priority(100);
                     inputs[entry].record.set_id(entry);
                     inputs[entry].record.set_state(Fw::DpState::UNTRANSMITTED);
@@ -730,7 +736,8 @@ namespace Svc {
 
                 // fill the input entries with random priorities
                 for (FwIndexType entry = 0; entry < static_cast<FwIndexType>(FW_NUM_ARRAY_ELEMENTS(inputs)); entry++) {
-                    U32 randVal = arc4random()%NUM_ENTRIES;
+                    std::uniform_int_distribution<U32> numEntriesDis(0, NUM_ENTRIES - 1);
+                    U32 randVal = numEntriesDis(this->m_rng);
                     inputs[entry].record.set_priority(100);
                     inputs[entry].record.set_id(randVal);
                     inputs[entry].record.set_state(Fw::DpState::UNTRANSMITTED);
@@ -783,12 +790,13 @@ namespace Svc {
 
                 // fill the input entries with random priorities
                 for (FwIndexType entry = 0; entry < static_cast<FwIndexType>(FW_NUM_ARRAY_ELEMENTS(inputs)); entry++) {
-                    U32 randVal = arc4random()%NUM_ENTRIES;
+                    std::uniform_int_distribution<U32> numEntriesDis(0, NUM_ENTRIES - 1);
+                    U32 randVal = numEntriesDis(this->m_rng);
                     inputs[entry].record.set_priority(randVal);
-                    randVal = arc4random()%NUM_ENTRIES;
+                    randVal = numEntriesDis(this->m_rng);
                     inputs[entry].record.set_id(randVal);
                     inputs[entry].record.set_state(Fw::DpState::UNTRANSMITTED);
-                    randVal = arc4random()%NUM_ENTRIES;
+                    randVal = numEntriesDis(this->m_rng);
                     inputs[entry].record.set_tSec(randVal);
                     inputs[entry].record.set_tSub(1500);
                     inputs[entry].record.set_size(100);
