@@ -678,8 +678,8 @@ tparam
 TPP
 trinomials
 tts
-typedef
 typedef'ed
+typedef
 uart
 UDPSOCKET
 uge
