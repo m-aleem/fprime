@@ -7,7 +7,6 @@
 #include "Fw/Types/String.hpp"
 #include <memory>
 
-
 struct PickedMessage {
     FwSizeType size;
     FwQueuePriorityType priority;
@@ -73,9 +72,8 @@ void Os::Test::Queue::Tester::Create::action(Os::Test::Queue::Tester& state  //!
 //
 // ------------------------------------------------------------------------------------------------------
 
-Os::Test::Queue::Tester::SendNotFull::SendNotFull(bool end_check) : STest::Rule<Os::Test::Queue::Tester>("SendNotFull"),
-    m_end_check(end_check)
-{}
+Os::Test::Queue::Tester::SendNotFull::SendNotFull(bool end_check)
+    : STest::Rule<Os::Test::Queue::Tester>("SendNotFull"), m_end_check(end_check) {}
 
 bool Os::Test::Queue::Tester::SendNotFull::precondition(const Os::Test::Queue::Tester& state  //!< The test state
 ) {
@@ -128,8 +126,8 @@ void Os::Test::Queue::Tester::SendFullNoBlock::action(Os::Test::Queue::Tester& s
 //
 // ------------------------------------------------------------------------------------------------------
 
-Os::Test::Queue::Tester::ReceiveNotEmpty::ReceiveNotEmpty(bool end_check) : STest::Rule<Os::Test::Queue::Tester>("ReceiveNotEmpty"),
-      m_end_check(end_check) {}
+Os::Test::Queue::Tester::ReceiveNotEmpty::ReceiveNotEmpty(bool end_check)
+    : STest::Rule<Os::Test::Queue::Tester>("ReceiveNotEmpty"), m_end_check(end_check) {}
 
 bool Os::Test::Queue::Tester::ReceiveNotEmpty::precondition(const Os::Test::Queue::Tester& state  //!< The test state
 ) {
