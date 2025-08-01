@@ -3,9 +3,9 @@
 // \brief queue rule implementations
 // ======================================================================
 
+#include <memory>
 #include "CommonTests.hpp"
 #include "Fw/Types/String.hpp"
-#include <memory>
 
 struct PickedMessage {
     FwSizeType size;
@@ -112,7 +112,8 @@ bool Os::Test::Queue::Tester::SendFullNoBlock::precondition(const Os::Test::Queu
 void Os::Test::Queue::Tester::SendFullNoBlock::action(Os::Test::Queue::Tester& state  //!< The test state
 ) {
     PickedMessage pick = pick_message(state.shadow.messageSize);
-    QueueInterface::Status status = state.shadow_send(pick.get_sent(), pick.size, pick.priority, QueueInterface::NONBLOCKING);
+    QueueInterface::Status status =
+        state.shadow_send(pick.get_sent(), pick.size, pick.priority, QueueInterface::NONBLOCKING);
     QueueInterface::Status test_status =
         state.queue.send(pick.get_sent(), pick.size, pick.priority, QueueInterface::NONBLOCKING);
 
