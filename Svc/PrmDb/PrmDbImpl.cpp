@@ -255,7 +255,6 @@ void PrmDbImpl::PRM_SET_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq, const F
     // // TODO: Update the RAM database with the new values
     // this->log_ACTIVITY_HI_PrmSetFileComplete(appliedRecords);
     this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::EXECUTION_ERROR);
-
 }
 
 PrmDbImpl::~PrmDbImpl() {}
