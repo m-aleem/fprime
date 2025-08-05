@@ -60,6 +60,20 @@ class PrmDbImpl final : public PrmDbComponentBase {
 
   protected:
   private:
+    struct t_dbStruct {
+        bool used;            //!< whether slot is being used
+        FwPrmIdType id;       //!< the id being stored in the slot
+        Fw::ParamBuffer val;  //!< the serialized value of the parameter
+    };
+
+    //! \brief Read a parameter file and apply the values to the database
+    //!
+    //!  This method reads a parameter file and applies the values to the database.
+    //!
+    //!  \param fileName The name of the parameter file to read
+    //!  \param db Pointer to the database array to populate with parameter data
+    void readParamFileImpl(const Fw::StringBase& fileName, t_dbStruct* db);
+
     //!  \brief PrmDb parameter get handler
     //!
     //!  This function retrieves a parameter value from the loaded set of stored parameters
@@ -69,6 +83,7 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  \param val buffer where value is placed.
     //!  \return status of retrieval. PARAM_VALID = successful read, PARAM_INVALID = unsuccessful read
     Fw::ParamValid getPrm_handler(FwIndexType portNum, FwPrmIdType id, Fw::ParamBuffer& val);
+
     //!  \brief PrmDb parameter set handler
     //!
     //!  This function updates the value of the parameter stored in RAM. The PRM_SAVE_FILE
@@ -87,8 +102,8 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  \param portNum the number of the incoming port.
     //!  \param opCode the opcode being registered.
     //!  \param key the key value that is returned with the ping response
-
     void pingIn_handler(FwIndexType portNum, U32 key);
+
     //!  \brief PrmDb PRM_SAVE_FILE command handler
     //!
     //!  This function saves the parameter values stored in RAM to the file
@@ -99,6 +114,17 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  \param cmdSeq The sequence number of the command
     void PRM_SAVE_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq);
 
+    //!  \brief PrmDb PRM_SAVE_FILE command handler
+    //!
+    //!  This function applies the parameter values from a specified
+    //   file into the the RAM parameter values. Note that these updates
+    //   are not saved until a subsequent call to SAVE file.
+    //!
+    //!  \param opCode The opcode of this commands
+    //!  \param cmdSeq The sequence number of the command
+    //!  \param fileName The name of the parameter load file
+    void PRM_SET_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq, const Fw::CmdStringArg& fileName);
+
     //!  \brief PrmDb clear database function
     //!
     //!  This function clears all entries from the RAM database
@@ -108,11 +134,8 @@ class PrmDbImpl final : public PrmDbComponentBase {
 
     Fw::String m_fileName;  //!< filename for parameter storage
 
-    struct t_dbStruct {
-        bool used;            //!< whether slot is being used
-        FwPrmIdType id;       //!< the id being stored in the slot
-        Fw::ParamBuffer val;  //!< the serialized value of the parameter
-    } m_db[PRMDB_NUM_DB_ENTRIES];
+    t_dbStruct m_db[PRMDB_NUM_DB_ENTRIES];
+    t_dbStruct m_dbBackup[PRMDB_NUM_DB_ENTRIES];
 };
 }  // namespace Svc
 

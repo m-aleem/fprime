@@ -233,9 +233,39 @@ void PrmDbImpl::PRM_SAVE_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
     this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
 }
 
+void PrmDbImpl::PRM_SET_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq, const Fw::CmdStringArg& fileName) {
+    // U32 appliedRecords = 0;
+    // FW_ASSERT(fileName.length() > 0);
+    // Os::File paramFile;
+
+    // Os::File::Status stat = paramFile.open(fileName.toChar(), Os::File::OPEN_READ);
+    // if (stat != Os::File::OP_OK) {
+    //     paramFile.close();
+    //     this->log_WARNING_HI_PrmFileReadError(PrmReadError::OPEN, 0, stat);
+    //     this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::EXECUTION_ERROR);
+    //     return;
+    // }
+
+    // // TODO: Read the file and apply the parameter values to the RAM database
+    // // Use a separate backup database to avoid overwriting the current values
+    // // in case of an error and then update pointers at the end.
+    // readParamFile();
+    // paramFile.close();
+
+    // // TODO: Update the RAM database with the new values
+    // this->log_ACTIVITY_HI_PrmSetFileComplete(appliedRecords);
+    this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::EXECUTION_ERROR);
+
+}
+
 PrmDbImpl::~PrmDbImpl() {}
 
 void PrmDbImpl::readParamFile() {
+    readParamFileImpl(this->m_fileName, this->m_db);
+}
+
+void PrmDbImpl::readParamFileImpl(const Fw::StringBase&, t_dbStruct* db) {
+    // TODO: Update this to return a bool or status
     FW_ASSERT(this->m_fileName.length() > 0);
     // load file. FIXME: Put more robust file checking, such as a CRC.
     Os::File paramFile;
