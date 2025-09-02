@@ -29,11 +29,7 @@ SocketIpStatus TcpServerComponentImpl::configure(const char* hostname,
                                                  const U32 send_timeout_seconds,
                                                  const U32 send_timeout_microseconds,
                                                  FwSizeType buffer_size) {
-    // Check that ensures the configured buffer size fits within the limits fixed-width type, U32
-
-    FW_ASSERT(buffer_size <= std::numeric_limits<U32>::max(), static_cast<FwAssertArgType>(buffer_size));
     m_allocation_size = buffer_size;  // Store the buffer size
-                                      //
     (void)m_socket.configure(hostname, port, send_timeout_seconds, send_timeout_microseconds);
     return startup();
 }
@@ -53,7 +49,7 @@ IpSocket& TcpServerComponentImpl::getSocketHandler() {
 }
 
 Fw::Buffer TcpServerComponentImpl::getBuffer() {
-    return allocate_out(0, static_cast<U32>(m_allocation_size));
+    return allocate_out(0, m_allocation_size);
 }
 
 void TcpServerComponentImpl::sendBuffer(Fw::Buffer buffer, SocketIpStatus status) {
@@ -119,9 +115,8 @@ void TcpServerComponentImpl::readLoop() {
 // Handler implementations for user-defined typed input ports
 // ----------------------------------------------------------------------
 
-void TcpServerComponentImpl::send_handler(const FwIndexType portNum, Fw::Buffer& fwBuffer) {
-    FW_ASSERT_NO_OVERFLOW(fwBuffer.getSize(), U32);
-    Drv::SocketIpStatus status = this->send(fwBuffer.getData(), static_cast<U32>(fwBuffer.getSize()));
+Drv::ByteStreamStatus TcpServerComponentImpl::send_handler(const FwIndexType portNum, Fw::Buffer& fwBuffer) {
+    Drv::SocketIpStatus status = this->send(fwBuffer.getData(), fwBuffer.getSize());
     Drv::ByteStreamStatus returnStatus;
     switch (status) {
         case SOCK_INTERRUPTED_TRY_AGAIN:
@@ -134,8 +129,7 @@ void TcpServerComponentImpl::send_handler(const FwIndexType portNum, Fw::Buffer&
             returnStatus = ByteStreamStatus::OTHER_ERROR;
             break;
     }
-    // Return the buffer and status to the caller
-    this->sendReturnOut_out(0, fwBuffer, returnStatus);
+    return returnStatus;
 }
 
 void TcpServerComponentImpl::recvReturnIn_handler(FwIndexType portNum, Fw::Buffer& fwBuffer) {

@@ -58,7 +58,7 @@ void TcpServerTester ::test_with_loop(U32 iterations, bool recv_thread) {
         client.configure("127.0.0.1", this->component.getListenPort(), 0, 100);
         status2 = client.open(client_fd);
         EXPECT_EQ(status2, Drv::SocketIpStatus::SOCK_SUCCESS) << "Failed to connect client";
-        U32 size = sizeof(m_data_storage);
+        FwSizeType size = sizeof(m_data_storage);
 
         // Not testing with reconnect thread, we will need to open ourselves
         if (not recv_thread) {
@@ -79,9 +79,7 @@ void TcpServerTester ::test_with_loop(U32 iterations, bool recv_thread) {
             Drv::Test::force_recv_timeout(client_fd.fd, client);
             m_data_buffer.setSize(sizeof(m_data_storage));
             size = Drv::Test::fill_random_buffer(m_data_buffer);
-            invoke_to_send(0, m_data_buffer);
-            ASSERT_from_sendReturnOut_SIZE(i + 1);
-            Drv::ByteStreamStatus status = this->fromPortHistory_sendReturnOut->at(i).status;
+            Drv::ByteStreamStatus status = invoke_to_send(0, m_data_buffer);
             EXPECT_EQ(status, ByteStreamStatus::OP_OK)
                 << "On iteration: " << i << " and receive thread: " << recv_thread;
             Drv::Test::receive_all(client, client_fd, buffer, size);
