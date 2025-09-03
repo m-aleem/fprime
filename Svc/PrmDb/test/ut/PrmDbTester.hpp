@@ -20,14 +20,15 @@ class PrmDbTester : public PrmDbGTestBase {
     PrmDbTester(Svc::PrmDbImpl& inst);
     virtual ~PrmDbTester();
 
+    // Test Cases
     void runNominalPopulate();
     void runNominalSaveFile();
     void runNominalLoadFile();
     void runMissingExtraParams();
     void runFileReadError();
     void runFileWriteError();
-
     void runRefPrmFile();
+    void runPrimeSaveBackupSet();
 
   private:
     //! Handler for from_pingOut
@@ -55,6 +56,9 @@ class PrmDbTester : public PrmDbGTestBase {
 
     Os::File::Status WriteInterceptor();
     Os::File::Status m_testWriteStatus;
+
+    // Param db print method to aid with debugging
+    void printDb(PrmDbImpl::t_dbStruct* db);
 
   public:
     class PrmDbTestFile : public Os::Stub::File::Test::TestFile {

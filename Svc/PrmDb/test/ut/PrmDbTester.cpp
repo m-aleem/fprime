@@ -23,7 +23,8 @@ typedef PrmDb_PrmReadError PrmReadError;
 
 void PrmDbTester::runNominalPopulate() {
     // clear database
-    this->m_impl.clearDb();
+    this->m_impl.clearDb(this->m_impl.m_db);
+    this->m_impl.clearDb(this->m_impl.m_dbBackup);
 
     // build a test parameter value with a simple value
     U32 val = 0x10;
@@ -156,9 +157,10 @@ void PrmDbTester::runNominalLoadFile() {
     }
 
     this->m_impl.readParamFile();
-    ASSERT_EVENTS_SIZE(1);
-    ASSERT_EVENTS_PrmFileLoadComplete_SIZE(1);
-    ASSERT_EVENTS_PrmFileLoadComplete(0, 2);
+    ASSERT_EVENTS_SIZE(2);
+    ASSERT_EVENTS_PrmFileLoadComplete_SIZE(2);
+    ASSERT_EVENTS_PrmFileLoadComplete(0, "Prime", 2, 2, 0);
+    ASSERT_EVENTS_PrmFileLoadComplete(1, "Backup", 2, 2, 0);
 
     // verify values (populated by runNominalPopulate())
 
@@ -192,7 +194,8 @@ void PrmDbTester::runMissingExtraParams() {
     ASSERT_EVENTS_PrmIdNotFound(0, 0x1000);
 
     // clear database
-    this->m_impl.clearDb();
+    this->m_impl.clearDb(this->m_impl.m_db);
+    this->m_impl.clearDb(this->m_impl.m_dbBackup);
 
     this->clearEvents();
     // write too many entries
@@ -343,6 +346,84 @@ void PrmDbTester::runRefPrmFile() {
     ASSERT_EVENTS_PrmFileSaveComplete(0, 4);
 }
 
+void PrmDbTester::runPrimeSaveBackupSet(){
+    Fw::QueuedComponentBase::MsgDispatchStatus cmdStat;
+    Fw::SerializeStatus serStat;
+
+    // clear database
+    printf("Clear the prime and backup DBs \n");
+    this->m_impl.clearDb(this->m_impl.m_db);
+    this->m_impl.clearDb(this->m_impl.m_dbBackup);
+    printDb(this->m_impl.m_db);
+    printDb(this->m_impl.m_dbBackup);
+    EXPECT_TRUE(this->m_impl.dbEqual());
+
+    // build a test parameter value with a simple value
+
+    printf("Add a paramter to the JUST the prime db commands \n");
+    U32 val = 2;
+    FwPrmIdType id = 0x123;
+
+    Fw::ParamBuffer pBuff;
+
+    serStat = pBuff.serialize(val);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+
+    // clear all events
+    this->clearEvents();
+
+    this->m_impl.updateAddPrm(id, pBuff, this->m_impl.m_db);
+
+    // retrieve it
+    U32 testVal;
+    this->invoke_to_getPrm(0, id, pBuff);
+
+    // deserialize it
+    serStat = pBuff.deserializeTo(testVal);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    EXPECT_EQ(testVal, val);
+
+    printDb(this->m_impl.m_db);
+    printDb(this->m_impl.m_dbBackup);
+    EXPECT_FALSE(this->m_impl.dbEqual());
+
+    printf("Save the prime db to a file then using SAVE_FILE then use SET_FILE\n");
+    Os::Stub::File::Test::StaticData::setWriteResult(m_io_data, sizeof m_io_data);
+    Os::Stub::File::Test::StaticData::setNextStatus(Os::File::OP_OK);
+
+    this->sendCmd_PRM_SAVE_FILE(0, 12);
+    cmdStat = this->m_impl.doDispatch();
+    ASSERT_EQ(cmdStat, Fw::QueuedComponentBase::MSG_DISPATCH_OK);
+
+    Os::Stub::File::Test::StaticData::setReadResult(m_io_data, Os::Stub::File::Test::StaticData::data.pointer);
+    Os::Stub::File::Test::StaticData::setNextStatus(Os::File::OP_OK);
+
+    this->sendCmd_PRM_SET_FILE(0, 12, this->m_impl.m_fileName);
+    cmdStat = this->m_impl.doDispatch();
+    ASSERT_EQ(cmdStat, Fw::QueuedComponentBase::MSG_DISPATCH_OK);
+
+    printDb(this->m_impl.m_db);
+    printDb(this->m_impl.m_dbBackup);
+    EXPECT_TRUE(this->m_impl.dbEqual());
+}
+
+void PrmDbTester::printDb(PrmDbImpl::t_dbStruct* db){
+    printf("Parameter DB @ %p \n", static_cast<void*>(db));
+    for (FwSizeType entry = 0; entry < PRMDB_NUM_DB_ENTRIES; entry++) {
+        U8* data = db[entry].val.getBuffAddr();
+        FwSizeType len = db[entry].val.getBuffLength();
+        if (db[entry].used) {
+            printf("  %2llu :", entry);
+            printf(" ID = %08X",  db[entry].id);
+            printf(" Value = ");
+            for (FwSizeType i = 0; i < len; ++i) {
+                printf("%02X ", data[i]);
+            }
+            printf("\n");
+        }
+    }
+}
+
 PrmDbTester* PrmDbTester::PrmDbTestFile::s_tester = nullptr;
 
 void PrmDbTester::PrmDbTestFile::setTester(Svc::PrmDbTester* tester) {
@@ -405,22 +486,23 @@ void PrmDbTester::runFileReadError() {
         clearEvents();
         this->m_waits = i;
         this->m_impl.readParamFile();
-        ASSERT_EVENTS_SIZE(1);
+        ASSERT_EVENTS_SIZE(2);
         switch (i) {
             case 0:
-                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                ASSERT_EVENTS_PrmFileReadError_SIZE(2);
                 ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::DELIMITER_SIZE, 0, sizeof(U8) + 1);
+                ASSERT_EVENTS_PrmFileReadError(1, PrmReadError::DELIMITER_SIZE, 0, sizeof(U8) + 1);
                 break;
             case 1:
-                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                ASSERT_EVENTS_PrmFileReadError_SIZE(2);
                 ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::RECORD_SIZE_SIZE, 0, sizeof(U32) + 1);
                 break;
             case 2:
-                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                ASSERT_EVENTS_PrmFileReadError_SIZE(2);
                 ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::PARAMETER_ID_SIZE, 0, sizeof(FwPrmIdType) + 1);
                 break;
             case 3:
-                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                ASSERT_EVENTS_PrmFileReadError_SIZE(2);
                 ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::PARAMETER_VALUE_SIZE, 0, sizeof(U32) + 1);
                 break;
             default:
@@ -446,22 +528,22 @@ void PrmDbTester::runFileReadError() {
             clearEvents();
             this->m_waits = j;
             this->m_impl.readParamFile();
-            ASSERT_EVENTS_SIZE(1);
+            ASSERT_EVENTS_SIZE(2);
             switch (j) {
                 case 0:
-                    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                    ASSERT_EVENTS_PrmFileReadError_SIZE(2);
                     ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::DELIMITER, 0, this->m_status);
                     break;
                 case 1:
-                    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                    ASSERT_EVENTS_PrmFileReadError_SIZE(2);
                     ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::RECORD_SIZE, 0, this->m_status);
                     break;
                 case 2:
-                    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                    ASSERT_EVENTS_PrmFileReadError_SIZE(2);
                     ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::PARAMETER_ID, 0, this->m_status);
                     break;
                 case 3:
-                    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                    ASSERT_EVENTS_PrmFileReadError_SIZE(2);
                     ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::PARAMETER_VALUE, 0, this->m_status);
                     break;
                 default:
@@ -474,10 +556,10 @@ void PrmDbTester::runFileReadError() {
         clearEvents();
         this->m_waits = i;
         this->m_impl.readParamFile();
-        ASSERT_EVENTS_SIZE(1);
+        ASSERT_EVENTS_SIZE(2);
         switch (i) {
             case 0:
-                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                ASSERT_EVENTS_PrmFileReadError_SIZE(2);
                 // Parameter read error caused by adding one to the expected read
                 ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::DELIMITER_VALUE, 0, PRMDB_ENTRY_DELIMITER + 1);
                 break;
@@ -486,7 +568,7 @@ void PrmDbTester::runFileReadError() {
                 // big-endian format the highest order byte of the record size (U32) must have one added to it.
                 // Expected result of '8' inherited from original design of test.
                 U32 expected_error_value = sizeof(FwPrmIdType) + 4 + (1 << ((sizeof(U32) - 1) * 8));
-                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                ASSERT_EVENTS_PrmFileReadError_SIZE(2);
                 ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::RECORD_SIZE_VALUE, 0, expected_error_value);
                 break;
             }

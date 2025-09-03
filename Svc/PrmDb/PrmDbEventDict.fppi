@@ -62,11 +62,14 @@ event PrmFileReadError(
 
 @ Load of parameter file completed
 event PrmFileLoadComplete(
-                            records: U32 @< The number of records loaded
+                            databaseString: string @< The database string
+                            recordsTotal: U32 @< The number of records total
+                            recordsAdded: U32 @< The number of new records added
+                            recordsUpdated: U32 @< The number of records updated
                             ) \
     severity activity high \
     id 7 \
-    format "Parameter file load completed. Read {} records."
+    format "Parameter file load completed. Database: {}, Records: {} ({} added and {} updated)."
 
 
 event PrmSetFileComplete(

@@ -28,8 +28,10 @@ namespace Svc {
 //!
 
 class PrmDbImpl final : public PrmDbComponentBase {
+
+  friend class PrmDbTester;
+
   public:
-    friend class PrmDbTester;
 
     //!  \brief PrmDb constructor
     //!
@@ -58,13 +60,40 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!
     virtual ~PrmDbImpl();
 
+
+    enum paramUpdateType {
+      NO_SLOTS,
+      PARAM_ADDED,
+      PARAM_UPDATED,
+      MAX_PARAM_UPDATE_TYPES
+    };
+
   protected:
   private:
     struct t_dbStruct {
         bool used;            //!< whether slot is being used
         FwPrmIdType id;       //!< the id being stored in the slot
         Fw::ParamBuffer val;  //!< the serialized value of the parameter
+
+        bool operator==(const t_dbStruct& other) const {
+          if (used != other.used) return false;
+          if (id != other.id) return false;
+          // Compare lengths first
+          if (val.getBuffLength() != other.val.getBuffLength()) return false;
+          // Compare buffer contents
+          return std::memcmp(val.getBuffAddr(), other.val.getBuffAddr(), val.getBuffLength()) == 0;
+        }
     };
+
+    //! \brief Check param db equality
+    //!
+    //!  This helper method verifies the prime and backup parameter dbs are equal
+    bool dbEqual();
+
+    //! \brief Deep copy for db
+    //!
+    //!  Copies one db to another
+    void dbCopy(t_dbStruct* dest, t_dbStruct* src);
 
     //! \brief Read a parameter file and apply the values to the database
     //!
@@ -72,7 +101,8 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!
     //!  \param fileName The name of the parameter file to read
     //!  \param db Pointer to the database array to populate with parameter data
-    void readParamFileImpl(const Fw::StringBase& fileName, t_dbStruct* db);
+    //!  \return status success (True)/failure(False)
+    bool readParamFileImpl(const Fw::StringBase& fileName, t_dbStruct* db, Fw::String dbString);
 
     //!  \brief PrmDb parameter get handler
     //!
@@ -93,6 +123,15 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  \param id identifier for parameter being used.
     //!  \param val buffer where value to be saved is stored.
     void setPrm_handler(FwIndexType portNum, FwPrmIdType id, Fw::ParamBuffer& val);
+
+
+    //!  \brief PrmDb parameter add or update (set) helper
+    //!
+    //!  This function does the underlying parameter update
+    //!
+    //!  \param id identifier for parameter being used.
+    //!  \param val buffer where value to be saved is stored.
+    PrmDbImpl::paramUpdateType updateAddPrm(FwPrmIdType id, Fw::ParamBuffer& val, t_dbStruct* db);
 
     //!  \brief component ping handler
     //!
@@ -117,8 +156,8 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  \brief PrmDb PRM_SAVE_FILE command handler
     //!
     //!  This function applies the parameter values from a specified
-    //   file into the the RAM parameter values. Note that these updates
-    //   are not saved until a subsequent call to SAVE file.
+    //!  file into the the RAM parameter values. Note that these updates
+    //!  are not saved until a subsequent call to SAVE file.
     //!
     //!  \param opCode The opcode of this commands
     //!  \param cmdSeq The sequence number of the command
@@ -129,8 +168,9 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!
     //!  This function clears all entries from the RAM database
     //!
+    //!  \param db Pointer to the database array to clear
 
-    void clearDb();  //!< clear the parameter database
+    void clearDb(t_dbStruct* db);  //!< clear the parameter database
 
     Fw::String m_fileName;  //!< filename for parameter storage
 
