@@ -16,6 +16,7 @@
 #include <Fw/Buffer/Buffer.hpp>
 #include <Os/Mutex.hpp>
 #include <Os/Task.hpp>
+#include <Os/Condition.hpp>
 
 namespace Drv {
 /**
@@ -28,6 +29,7 @@ namespace Drv {
 class SocketComponentHelper {
   public:
     enum OpenState { NOT_OPEN, OPENING, OPEN, SKIP };
+    enum ReconnectState { NOT_RECONNECTING, REQUEST_RECONNECT, RECONNECT_IN_PROGRESS};
     /**
      * \brief constructs the socket read task
      */
@@ -134,6 +136,7 @@ class SocketComponentHelper {
      * \brief is the read loop running
      */
     bool running();
+    bool runningReconnect();
 
     /**
      * \brief stop the socket read task and close the associated socket.
@@ -142,6 +145,8 @@ class SocketComponentHelper {
      * startSocketTask call. This will stop the read task and close the client socket.
      */
     void stop();
+
+    void stopReconnect();
 
     /**
      * \brief joins to the stopping read task to wait for it to close
@@ -153,11 +158,20 @@ class SocketComponentHelper {
      */
     Os::Task::Status join();
 
+    Os::Task::Status joinReconnect();
+
+
   protected:
     /**
      * \brief receive off the TCP socket
      */
     virtual void readLoop();
+
+    /**
+     * \brief reconnect TCP socket
+     */
+    virtual void reconnectLoop();
+
     /**
      * \brief returns a reference to the socket handler
      *
@@ -206,6 +220,18 @@ class SocketComponentHelper {
      */
     static void readTask(void* pointer);
 
+    /**
+     * \brief a task designed for socket reconnection
+     *
+     * \param pointer: pointer to "this" component
+     */
+    static void reconnectTask(void* pointer);
+
+
+    // FIXME
+    void requestReconnect();
+    SocketIpStatus waitForReconnect();
+
   private:
     /**
      * \brief Re-open port if it has been disconnected
@@ -218,13 +244,24 @@ class SocketComponentHelper {
      */
     SocketIpStatus reopen();
 
+
   protected:
+    bool m_reopen = true;                    //!< Force reopen on disconnect
+    SocketDescriptor m_descriptor;
+
+    // Read/recv
     Os::Task m_task;
     Os::Mutex m_lock;
-    SocketDescriptor m_descriptor;
-    bool m_reopen = true;                    //!< Force reopen on disconnect
     bool m_stop = true;                      //!< Stops the task when set to true
     OpenState m_open = OpenState::NOT_OPEN;  //!< Have we successfully opened
+
+    // Reconnect
+    Os::Task m_reconnectTask;
+    Os::Mutex m_reconnectLock;
+    bool m_reconnectStop = false;
+    ReconnectState m_reconnectState = ReconnectState::NOT_RECONNECTING;
+
+
 };
 }  // namespace Drv
 #endif  // DRV_SocketComponentHelper_HPP
