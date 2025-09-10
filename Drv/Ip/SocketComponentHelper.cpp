@@ -136,8 +136,6 @@ SocketIpStatus SocketComponentHelper::send(const U8* const data, const FwSizeTyp
     status = this->getSocketHandler().send(descriptor, data, size);
     if (status == SOCK_DISCONNECTED) {
         this->close();
-        // this->requestReconnect(); // FIXME: should we request an immediate reconnect here? Not in OG but makes sense
-        // to me
     }
     return status;
 }
@@ -222,8 +220,6 @@ void SocketComponentHelper::readLoop() {
                 Fw::Logger::log("[WARNING] Failed to recv from port with status %d and errno %d\n", status, errno);
                 this->close();
                 buffer.setSize(0);
-                // this->requestReconnect(); // FIXME: should we request an immediate reconnect here? Not in OG but
-                // makes sense to me
             } else {
                 // Send out received data
                 buffer.setSize(size);
