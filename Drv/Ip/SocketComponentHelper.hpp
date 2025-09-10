@@ -265,6 +265,8 @@ class SocketComponentHelper {
      */
     SocketIpStatus reopen();
 
+    void threadSafeDelay(const Fw::TimeInterval& interval);
+
   protected:
     bool m_reopen = true;  //!< Force reopen on disconnect
     SocketDescriptor m_descriptor;

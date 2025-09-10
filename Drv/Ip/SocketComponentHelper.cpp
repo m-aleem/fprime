@@ -271,6 +271,7 @@ void SocketComponentHelper::reconnectLoop() {
             if (this->m_reconnectState == ReconnectState::REQUEST_RECONNECT) {
                 this->m_reconnectState = ReconnectState::RECONNECT_IN_PROGRESS;
                 reconnect = true;
+
             }
             // If we were already in or are now in RECONNECT_IN_PROGRESS we
             // need to try to reconnect, again
@@ -298,11 +299,13 @@ void SocketComponentHelper::reconnectLoop() {
             // state change
             else {
                 Fw::Logger::log("[WARNING] Failed to open port with status %d and errno %d\n", status, errno);
-                (void)Os::Task::delay(SOCKET_RETRY_INTERVAL);
+                // (void)Os::Task::delay(SOCKET_RETRY_INTERVAL);
+                m_reconnectTask._delay(SOCKET_RETRY_INTERVAL);  // FIXME review
             }
         } else {
             // After a brief delay, we will loop again
-            (void)Os::Task::delay(this->m_reconnectCheckInterval);
+            // (void)Os::Task::delay(this->m_reconnectCheckInterval);
+            m_reconnectTask._delay(this->m_reconnectCheckInterval);  // FIXME review
         }
     }
 }
@@ -342,7 +345,9 @@ SocketIpStatus SocketComponentHelper::waitForReconnect(Fw::TimeInterval timeout)
             }
         }
 
-        (void)Os::Task::delay(this->m_reconnectWaitInterval);
+        // Note we are using direct delay (singleton) here because this could be
+        // called from send or recv tasks, we don't have pointer to the task object
+        (void)Os::Task::delay(this->m_reconnectWaitInterval);  // FIXME review
         elapsed.add(this->m_reconnectWaitInterval.getSeconds(), this->m_reconnectWaitInterval.getUSeconds());
     }
 
