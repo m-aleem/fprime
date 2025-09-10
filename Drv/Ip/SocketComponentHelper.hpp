@@ -14,9 +14,9 @@
 
 #include <Drv/Ip/IpSocket.hpp>
 #include <Fw/Buffer/Buffer.hpp>
+#include <Os/Condition.hpp>
 #include <Os/Mutex.hpp>
 #include <Os/Task.hpp>
-#include <Os/Condition.hpp>
 
 namespace Drv {
 /**
@@ -29,7 +29,7 @@ namespace Drv {
 class SocketComponentHelper {
   public:
     enum OpenState { NOT_OPEN, OPENING, OPEN, SKIP };
-    enum ReconnectState { NOT_RECONNECTING, REQUEST_RECONNECT, RECONNECT_IN_PROGRESS};
+    enum ReconnectState { NOT_RECONNECTING, REQUEST_RECONNECT, RECONNECT_IN_PROGRESS };
     /**
      * \brief constructs the socket read task
      */
@@ -92,7 +92,6 @@ class SocketComponentHelper {
      * \param auto_open: true to automatically open and reopen sockets, false otherwise
      */
     void setAutomaticOpen(bool auto_open);
-
 
     /**
      * \brief get socket automatically open connections status
@@ -167,7 +166,6 @@ class SocketComponentHelper {
     Os::Task::Status join();
 
     Os::Task::Status joinReconnect();
-
 
   protected:
     /**
@@ -267,9 +265,8 @@ class SocketComponentHelper {
      */
     SocketIpStatus reopen();
 
-
   protected:
-    bool m_reopen = true;                    //!< Force reopen on disconnect
+    bool m_reopen = true;  //!< Force reopen on disconnect
     SocketDescriptor m_descriptor;
 
     // Read/recv
@@ -283,9 +280,10 @@ class SocketComponentHelper {
     Os::Mutex m_reconnectLock;
     bool m_reconnectStop = true;
     ReconnectState m_reconnectState = ReconnectState::NOT_RECONNECTING;
-    Fw::TimeInterval m_reconnectCheckInterval = Fw::TimeInterval(0, 50000); // 50 ms, Interval at which reconnect task loop checks for requests
-    Fw::TimeInterval m_reconnectWaitInterval = Fw::TimeInterval(0, 10000); // 10 ms, Interval at which reconnect requesters wait for response
-
+    Fw::TimeInterval m_reconnectCheckInterval =
+        Fw::TimeInterval(0, 50000);  // 50 ms, Interval at which reconnect task loop checks for requests
+    Fw::TimeInterval m_reconnectWaitInterval =
+        Fw::TimeInterval(0, 10000);  // 10 ms, Interval at which reconnect requesters wait for response
 };
 }  // namespace Drv
 #endif  // DRV_SocketComponentHelper_HPP
