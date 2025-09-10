@@ -92,18 +92,19 @@ void SocketComponentHelper::setAutomaticOpen(bool auto_open) {
     this->m_reopen = auto_open;
 }
 
+bool SocketComponentHelper::getAutomaticOpen() {
+    Os::ScopeLock scopedLock(this->m_lock);
+    return this->m_reopen;
+}
+
 SocketIpStatus SocketComponentHelper::reopen() {
     SocketIpStatus status = SOCK_SUCCESS;
     if (not this->isOpened()) {
         // Check for auto-open before attempting to reopen
-        bool reopen = false;
-        {
-            Os::ScopeLock scopedLock(this->m_lock);
-            reopen = this->m_reopen;
-        }
-        // Open a network connection if it has not already been open
+        bool reopen = this->getAutomaticOpen();
         if (not reopen) {
             status = SOCK_AUTO_CONNECT_DISABLED;
+        // Open a network connection if it has not already been open
         } else {
             status = this->open();
             if (status == SocketIpStatus::SOCK_ANOTHER_THREAD_OPENING) {
@@ -136,7 +137,7 @@ SocketIpStatus SocketComponentHelper::send(const U8* const data, const FwSizeTyp
     status = this->getSocketHandler().send(descriptor, data, size);
     if (status == SOCK_DISCONNECTED) {
         this->close();
-        // FIXME - reconnect request here?
+        // this->requestReconnect(); // FIXME: should we request an immediate reconnect here? Not in OG but makes sense to me
     }
     return status;
 }
@@ -157,6 +158,7 @@ void SocketComponentHelper::close() {
 
 Os::Task::Status SocketComponentHelper::join() {
     return m_task.join();
+    // FIXME would it make sense to call joinReconnect here? Right now, for example in the UTs, we have to call both separately
 }
 
 void SocketComponentHelper::stop() {
@@ -202,12 +204,6 @@ void SocketComponentHelper::readLoop() {
             if (status == SOCK_AUTO_CONNECT_DISABLED) {
                 break;
             }
-            // // If the reconnection failed in any other way, warn, wait, and retry
-            // else if (status != SOCK_SUCCESS) {
-            //     Fw::Logger::log("[WARNING] Failed to open port with status %d and errno %d\n", status, errno);
-            //     (void)Os::Task::delay(SOCKET_RETRY_INTERVAL);
-            //     continue;
-            // }
         }
         // If the network connection is open, read from it
         if (this->isOpened() and this->running()) {
@@ -222,7 +218,7 @@ void SocketComponentHelper::readLoop() {
                 Fw::Logger::log("[WARNING] Failed to recv from port with status %d and errno %d\n", status, errno);
                 this->close();
                 buffer.setSize(0);
-                // FIXME reconnect request here?
+                // this->requestReconnect(); // FIXME: should we request an immediate reconnect here? Not in OG but makes sense to me
             } else {
                 // Send out received data
                 buffer.setSize(size);
@@ -251,6 +247,7 @@ Os::Task::Status SocketComponentHelper::joinReconnect() {
 
 void SocketComponentHelper::stopReconnect() {
     Os::ScopeLock scopeLock(this->m_reconnectLock);
+    this->m_reconnectState = ReconnectState::NOT_RECONNECTING;
     this->m_reconnectStop = true;
 }
 
@@ -262,7 +259,7 @@ bool SocketComponentHelper::runningReconnect() {
 
 void SocketComponentHelper::reconnectLoop() {
     SocketIpStatus status = SOCK_SUCCESS;
-    do{
+    while(this->runningReconnect()){
         // Check if we need to reconnect
         bool reconnect = false;
         {
@@ -270,6 +267,8 @@ void SocketComponentHelper::reconnectLoop() {
             if(this->m_reconnectState == ReconnectState::REQUEST_RECONNECT){
                 this->m_reconnectState = ReconnectState::RECONNECT_IN_PROGRESS;
             }
+            // If we were already in or are now in RECONNECT_IN_PROGRESS we
+            // need to try to reconnect, again
             if (this->m_reconnectState == ReconnectState::RECONNECT_IN_PROGRESS) {
                 reconnect = true;
             }
@@ -278,21 +277,31 @@ void SocketComponentHelper::reconnectLoop() {
         if(reconnect){
             status = this->reopen();
 
-            // If we fail to reopen because reconnect is disabled OR
-            // we succeed in re-opening, we are done and can update our
-            // reconnecting state accordingly
-            if(status == SOCK_AUTO_CONNECT_DISABLED || status == SOCK_SUCCESS){
+            // Reopen Case 1: Auto Connect is disabled, so no longer
+            // try to reconnect
+            if(status == SOCK_AUTO_CONNECT_DISABLED){
                 Os::ScopeLock scopedLock(this->m_reconnectLock);
                 this->m_reconnectState = ReconnectState::NOT_RECONNECTING;
             }
+            // Reopen Case 2: Success, so no longer
+            // try to reconnect
+            else if(status == SOCK_SUCCESS){
+                Os::ScopeLock scopedLock(this->m_reconnectLock);
+                this->m_reconnectState = ReconnectState::NOT_RECONNECTING;
+            }
+            // Reopen Case 3: Keep trying to reconnect - NO reconnect
+            // state change
+            else{
+                Fw::Logger::log("[WARNING] Failed to open port with status %d and errno %d\n", status, errno);
+                (void)Os::Task::delay(SOCKET_RETRY_INTERVAL);
+            }
+        }
+        else{
+            // After a brief delay, we will loop again
+            (void)Os::Task::delay(this->m_reconnectCheckInterval);
         }
 
-        // After a brief delay, we will loop again
-        (void)Os::Task::delay(SOCKET_RETRY_INTERVAL);
-
     }
-    // This will loop until reconnect thread is stopped
-    while (this->runningReconnect());
 
 }
 
@@ -305,39 +314,48 @@ void SocketComponentHelper::reconnectTask(void* pointer) {
 void SocketComponentHelper::requestReconnect() {
     Os::ScopeLock scopedLock(this->m_reconnectLock);
     if(m_reconnectState == ReconnectState::NOT_RECONNECTING){
-       m_reconnectState = ReconnectState::REQUEST_RECONNECT;
+        m_reconnectState = ReconnectState::REQUEST_RECONNECT;
     }
     return;
 }
 
-SocketIpStatus SocketComponentHelper::waitForReconnect(){
-    // Do not attempt to reconnect if config flag is disabled
-    if(!m_reopen){
+SocketIpStatus SocketComponentHelper::waitForReconnect(Fw::TimeInterval timeout){
+    // Do not attempt to reconnect if auto reconnect config flag is disabled
+    if(!this->getAutomaticOpen()){
         return SOCK_AUTO_CONNECT_DISABLED;
     }
 
-    // FIXME maybe give this a timeout?
-    // FIXME where should this be configured?
-    Fw::TimeInterval reconnectInterval = Fw::TimeInterval(0, 1000);  // 1ms
+    Fw::TimeInterval elapsed = Fw::TimeInterval(0, 0);
 
-    bool wait = true;
-    while(wait){
+    while(elapsed < timeout){
         // If the reconnect thread is NOT reconnecting, we are done waiting
-        Os::ScopeLock scopedLock(this->m_reconnectLock);
-        if(this->m_reconnectState == ReconnectState::NOT_RECONNECTING){
-            wait = false;
-            break;
+        // If we are no longer running the reconnect thread, we are done waiting
+        {
+            Os::ScopeLock scopedLock(this->m_reconnectLock);
+            if(this->m_reconnectState == ReconnectState::NOT_RECONNECTING){
+                break;
+            }
+            if(this->m_reconnectStop){
+                break;
+            }
         }
 
-        (void)Os::Task::delay(reconnectInterval);
+        (void)Os::Task::delay(this->m_reconnectWaitInterval);
+        elapsed.add(this->m_reconnectWaitInterval.getSeconds(), this->m_reconnectWaitInterval.getUSeconds());
     }
 
-    // If we have exhausted our timeout, check once more if socket connection
-    // is open and if not return an error
+    // If we have completed our loop, check if we are connected or if
+    // auto connect was disabled during our wait
     if(this->isOpened()){
         return SOCK_SUCCESS;
     }
-    return SOCK_DISCONNECTED;  // FIXME
+
+    // Check one more time if auto reconnect config flag got disabled
+    if(!this->getAutomaticOpen()){
+        return SOCK_AUTO_CONNECT_DISABLED;
+    }
+
+    return SOCK_DISCONNECTED;  // Indicates failure of this attempt, another reopen needed
 
 }
 

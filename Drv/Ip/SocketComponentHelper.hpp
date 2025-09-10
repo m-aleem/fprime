@@ -93,6 +93,14 @@ class SocketComponentHelper {
      */
     void setAutomaticOpen(bool auto_open);
 
+
+    /**
+     * \brief get socket automatically open connections status
+     *
+     * \return status of auto_open
+     */
+    bool getAutomaticOpen();
+
     /**
      * \brief send data to the IP socket from the given buffer
      *
@@ -227,10 +235,25 @@ class SocketComponentHelper {
      */
     static void reconnectTask(void* pointer);
 
-
-    // FIXME
+    /**
+     * \brief signal to reconnect task that a reconnect is needed
+     *
+     */
     void requestReconnect();
-    SocketIpStatus waitForReconnect();
+
+    /**
+     * \brief wait method for a task to wait for a reconnect request to complete
+     *
+     * After requesting a reconnect, tasks should call this this method
+     * to wait for the reconnect thread to complete
+     *
+     *
+     * \param timeout: timeout so that the wait doesn't hang indefinitely
+     *
+     * \return status of the reconnect request, SOCK_DISCONNECTED for
+     * reopen again, or SOCK_SUCCESS on success, something else on error
+     */
+    SocketIpStatus waitForReconnect(Fw::TimeInterval timeout = Fw::TimeInterval(1, 0));
 
   private:
     /**
@@ -260,7 +283,8 @@ class SocketComponentHelper {
     Os::Mutex m_reconnectLock;
     bool m_reconnectStop = false;
     ReconnectState m_reconnectState = ReconnectState::NOT_RECONNECTING;
-
+    Fw::TimeInterval m_reconnectCheckInterval = Fw::TimeInterval(0, 50000); // 50 ms, Interval at which reconnect task loop checks for requests
+    Fw::TimeInterval m_reconnectWaitInterval = Fw::TimeInterval(0, 10000); // 10 ms, Interval at which reconnect requesters wait for response
 
 };
 }  // namespace Drv
