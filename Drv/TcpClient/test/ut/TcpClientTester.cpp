@@ -98,7 +98,6 @@ void TcpClientTester ::test_with_loop(U32 iterations, bool recv_thread) {
         if (((1 + i) == iterations) && recv_thread) {
             this->component.stop();
             this->component.join();
-            this->component.joinReconnect();
         } else {
             // Client should close to initiate a clean shutdown
             // This is because the server "can't know" if the client is done until
@@ -178,7 +177,6 @@ void TcpClientTester ::test_no_automatic_recv_connection() {
     // Clean-up even if the thread (incorrectly) started
     this->component.stop();
     this->component.join();
-    this->component.joinReconnect();
     Drv::Test::drain(server, server_fd);
     server.terminate(server_fd);
 }

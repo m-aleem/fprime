@@ -281,7 +281,7 @@ class SocketComponentHelper {
     // Reconnect
     Os::Task m_reconnectTask;
     Os::Mutex m_reconnectLock;
-    bool m_reconnectStop = false;
+    bool m_reconnectStop = true;
     ReconnectState m_reconnectState = ReconnectState::NOT_RECONNECTING;
     Fw::TimeInterval m_reconnectCheckInterval = Fw::TimeInterval(0, 50000); // 50 ms, Interval at which reconnect task loop checks for requests
     Fw::TimeInterval m_reconnectWaitInterval = Fw::TimeInterval(0, 10000); // 10 ms, Interval at which reconnect requesters wait for response

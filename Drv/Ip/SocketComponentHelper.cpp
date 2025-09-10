@@ -157,8 +157,12 @@ void SocketComponentHelper::close() {
 /* Read Thread */
 
 Os::Task::Status SocketComponentHelper::join() {
-    return m_task.join();
-    // FIXME would it make sense to call joinReconnect here? Right now, for example in the UTs, we have to call both separately
+    Os::Task::Status stat = m_task.join();
+    Os::Task::Status reconnectStat = this->joinReconnect();
+    if (stat == Os::Task::Status::OP_OK) {
+        return reconnectStat;
+    }
+    return stat;
 }
 
 void SocketComponentHelper::stop() {
@@ -266,10 +270,11 @@ void SocketComponentHelper::reconnectLoop() {
             Os::ScopeLock scopedLock(this->m_reconnectLock);
             if(this->m_reconnectState == ReconnectState::REQUEST_RECONNECT){
                 this->m_reconnectState = ReconnectState::RECONNECT_IN_PROGRESS;
+                reconnect = true;
             }
             // If we were already in or are now in RECONNECT_IN_PROGRESS we
             // need to try to reconnect, again
-            if (this->m_reconnectState == ReconnectState::RECONNECT_IN_PROGRESS) {
+            else if (this->m_reconnectState == ReconnectState::RECONNECT_IN_PROGRESS) {
                 reconnect = true;
             }
         }
