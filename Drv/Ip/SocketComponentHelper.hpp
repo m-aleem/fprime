@@ -244,7 +244,7 @@ class SocketComponentHelper {
     /**
      * \brief wait method for a task to wait for a reconnect request to complete
      *
-     * After requesting a reconnect, tasks should call this this method
+     * After requesting a reconnect, tasks should call this method
      * to wait for the reconnect thread to complete
      *
      *
