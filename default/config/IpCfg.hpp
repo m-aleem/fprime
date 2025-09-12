@@ -31,11 +31,10 @@ static const Fw::TimeInterval SOCKET_RETRY_INTERVAL = Fw::TimeInterval(1, 0);
 #error OS not supported for IP Socket Communications
 #endif
 
-
 // Value type enumeration
 enum SocketOptionValueType {
-    SOCK_OPT_INT,      // Integer value
-    SOCK_OPT_SIZE_T,   // size_t value
+    SOCK_OPT_INT,     // Integer value
+    SOCK_OPT_SIZE_T,  // size_t value
 };
 
 // Socket option structure with flexible value types
@@ -45,25 +44,25 @@ struct IpSocketOptions {
     SocketOptionValueType type;  // Type of value stored
 
     union {
-        int intVal;              // Integer value
-        size_t sizeVal;          // Size_t value
+        int intVal;      // Integer value
+        size_t sizeVal;  // Size_t value
     } value;
 };
 
 // Helper functions to create different types of socket options
-inline IpSocketOptions makeIntOption(int opt, int lvl, int val) {
+inline IpSocketOptions makeIntOption(int opt, int level, int val) {
     IpSocketOptions option;
     option.option = opt;
-    option.level = lvl;
+    option.level = level;
     option.type = SOCK_OPT_INT;
     option.value.intVal = val;
     return option;
 }
 
-inline IpSocketOptions makeSizeOption(int opt, int lvl, size_t val) {
+inline IpSocketOptions makeSizeOption(int opt, int level, size_t val) {
     IpSocketOptions option;
     option.option = opt;
-    option.level = lvl;
+    option.level = level;
     option.type = SOCK_OPT_SIZE_T;
     option.value.sizeVal = val;
     return option;
@@ -79,7 +78,7 @@ inline IpSocketOptions makeSizeOption(int opt, int lvl, size_t val) {
 // machine, they could potentially bind to the same port and intercept messages.
 // Projects should evaluate their threat model and choose options accordingly.
 static const IpSocketOptions IP_SOCKET_OPTIONS[] = {
-    makeIntOption(SO_REUSEADDR, SOL_SOCKET, 0), // Example
+    makeIntOption(SO_REUSEADDR, SOL_SOCKET, 0),  // Example
     // Add other socket options as needed, and expand above helper functions
     // if other types are needed
 };
