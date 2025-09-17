@@ -162,7 +162,7 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  \brief PrmDb PRM_SAVE_FILE command handler
     //!
     //!  This function applies the parameter values from a specified
-    //!  file into the the RAM parameter values. Note that these updates
+    //!  file into the RAM parameter values. Note that these updates
     //!  are not saved until a subsequent call to SAVE file.
     //!
     //!  \param opCode The opcode of this commands
