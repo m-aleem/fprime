@@ -23,7 +23,7 @@ typedef PrmDb_PrmReadError PrmReadError;
 
 void PrmDbTester::runNominalPopulate() {
     // clear database
-    this->m_impl.clearDb(this->m_impl.m_db);
+    this->m_impl.clearDb(this->m_impl.m_dbPrime);
     this->m_impl.clearDb(this->m_impl.m_dbBackup);
 
     // build a test parameter value with a simple value
@@ -194,7 +194,7 @@ void PrmDbTester::runMissingExtraParams() {
     ASSERT_EVENTS_PrmIdNotFound(0, 0x1000);
 
     // clear database
-    this->m_impl.clearDb(this->m_impl.m_db);
+    this->m_impl.clearDb(this->m_impl.m_dbPrime);
     this->m_impl.clearDb(this->m_impl.m_dbBackup);
 
     this->clearEvents();
@@ -346,75 +346,247 @@ void PrmDbTester::runRefPrmFile() {
     ASSERT_EVENTS_PrmFileSaveComplete(0, 4);
 }
 
-void PrmDbTester::runPrimeSaveBackupSet(){
+void PrmDbTester::runPrimeSaveBackupSet() {
     Fw::QueuedComponentBase::MsgDispatchStatus cmdStat;
     Fw::SerializeStatus serStat;
 
-    // clear database
     printf("Clear the prime and backup DBs \n");
-    this->m_impl.clearDb(this->m_impl.m_db);
+    this->m_impl.clearDb(this->m_impl.m_dbPrime);
     this->m_impl.clearDb(this->m_impl.m_dbBackup);
-    printDb(this->m_impl.m_db);
-    printDb(this->m_impl.m_dbBackup);
+    printDb(PrmDb_PrmDbType::DB_PRIME);
+    printDb(PrmDb_PrmDbType::DB_BACKUP);
     EXPECT_TRUE(this->m_impl.dbEqual());
 
-    // build a test parameter value with a simple value
-
-    printf("Add a paramter to the JUST the prime db commands \n");
+    printf("Add a parameter to the JUST the Prime DB \n");
     U32 val = 2;
     FwPrmIdType id = 0x123;
-
     Fw::ParamBuffer pBuff;
-
     serStat = pBuff.serialize(val);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
-
-    // clear all events
     this->clearEvents();
+    this->m_impl.updateAddPrm(id, pBuff, this->m_impl.m_dbPrime, nullptr);
 
-    this->m_impl.updateAddPrm(id, pBuff, this->m_impl.m_db);
-
-    // retrieve it
+    printf("Retrieve and verify the parameter added to the Prime DB \n");
     U32 testVal;
     this->invoke_to_getPrm(0, id, pBuff);
-
-    // deserialize it
     serStat = pBuff.deserializeTo(testVal);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
     EXPECT_EQ(testVal, val);
 
-    printDb(this->m_impl.m_db);
-    printDb(this->m_impl.m_dbBackup);
+    printDb(PrmDb_PrmDbType::DB_PRIME);
+    printDb(PrmDb_PrmDbType::DB_BACKUP);
     EXPECT_FALSE(this->m_impl.dbEqual());
 
-    printf("Save the prime db to a file then using SAVE_FILE then use SET_FILE\n");
+    printf("Save the Prime DB to a file using SAVE_FILE\n");
     Os::Stub::File::Test::StaticData::setWriteResult(m_io_data, sizeof m_io_data);
     Os::Stub::File::Test::StaticData::setNextStatus(Os::File::OP_OK);
-
+    this->clearEvents();
     this->sendCmd_PRM_SAVE_FILE(0, 12);
     cmdStat = this->m_impl.doDispatch();
     ASSERT_EQ(cmdStat, Fw::QueuedComponentBase::MSG_DISPATCH_OK);
 
+    printf("Set the Backup DB using SET_FILE\n");
     Os::Stub::File::Test::StaticData::setReadResult(m_io_data, Os::Stub::File::Test::StaticData::data.pointer);
     Os::Stub::File::Test::StaticData::setNextStatus(Os::File::OP_OK);
-
     this->sendCmd_PRM_SET_FILE(0, 12, this->m_impl.m_fileName);
     cmdStat = this->m_impl.doDispatch();
     ASSERT_EQ(cmdStat, Fw::QueuedComponentBase::MSG_DISPATCH_OK);
 
-    printDb(this->m_impl.m_db);
-    printDb(this->m_impl.m_dbBackup);
+    printDb(PrmDb_PrmDbType::DB_PRIME);
+    printDb(PrmDb_PrmDbType::DB_BACKUP);
     EXPECT_TRUE(this->m_impl.dbEqual());
 }
 
-void PrmDbTester::printDb(PrmDbImpl::t_dbStruct* db){
-    printf("Parameter DB @ %p \n", static_cast<void*>(db));
+void PrmDbTester::runDbEqualTest() {
+    Fw::SerializeStatus serStat;
+
+    // 1. Test with empty databases - should be equal
+    this->m_impl.clearDb(this->m_impl.m_dbPrime);
+    this->m_impl.clearDb(this->m_impl.m_dbBackup);
+    EXPECT_TRUE(this->m_impl.dbEqual());
+
+    // 2. Add an entry to prime DB only - should not be equal
+    U32 val1 = 0x42;
+    FwPrmIdType id1 = 0x100;
+    Fw::ParamBuffer pBuff;
+
+    serStat = pBuff.serialize(val1);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+
+    this->m_impl.updateAddPrm(id1, pBuff, this->m_impl.m_dbPrime, nullptr);
+    EXPECT_FALSE(this->m_impl.dbEqual());
+
+    // 3. Add same entry to backup DB - should be equal again
+    pBuff.resetSer();
+    serStat = pBuff.serialize(val1);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+
+    this->m_impl.updateAddPrm(id1, pBuff, this->m_impl.m_dbBackup, nullptr);
+    EXPECT_TRUE(this->m_impl.dbEqual());
+
+    // 4. Update entry in prime DB only - should not be equal
+    U32 val2 = 0x43;
+    pBuff.resetSer();
+    serStat = pBuff.serialize(val2);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+
+    this->m_impl.updateAddPrm(id1, pBuff, this->m_impl.m_dbPrime, nullptr);
+    EXPECT_FALSE(this->m_impl.dbEqual());
+
+    // 5. Update backup DB to match - should be equal again
+    pBuff.resetSer();
+    serStat = pBuff.serialize(val2);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+
+    this->m_impl.updateAddPrm(id1, pBuff, this->m_impl.m_dbBackup, nullptr);
+    EXPECT_TRUE(this->m_impl.dbEqual());
+
+    // 6. Add different entry to backup DB - should not be equal
+    U32 val3 = 0x44;
+    FwPrmIdType id2 = 0x101;
+    pBuff.resetSer();
+    serStat = pBuff.serialize(val3);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+
+    this->m_impl.updateAddPrm(id2, pBuff, this->m_impl.m_dbBackup, nullptr);
+    EXPECT_FALSE(this->m_impl.dbEqual());
+}
+
+void PrmDbTester::runDbCopyTest() {
+    Fw::SerializeStatus serStat;
+
+    // ---- Test dbCopy ----
+    printf("Testing dbCopy...\n");
+
+    // Clear both databases
+    this->m_impl.clearDb(this->m_impl.m_dbPrime);
+    this->m_impl.clearDb(this->m_impl.m_dbBackup);
+
+    // Add entries to Prime DB only
+    U32 val1 = 0x1234;
+    FwPrmIdType id1 = 0x100;
+    Fw::ParamBuffer pBuff;
+
+    // Add first parameter
+    pBuff.resetSer();
+    serStat = pBuff.serialize(val1);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    this->m_impl.updateAddPrm(id1, pBuff, this->m_impl.m_dbPrime, nullptr);
+
+    // Add second parameter
+    F32 val2 = 3.14159f;
+    FwPrmIdType id2 = 0x200;
+    pBuff.resetSer();
+    serStat = pBuff.serialize(val2);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    this->m_impl.updateAddPrm(id2, pBuff, this->m_impl.m_dbPrime, nullptr);
+
+    // Verify databases are not equal
+    EXPECT_FALSE(this->m_impl.dbEqual());
+
+    // Copy Prime DB to Backup DB
+    this->m_impl.dbCopy(this->m_impl.m_dbBackup, this->m_impl.m_dbPrime);
+
+    // Verify databases are now equal
+    EXPECT_TRUE(this->m_impl.dbEqual());
+
+    // Verify values in the backup DB
+    pBuff.resetSer();
+    U32 testVal1;
+    FwSizeType idx = 0;
+    // Find the parameter and get its index
+    for (FwSizeType i = 0; i < PRMDB_NUM_DB_ENTRIES; i++) {
+        if (this->m_impl.m_dbBackup[i].used && this->m_impl.m_dbBackup[i].id == id1) {
+            idx = i;
+            break;
+        }
+    }
+    EXPECT_TRUE(this->m_impl.m_dbBackup[idx].used);
+    EXPECT_EQ(id1, this->m_impl.m_dbBackup[idx].id);
+    pBuff = this->m_impl.m_dbBackup[idx].val;
+    serStat = pBuff.deserializeTo(testVal1);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    EXPECT_EQ(val1, testVal1);
+
+    // ---- Test dbCopySingle ----
+    printf("Testing dbCopySingle...\n");
+
+    // Clear both databases
+    this->m_impl.clearDb(this->m_impl.m_dbPrime);
+    this->m_impl.clearDb(this->m_impl.m_dbBackup);
+
+    // Add different entries to Prime and Backup DBs
+
+    // Prime DB - add first parameter
+    pBuff.resetSer();
+    serStat = pBuff.serialize(val1);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    FwSizeType primeIdx1;
+    this->m_impl.updateAddPrm(id1, pBuff, this->m_impl.m_dbPrime, &primeIdx1);
+
+    // Prime DB - add second parameter
+    pBuff.resetSer();
+    serStat = pBuff.serialize(val2);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    FwSizeType primeIdx2;
+    this->m_impl.updateAddPrm(id2, pBuff, this->m_impl.m_dbPrime, &primeIdx2);
+
+    // Backup DB - add different parameter
+    U16 val3 = 0x5678;
+    FwPrmIdType id3 = 0x300;
+    pBuff.resetSer();
+    serStat = pBuff.serialize(val3);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    this->m_impl.updateAddPrm(id3, pBuff, this->m_impl.m_dbBackup, nullptr);
+
+    // Verify databases are not equal
+    EXPECT_FALSE(this->m_impl.dbEqual());
+
+    // Copy only the second entry from Prime to Backup at the same index
+    this->m_impl.dbCopySingle(this->m_impl.m_dbBackup, this->m_impl.m_dbPrime, primeIdx2);
+
+    // Verify the specific entry was copied correctly
+    EXPECT_TRUE(this->m_impl.m_dbBackup[primeIdx2].used);
+    EXPECT_EQ(id2, this->m_impl.m_dbBackup[primeIdx2].id);
+
+    // Verify value matches
+    pBuff = this->m_impl.m_dbBackup[primeIdx2].val;
+    F32 testVal2;
+    serStat = pBuff.deserializeTo(testVal2);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    EXPECT_EQ(val2, testVal2);
+
+    // Verify the original entry in Backup DB is still there
+    bool foundOriginal = false;
+    for (FwSizeType i = 0; i < PRMDB_NUM_DB_ENTRIES; i++) {
+        if (this->m_impl.m_dbBackup[i].used && this->m_impl.m_dbBackup[i].id == id3) {
+            foundOriginal = true;
+
+            // Verify value is still correct
+            pBuff = this->m_impl.m_dbBackup[i].val;
+            U16 testVal3;
+            serStat = pBuff.deserializeTo(testVal3);
+            EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+            EXPECT_EQ(val3, testVal3);
+            break;
+        }
+    }
+    EXPECT_TRUE(foundOriginal);
+
+    // Databases should still not be equal since we only copied one entry
+    EXPECT_FALSE(this->m_impl.dbEqual());
+}
+
+void PrmDbTester::printDb(PrmDb_PrmDbType dbType) {
+    PrmDbImpl::t_dbStruct* db;
+    this->m_impl.getDbPtr(dbType, &db);
+    printf("%s Parameter DB @ %p \n", PrmDbImpl::getDbString(dbType).toChar(), static_cast<void*>(db));
     for (FwSizeType entry = 0; entry < PRMDB_NUM_DB_ENTRIES; entry++) {
         U8* data = db[entry].val.getBuffAddr();
         FwSizeType len = db[entry].val.getBuffLength();
         if (db[entry].used) {
             printf("  %2llu :", entry);
-            printf(" ID = %08X",  db[entry].id);
+            printf(" ID = %08X", db[entry].id);
             printf(" Value = ");
             for (FwSizeType i = 0; i < len; ++i) {
                 printf("%02X ", data[i]);

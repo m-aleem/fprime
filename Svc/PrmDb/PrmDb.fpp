@@ -7,6 +7,12 @@ module Svc {
     # Types
     # ----------------------------------------------------------------------
 
+    @ Parameter DB type
+    enum PrmDbType {
+      DB_PRIME,
+      DB_BACKUP
+    }
+
     @ Parameter read error
     enum PrmReadError {
       OPEN

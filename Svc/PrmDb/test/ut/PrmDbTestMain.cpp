@@ -175,6 +175,43 @@ TEST(ParameterDbTest, PrmFileWriteError) {
     tester.runFileWriteError();
 }
 
+TEST(ParameterDbTest, PrmDbEqualTest) {
+    COMMENT("Verify helper that checks equality of prime and backup DBs");
+
+    Svc::PrmDbImpl impl("PrmDbImpl");
+
+    impl.init(10, 0);
+    impl.configure("TestFile.prm");
+
+    Svc::PrmDbTester tester(impl);
+
+    tester.init();
+
+    // connect ports
+    connectPorts(impl, tester);
+
+    // run test
+    tester.runDbEqualTest();
+}
+
+TEST(ParameterDbTest, PrmDbCopyTest) {
+    COMMENT("Verify parameter DB copy helpers");
+
+    Svc::PrmDbImpl impl("PrmDbImpl");
+
+    impl.init(10, 0);
+    impl.configure("TestFile.prm");
+
+    Svc::PrmDbTester tester(impl);
+
+    tester.init();
+
+    // connect ports
+    connectPorts(impl, tester);
+
+    // run test
+    tester.runDbCopyTest();
+}
 
 TEST(ParameterDbTest, PrmDbPrimeSaveBackupSet) {
     COMMENT("Verify Backup Parameter DB set from Save File");
@@ -191,10 +228,9 @@ TEST(ParameterDbTest, PrmDbPrimeSaveBackupSet) {
     // connect ports
     connectPorts(impl, tester);
 
-    // run test with file errors
+    // run test
     tester.runPrimeSaveBackupSet();
 }
-
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

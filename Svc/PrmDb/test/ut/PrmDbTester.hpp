@@ -28,6 +28,8 @@ class PrmDbTester : public PrmDbGTestBase {
     void runFileReadError();
     void runFileWriteError();
     void runRefPrmFile();
+    void runDbEqualTest();
+    void runDbCopyTest();
     void runPrimeSaveBackupSet();
 
   private:
@@ -58,7 +60,7 @@ class PrmDbTester : public PrmDbGTestBase {
     Os::File::Status m_testWriteStatus;
 
     // Param db print method to aid with debugging
-    void printDb(PrmDbImpl::t_dbStruct* db);
+    void printDb(PrmDb_PrmDbType dbType);
 
   public:
     class PrmDbTestFile : public Os::Stub::File::Test::TestFile {

@@ -16,9 +16,14 @@
 #include <Fw/Types/String.hpp>
 #include <Os/Mutex.hpp>
 #include <Svc/PrmDb/PrmDbComponentAc.hpp>
+#include <Svc/PrmDb/PrmDb_PrmDbTypeEnumAc.hpp>
 #include <config/PrmDbImplCfg.hpp>
 
 namespace Svc {
+
+typedef PrmDb_PrmWriteError PrmWriteError;
+typedef PrmDb_PrmReadError PrmReadError;
+typedef PrmDb_PrmDbType PrmDbType;
 
 //! \class PrmDbImpl
 //! \brief Component class for managing parameters
@@ -28,11 +33,9 @@ namespace Svc {
 //!
 
 class PrmDbImpl final : public PrmDbComponentBase {
-
-  friend class PrmDbTester;
+    friend class PrmDbTester;
 
   public:
-
     //!  \brief PrmDb constructor
     //!
     //!  The constructor for the PrmDbImpl class.
@@ -60,13 +63,7 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!
     virtual ~PrmDbImpl();
 
-
-    enum paramUpdateType {
-      NO_SLOTS,
-      PARAM_ADDED,
-      PARAM_UPDATED,
-      MAX_PARAM_UPDATE_TYPES
-    };
+    enum paramUpdateType { NO_SLOTS, PARAM_ADDED, PARAM_UPDATED, MAX_PARAM_UPDATE_TYPES };
 
   protected:
   private:
@@ -76,12 +73,15 @@ class PrmDbImpl final : public PrmDbComponentBase {
         Fw::ParamBuffer val;  //!< the serialized value of the parameter
 
         bool operator==(const t_dbStruct& other) const {
-          if (used != other.used) return false;
-          if (id != other.id) return false;
-          // Compare lengths first
-          if (val.getBuffLength() != other.val.getBuffLength()) return false;
-          // Compare buffer contents
-          return std::memcmp(val.getBuffAddr(), other.val.getBuffAddr(), val.getBuffLength()) == 0;
+            if (used != other.used)
+                return false;
+            if (id != other.id)
+                return false;
+            // Compare lengths first
+            if (val.getBuffLength() != other.val.getBuffLength())
+                return false;
+            // Compare buffer contents
+            return std::memcmp(val.getBuffAddr(), other.val.getBuffAddr(), val.getBuffLength()) == 0;
         }
     };
 
@@ -95,14 +95,19 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  Copies one db to another
     void dbCopy(t_dbStruct* dest, t_dbStruct* src);
 
+    //! \brief Deep copy for single db entry
+    //!
+    //!  Copies one db entry to another at specified index
+    void dbCopySingle(t_dbStruct* dest, t_dbStruct* src, FwSizeType index);
+
     //! \brief Read a parameter file and apply the values to the database
     //!
     //!  This method reads a parameter file and applies the values to the database.
     //!
     //!  \param fileName The name of the parameter file to read
-    //!  \param db Pointer to the database array to populate with parameter data
+    //!  \param dbType The type of database to read into (primary or backup)
     //!  \return status success (True)/failure(False)
-    bool readParamFileImpl(const Fw::StringBase& fileName, t_dbStruct* db, Fw::String dbString);
+    bool readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbType);
 
     //!  \brief PrmDb parameter get handler
     //!
@@ -124,14 +129,15 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  \param val buffer where value to be saved is stored.
     void setPrm_handler(FwIndexType portNum, FwPrmIdType id, Fw::ParamBuffer& val);
 
-
     //!  \brief PrmDb parameter add or update (set) helper
     //!
     //!  This function does the underlying parameter update
     //!
     //!  \param id identifier for parameter being used.
     //!  \param val buffer where value to be saved is stored.
-    PrmDbImpl::paramUpdateType updateAddPrm(FwPrmIdType id, Fw::ParamBuffer& val, t_dbStruct* db);
+    //!  \param db pointer to the database to update (primary or backup)
+    //!  \param index pointer to index of updated or added parameter
+    PrmDbImpl::paramUpdateType updateAddPrm(FwPrmIdType id, Fw::ParamBuffer& val, t_dbStruct* db, FwSizeType* index);
 
     //!  \brief component ping handler
     //!
@@ -169,12 +175,23 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  This function clears all entries from the RAM database
     //!
     //!  \param db Pointer to the database array to clear
-
     void clearDb(t_dbStruct* db);  //!< clear the parameter database
+
+    //!  \brief PrmDb get db pointer function
+    //!  This function returns a pointer to the requested database
+    //!  \param dbType The type of database requested (primary or backup)
+    //!  \param dbPtr Pointer to the database array to be set
+    void getDbPtr(PrmDbType dbType, t_dbStruct** dbPtr);
+
+    //!  \brief PrmDb get db pointer function
+    //!  This function returns a pointer to the requested database
+    //!  \param dbType The type of database requested (primary or backup)
+    //!  \param dbPtr Pointer to the database array to be set
+    static Fw::String getDbString(PrmDbType dbType);
 
     Fw::String m_fileName;  //!< filename for parameter storage
 
-    t_dbStruct m_db[PRMDB_NUM_DB_ENTRIES];
+    t_dbStruct m_dbPrime[PRMDB_NUM_DB_ENTRIES];
     t_dbStruct m_dbBackup[PRMDB_NUM_DB_ENTRIES];
 };
 }  // namespace Svc
