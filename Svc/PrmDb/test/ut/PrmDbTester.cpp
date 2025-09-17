@@ -585,7 +585,7 @@ void PrmDbTester::printDb(PrmDb_PrmDbType dbType) {
         U8* data = db[entry].val.getBuffAddr();
         FwSizeType len = db[entry].val.getBuffLength();
         if (db[entry].used) {
-            printf("  %2llu :", entry);
+            printf("  %2lu :", entry);
             printf(" ID = %08X", db[entry].id);
             printf(" Value = ");
             for (FwSizeType i = 0; i < len; ++i) {
