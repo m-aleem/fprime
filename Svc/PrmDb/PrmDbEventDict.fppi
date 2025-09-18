@@ -78,3 +78,12 @@ event PrmSetFileComplete(
     severity activity high \
     id 8 \
     format "Parameter set file completed. Applied {} records."
+
+@ Parmeters Copied from one DB to another
+event PrmDbCopyAllComplete(
+                            databaseStringSrc: string @< The src database string
+                            databaseStringDest: string @< The dest database string
+                            ) \
+    severity activity high \
+    id 9 \
+    format "All parameters copied. Source database: {}, Destination databse: {}."

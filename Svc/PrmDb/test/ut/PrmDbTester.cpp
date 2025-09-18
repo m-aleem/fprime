@@ -23,8 +23,8 @@ typedef PrmDb_PrmReadError PrmReadError;
 
 void PrmDbTester::runNominalPopulate() {
     // clear database
-    this->m_impl.clearDb(this->m_impl.m_dbPrime);
-    this->m_impl.clearDb(this->m_impl.m_dbBackup);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_PRIME);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_BACKUP);
 
     // build a test parameter value with a simple value
     U32 val = 0x10;
@@ -158,9 +158,10 @@ void PrmDbTester::runNominalLoadFile() {
 
     this->m_impl.readParamFile();
     ASSERT_EVENTS_SIZE(2);
-    ASSERT_EVENTS_PrmFileLoadComplete_SIZE(2);
+    ASSERT_EVENTS_PrmFileLoadComplete_SIZE(1);
     ASSERT_EVENTS_PrmFileLoadComplete(0, "Prime", 2, 2, 0);
-    ASSERT_EVENTS_PrmFileLoadComplete(1, "Backup", 2, 2, 0);
+    ASSERT_EVENTS_PrmDbCopyAllComplete_SIZE(1);
+    ASSERT_EVENTS_PrmDbCopyAllComplete(0, "Prime", "Backup");
 
     // verify values (populated by runNominalPopulate())
 
@@ -194,8 +195,8 @@ void PrmDbTester::runMissingExtraParams() {
     ASSERT_EVENTS_PrmIdNotFound(0, 0x1000);
 
     // clear database
-    this->m_impl.clearDb(this->m_impl.m_dbPrime);
-    this->m_impl.clearDb(this->m_impl.m_dbBackup);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_PRIME);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_BACKUP);
 
     this->clearEvents();
     // write too many entries
@@ -351,8 +352,8 @@ void PrmDbTester::runPrimeSaveBackupSet() {
     Fw::SerializeStatus serStat;
 
     printf("Clear the prime and backup DBs \n");
-    this->m_impl.clearDb(this->m_impl.m_dbPrime);
-    this->m_impl.clearDb(this->m_impl.m_dbBackup);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_PRIME);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_BACKUP);
     printDb(PrmDb_PrmDbType::DB_PRIME);
     printDb(PrmDb_PrmDbType::DB_BACKUP);
     EXPECT_TRUE(this->m_impl.dbEqual());
@@ -364,7 +365,7 @@ void PrmDbTester::runPrimeSaveBackupSet() {
     serStat = pBuff.serialize(val);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
     this->clearEvents();
-    this->m_impl.updateAddPrm(id, pBuff, this->m_impl.m_dbPrime, nullptr);
+    this->m_impl.updateAddPrm(id, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
 
     printf("Retrieve and verify the parameter added to the Prime DB \n");
     U32 testVal;
@@ -401,8 +402,8 @@ void PrmDbTester::runDbEqualTest() {
     Fw::SerializeStatus serStat;
 
     // 1. Test with empty databases - should be equal
-    this->m_impl.clearDb(this->m_impl.m_dbPrime);
-    this->m_impl.clearDb(this->m_impl.m_dbBackup);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_PRIME);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_BACKUP);
     EXPECT_TRUE(this->m_impl.dbEqual());
 
     // 2. Add an entry to prime DB only - should not be equal
@@ -413,7 +414,7 @@ void PrmDbTester::runDbEqualTest() {
     serStat = pBuff.serialize(val1);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
 
-    this->m_impl.updateAddPrm(id1, pBuff, this->m_impl.m_dbPrime, nullptr);
+    this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
     EXPECT_FALSE(this->m_impl.dbEqual());
 
     // 3. Add same entry to backup DB - should be equal again
@@ -421,7 +422,7 @@ void PrmDbTester::runDbEqualTest() {
     serStat = pBuff.serialize(val1);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
 
-    this->m_impl.updateAddPrm(id1, pBuff, this->m_impl.m_dbBackup, nullptr);
+    this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_BACKUP, nullptr);
     EXPECT_TRUE(this->m_impl.dbEqual());
 
     // 4. Update entry in prime DB only - should not be equal
@@ -430,7 +431,7 @@ void PrmDbTester::runDbEqualTest() {
     serStat = pBuff.serialize(val2);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
 
-    this->m_impl.updateAddPrm(id1, pBuff, this->m_impl.m_dbPrime, nullptr);
+    this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
     EXPECT_FALSE(this->m_impl.dbEqual());
 
     // 5. Update backup DB to match - should be equal again
@@ -438,7 +439,7 @@ void PrmDbTester::runDbEqualTest() {
     serStat = pBuff.serialize(val2);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
 
-    this->m_impl.updateAddPrm(id1, pBuff, this->m_impl.m_dbBackup, nullptr);
+    this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_BACKUP, nullptr);
     EXPECT_TRUE(this->m_impl.dbEqual());
 
     // 6. Add different entry to backup DB - should not be equal
@@ -448,7 +449,7 @@ void PrmDbTester::runDbEqualTest() {
     serStat = pBuff.serialize(val3);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
 
-    this->m_impl.updateAddPrm(id2, pBuff, this->m_impl.m_dbBackup, nullptr);
+    this->m_impl.updateAddPrm(id2, pBuff, PrmDb_PrmDbType::DB_BACKUP, nullptr);
     EXPECT_FALSE(this->m_impl.dbEqual());
 }
 
@@ -459,8 +460,8 @@ void PrmDbTester::runDbCopyTest() {
     printf("Testing dbCopy...\n");
 
     // Clear both databases
-    this->m_impl.clearDb(this->m_impl.m_dbPrime);
-    this->m_impl.clearDb(this->m_impl.m_dbBackup);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_PRIME);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_BACKUP);
 
     // Add entries to Prime DB only
     U32 val1 = 0x1234;
@@ -471,7 +472,7 @@ void PrmDbTester::runDbCopyTest() {
     pBuff.resetSer();
     serStat = pBuff.serialize(val1);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
-    this->m_impl.updateAddPrm(id1, pBuff, this->m_impl.m_dbPrime, nullptr);
+    this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
 
     // Add second parameter
     F32 val2 = 3.14159f;
@@ -479,13 +480,13 @@ void PrmDbTester::runDbCopyTest() {
     pBuff.resetSer();
     serStat = pBuff.serialize(val2);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
-    this->m_impl.updateAddPrm(id2, pBuff, this->m_impl.m_dbPrime, nullptr);
+    this->m_impl.updateAddPrm(id2, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
 
     // Verify databases are not equal
     EXPECT_FALSE(this->m_impl.dbEqual());
 
     // Copy Prime DB to Backup DB
-    this->m_impl.dbCopy(this->m_impl.m_dbBackup, this->m_impl.m_dbPrime);
+    this->m_impl.dbCopy(PrmDb_PrmDbType::DB_BACKUP, PrmDb_PrmDbType::DB_PRIME);
 
     // Verify databases are now equal
     EXPECT_TRUE(this->m_impl.dbEqual());
@@ -512,8 +513,8 @@ void PrmDbTester::runDbCopyTest() {
     printf("Testing dbCopySingle...\n");
 
     // Clear both databases
-    this->m_impl.clearDb(this->m_impl.m_dbPrime);
-    this->m_impl.clearDb(this->m_impl.m_dbBackup);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_PRIME);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_BACKUP);
 
     // Add different entries to Prime and Backup DBs
 
@@ -522,14 +523,14 @@ void PrmDbTester::runDbCopyTest() {
     serStat = pBuff.serialize(val1);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
     FwSizeType primeIdx1;
-    this->m_impl.updateAddPrm(id1, pBuff, this->m_impl.m_dbPrime, &primeIdx1);
+    this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_PRIME, &primeIdx1);
 
     // Prime DB - add second parameter
     pBuff.resetSer();
     serStat = pBuff.serialize(val2);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
     FwSizeType primeIdx2;
-    this->m_impl.updateAddPrm(id2, pBuff, this->m_impl.m_dbPrime, &primeIdx2);
+    this->m_impl.updateAddPrm(id2, pBuff, PrmDb_PrmDbType::DB_PRIME, &primeIdx2);
 
     // Backup DB - add different parameter
     U16 val3 = 0x5678;
@@ -537,13 +538,13 @@ void PrmDbTester::runDbCopyTest() {
     pBuff.resetSer();
     serStat = pBuff.serialize(val3);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
-    this->m_impl.updateAddPrm(id3, pBuff, this->m_impl.m_dbBackup, nullptr);
+    this->m_impl.updateAddPrm(id3, pBuff, PrmDb_PrmDbType::DB_BACKUP, nullptr);
 
     // Verify databases are not equal
     EXPECT_FALSE(this->m_impl.dbEqual());
 
     // Copy only the second entry from Prime to Backup at the same index
-    this->m_impl.dbCopySingle(this->m_impl.m_dbBackup, this->m_impl.m_dbPrime, primeIdx2);
+    this->m_impl.dbCopySingle(PrmDb_PrmDbType::DB_BACKUP, PrmDb_PrmDbType::DB_PRIME, primeIdx2);
 
     // Verify the specific entry was copied correctly
     EXPECT_TRUE(this->m_impl.m_dbBackup[primeIdx2].used);
@@ -575,6 +576,122 @@ void PrmDbTester::runDbCopyTest() {
 
     // Databases should still not be equal since we only copied one entry
     EXPECT_FALSE(this->m_impl.dbEqual());
+}
+
+void PrmDbTester::runSetFileTests() {
+    // Preconditions setup and test
+    this->runNominalLoadFile();
+
+    this->clearEvents();
+    // Loop through all size errors testing each
+    Os::Stub::File::Test::StaticData::setNextStatus(Os::File::OP_OK);
+    this->m_errorType = FILE_SIZE_ERROR;
+    for (FwSizeType i = 0; i < 4; i++) {
+        clearEvents();
+        this->m_waits = i;
+        this->sendCmd_PRM_SET_FILE(0, 12, this->m_impl.m_fileName);
+        this->m_impl.doDispatch();
+        ASSERT_EVENTS_SIZE(2);
+        ASSERT_EVENTS_PrmDbCopyAllComplete_SIZE(1);
+        ASSERT_EVENTS_PrmDbCopyAllComplete(0, "Backup", "Prime");
+        switch (i) {
+            // This time if we fail reading the file, we should revert the Prime DB to the state of the Backup DB
+            case 0:
+                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::DELIMITER_SIZE, 0, sizeof(U8) + 1);
+                break;
+            case 1:
+                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::RECORD_SIZE_SIZE, 0, sizeof(U32) + 1);
+                break;
+            case 2:
+                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::PARAMETER_ID_SIZE, 0, sizeof(FwPrmIdType) + 1);
+                break;
+            case 3:
+                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::PARAMETER_VALUE_SIZE, 0, sizeof(U32) + 1);
+                break;
+            default:
+                FAIL() << "Reached unknown case";
+        }
+    }
+    // Loop through failure statuses
+    for (FwSizeType i = 0; i < 2; i++) {
+        this->m_errorType = FILE_STATUS_ERROR;
+        // Set various file errors
+        switch (i) {
+            case 0:
+                this->m_status = Os::File::Status::DOESNT_EXIST;
+                break;
+            case 1:
+                this->m_status = Os::File::Status::NOT_OPENED;
+                break;
+            default:
+                FAIL() << "Reached unknown case";
+        }
+        // Loop through various field reads
+        for (FwSizeType j = 0; j < 4; j++) {
+            clearEvents();
+            this->m_waits = j;
+            this->sendCmd_PRM_SET_FILE(0, 12, this->m_impl.m_fileName);
+            this->m_impl.doDispatch();
+            ASSERT_EVENTS_SIZE(2);
+            ASSERT_EVENTS_PrmDbCopyAllComplete_SIZE(1);
+            ASSERT_EVENTS_PrmDbCopyAllComplete(0, "Backup", "Prime");
+            switch (j) {
+                case 0:
+                    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                    ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::DELIMITER, 0, this->m_status);
+                    break;
+                case 1:
+                    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                    ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::RECORD_SIZE, 0, this->m_status);
+                    break;
+                case 2:
+                    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                    ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::PARAMETER_ID, 0, this->m_status);
+                    break;
+                case 3:
+                    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                    ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::PARAMETER_VALUE, 0, this->m_status);
+                    break;
+                default:
+                    FAIL() << "Reached unknown case";
+            }
+        }
+    }
+
+
+    this->m_errorType = FILE_DATA_ERROR;
+    for (FwSizeType i = 0; i < 2; i++) {
+        clearEvents();
+        this->m_waits = i;
+        this->sendCmd_PRM_SET_FILE(0, 12, this->m_impl.m_fileName);
+        this->m_impl.doDispatch();
+        ASSERT_EVENTS_SIZE(2);
+        ASSERT_EVENTS_PrmDbCopyAllComplete_SIZE(1);
+        ASSERT_EVENTS_PrmDbCopyAllComplete(0, "Backup", "Prime");
+        switch (i) {
+            case 0:
+                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                // Parameter read error caused by adding one to the expected read
+                ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::DELIMITER_VALUE, 0, PRMDB_ENTRY_DELIMITER + 1);
+                break;
+            case 1: {
+                // Data in this test is corrupted by adding 1 to the first data byte read. Since data is stored in
+                // big-endian format the highest order byte of the record size (U32) must have one added to it.
+                // Expected result of '8' inherited from original design of test.
+                U32 expected_error_value = sizeof(FwPrmIdType) + 4 + (1 << ((sizeof(U32) - 1) * 8));
+                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+                ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::RECORD_SIZE_VALUE, 0, expected_error_value);
+                break;
+            }
+            default:
+                FAIL() << "Reached unknown case";
+        }
+    }
+
 }
 
 void PrmDbTester::printDb(PrmDb_PrmDbType dbType) {
@@ -658,23 +775,22 @@ void PrmDbTester::runFileReadError() {
         clearEvents();
         this->m_waits = i;
         this->m_impl.readParamFile();
-        ASSERT_EVENTS_SIZE(2);
+        ASSERT_EVENTS_SIZE(1);
         switch (i) {
             case 0:
-                ASSERT_EVENTS_PrmFileReadError_SIZE(2);
+                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
                 ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::DELIMITER_SIZE, 0, sizeof(U8) + 1);
-                ASSERT_EVENTS_PrmFileReadError(1, PrmReadError::DELIMITER_SIZE, 0, sizeof(U8) + 1);
                 break;
             case 1:
-                ASSERT_EVENTS_PrmFileReadError_SIZE(2);
+                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
                 ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::RECORD_SIZE_SIZE, 0, sizeof(U32) + 1);
                 break;
             case 2:
-                ASSERT_EVENTS_PrmFileReadError_SIZE(2);
+                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
                 ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::PARAMETER_ID_SIZE, 0, sizeof(FwPrmIdType) + 1);
                 break;
             case 3:
-                ASSERT_EVENTS_PrmFileReadError_SIZE(2);
+                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
                 ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::PARAMETER_VALUE_SIZE, 0, sizeof(U32) + 1);
                 break;
             default:
@@ -700,22 +816,22 @@ void PrmDbTester::runFileReadError() {
             clearEvents();
             this->m_waits = j;
             this->m_impl.readParamFile();
-            ASSERT_EVENTS_SIZE(2);
+            ASSERT_EVENTS_SIZE(1);
             switch (j) {
                 case 0:
-                    ASSERT_EVENTS_PrmFileReadError_SIZE(2);
+                    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
                     ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::DELIMITER, 0, this->m_status);
                     break;
                 case 1:
-                    ASSERT_EVENTS_PrmFileReadError_SIZE(2);
+                    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
                     ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::RECORD_SIZE, 0, this->m_status);
                     break;
                 case 2:
-                    ASSERT_EVENTS_PrmFileReadError_SIZE(2);
+                    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
                     ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::PARAMETER_ID, 0, this->m_status);
                     break;
                 case 3:
-                    ASSERT_EVENTS_PrmFileReadError_SIZE(2);
+                    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
                     ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::PARAMETER_VALUE, 0, this->m_status);
                     break;
                 default:
@@ -728,10 +844,10 @@ void PrmDbTester::runFileReadError() {
         clearEvents();
         this->m_waits = i;
         this->m_impl.readParamFile();
-        ASSERT_EVENTS_SIZE(2);
+        ASSERT_EVENTS_SIZE(1);
         switch (i) {
             case 0:
-                ASSERT_EVENTS_PrmFileReadError_SIZE(2);
+                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
                 // Parameter read error caused by adding one to the expected read
                 ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::DELIMITER_VALUE, 0, PRMDB_ENTRY_DELIMITER + 1);
                 break;
@@ -740,7 +856,7 @@ void PrmDbTester::runFileReadError() {
                 // big-endian format the highest order byte of the record size (U32) must have one added to it.
                 // Expected result of '8' inherited from original design of test.
                 U32 expected_error_value = sizeof(FwPrmIdType) + 4 + (1 << ((sizeof(U32) - 1) * 8));
-                ASSERT_EVENTS_PrmFileReadError_SIZE(2);
+                ASSERT_EVENTS_PrmFileReadError_SIZE(1);
                 ASSERT_EVENTS_PrmFileReadError(0, PrmReadError::RECORD_SIZE_VALUE, 0, expected_error_value);
                 break;
             }

@@ -35,8 +35,8 @@ class WorkingBuffer : public Fw::SerializeBufferBase {
 }  // namespace
 
 PrmDbImpl::PrmDbImpl(const char* name) : PrmDbComponentBase(name) {
-    this->clearDb(this->m_dbPrime);
-    this->clearDb(this->m_dbBackup);
+    this->clearDb(PrmDbType::DB_PRIME);
+    this->clearDb(PrmDbType::DB_BACKUP);
 }
 
 void PrmDbImpl::configure(const char* file) {
@@ -44,7 +44,9 @@ void PrmDbImpl::configure(const char* file) {
     this->m_fileName = file;
 }
 
-void PrmDbImpl::clearDb(t_dbStruct* db) {
+void PrmDbImpl::clearDb(PrmDbType prmDbType) {
+    t_dbStruct* db;
+    getDbPtr(prmDbType, &db);
     for (FwSizeType entry = 0; entry < PRMDB_NUM_DB_ENTRIES; entry++) {
         db[entry].used = false;
         db[entry].id = 0;
@@ -78,9 +80,12 @@ Fw::ParamValid PrmDbImpl::getPrm_handler(FwIndexType portNum, FwPrmIdType id, Fw
 
 PrmDbImpl::paramUpdateType PrmDbImpl::updateAddPrm(FwPrmIdType id,
                                                    Fw::ParamBuffer& val,
-                                                   t_dbStruct* db,
+                                                   PrmDbType prmDbType,
                                                    FwSizeType* index) {
     paramUpdateType updateStatus = NO_SLOTS;
+
+    t_dbStruct* db;
+    getDbPtr(prmDbType, &db);
 
     this->lock();
     // search for existing entry
@@ -121,15 +126,19 @@ PrmDbImpl::paramUpdateType PrmDbImpl::updateAddPrm(FwPrmIdType id,
 
 void PrmDbImpl::setPrm_handler(FwIndexType portNum, FwPrmIdType id, Fw::ParamBuffer& val) {
     FwSizeType index;  // Which index was used for this parameter
-    paramUpdateType update_status = updateAddPrm(id, val, this->m_dbBackup, &index);
 
+    // Update in the backup DB first
+    paramUpdateType update_status = updateAddPrm(id, val, PrmDbType::DB_BACKUP, &index);
+
+    // Issue relevant EVR
+    // Copy to primary DB if added or updated
     if (update_status == PARAM_UPDATED) {
-        dbCopySingle(this->m_dbPrime, this->m_dbBackup, index);
+        dbCopySingle(PrmDbType::DB_PRIME, PrmDbType::DB_BACKUP, index);
         this->log_ACTIVITY_HI_PrmIdUpdated(id);
     } else if (update_status == NO_SLOTS) {
         this->log_FATAL_PrmDbFull(id);
     } else {
-        dbCopySingle(this->m_dbPrime, this->m_dbBackup, index);
+        dbCopySingle(PrmDbType::DB_PRIME, PrmDbType::DB_BACKUP, index);
         this->log_ACTIVITY_HI_PrmIdAdded(id);
     }
 }
@@ -278,7 +287,7 @@ void PrmDbImpl::PRM_SET_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq, const F
         }
     } else {
         // Revert Prime using Backup
-        dbCopy(this->m_dbPrime, this->m_dbBackup);
+        dbCopy(PrmDbType::DB_PRIME, PrmDbType::DB_BACKUP);
     }
 
     // Prime/backup should be the same after
@@ -293,14 +302,13 @@ void PrmDbImpl::readParamFile() {
     // Assumed to run at initialization time
 
     // Clear databases
-    this->clearDb(this->m_dbPrime);
-    this->clearDb(this->m_dbBackup);
+    this->clearDb(PrmDbType::DB_PRIME);
+    this->clearDb(PrmDbType::DB_BACKUP);
 
     // Read parameter file to prime and backup
     bool prime_ok = readParamFileImpl(this->m_fileName, PrmDbType::DB_PRIME);
-    bool backup_ok = readParamFileImpl(this->m_fileName, PrmDbType::DB_BACKUP);
-
-    if (prime_ok and backup_ok) {
+    if (prime_ok) {
+        dbCopy(PrmDbType::DB_BACKUP, PrmDbType::DB_PRIME);
         FW_ASSERT(static_cast<FwAssertArgType>(dbEqual()));
     }
 }
@@ -434,7 +442,7 @@ bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbTy
 
         // Actually update or add parameter
         FwSizeType index;  // Which index was used for this parameter
-        paramUpdateType updateStatus = updateAddPrm(parameterId, tmpParamBuffer, db, &index);
+        paramUpdateType updateStatus = updateAddPrm(parameterId, tmpParamBuffer, dbType, &index);
         if (updateStatus == PARAM_ADDED) {
             recordNumAdded++;
         } else if (updateStatus == PARAM_UPDATED) {
@@ -469,21 +477,24 @@ bool PrmDbImpl::dbEqual() {
     return true;
 }
 
-void PrmDbImpl::dbCopy(t_dbStruct* dest, t_dbStruct* src) {
+void PrmDbImpl::dbCopy(PrmDbType dest, PrmDbType src) {
     for (FwSizeType i = 0; i < PRMDB_NUM_DB_ENTRIES; i++) {
-        dest[i].used = src[i].used;
-        dest[i].id = src[i].id;
-        dest[i].val = src[i].val;
+        dbCopySingle(dest, src, i);
     }
+    this->log_ACTIVITY_HI_PrmDbCopyAllComplete(getDbString(src), getDbString(dest));
 }
 
-void PrmDbImpl::dbCopySingle(t_dbStruct* dest, t_dbStruct* src, FwSizeType index) {
-    printf("Copying single entry %u %u\n", static_cast<unsigned int>(index),
-           static_cast<unsigned int>(PRMDB_NUM_DB_ENTRIES));
+void PrmDbImpl::dbCopySingle(PrmDbType dest, PrmDbType src, FwSizeType index) {
+    t_dbStruct* srcPtr;
+    t_dbStruct* destPtr;
+
+    getDbPtr(src, &srcPtr);
+    getDbPtr(dest, &destPtr);
+
     FW_ASSERT(index < PRMDB_NUM_DB_ENTRIES);
-    dest[index].used = src[index].used;
-    dest[index].id = src[index].id;
-    dest[index].val = src[index].val;
+    destPtr[index].used = srcPtr[index].used;
+    destPtr[index].id = srcPtr[index].id;
+    destPtr[index].val = srcPtr[index].val;
 }
 
 void PrmDbImpl::getDbPtr(PrmDbType dbType, t_dbStruct** dbPtr) {

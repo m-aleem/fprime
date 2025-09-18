@@ -232,6 +232,25 @@ TEST(ParameterDbTest, PrmDbPrimeSaveBackupSet) {
     tester.runPrimeSaveBackupSet();
 }
 
+TEST(ParameterDbTest, PrmSetFileTests) {
+    COMMENT("Verify Backup Parameter DB set from Set File");
+
+    Svc::PrmDbImpl impl("PrmDbImpl");
+
+    impl.init(10, 0);
+    impl.configure("TestFile.prm");
+
+    Svc::PrmDbTester tester(impl);
+
+    tester.init();
+
+    // connect ports
+    connectPorts(impl, tester);
+
+    // run test
+    tester.runSetFileTests();
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
