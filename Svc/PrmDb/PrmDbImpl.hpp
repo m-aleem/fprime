@@ -93,11 +93,17 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //! \brief Deep copy for db
     //!
     //!  Copies one db to another
+    //! \param dest The destination db to copy to (primary or backup)
+    //! \param src The source db to copy from (primary or backup)
     void dbCopy(PrmDbType dest, PrmDbType src);
 
     //! \brief Deep copy for single db entry
     //!
     //!  Copies one db entry to another at specified index
+    //!
+    //! \param dest The destination db to copy to (primary or backup)
+    //! \param src The source db to copy from (primary or backup)
+    //! \param index The index of the entry to copy
     void dbCopySingle(PrmDbType dest, PrmDbType src, FwSizeType index);
 
     //! \brief Read a parameter file and apply the values to the database
@@ -135,7 +141,7 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!
     //!  \param id identifier for parameter being used.
     //!  \param val buffer where value to be saved is stored.
-    //!  \param db pointer to the database to update (primary or backup)
+    //!  \param dbType The type of database to read into (primary or backup)
     //!  \param index pointer to index of updated or added parameter
     PrmDbImpl::paramUpdateType updateAddPrm(FwPrmIdType id,
                                             Fw::ParamBuffer& val,
@@ -177,7 +183,7 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!
     //!  This function clears all entries from the RAM database
     //!
-    //!  \param db Pointer to the database array to clear
+    //!  \param dbType The type of database to read into (primary or backup)
     void clearDb(PrmDbType prmDbType);  //!< clear the parameter database
 
     //!  \brief PrmDb get db pointer function
@@ -186,10 +192,10 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  \param dbPtr Pointer to the database array to be set
     void getDbPtr(PrmDbType dbType, t_dbStruct** dbPtr);
 
-    //!  \brief PrmDb get db pointer function
-    //!  This function returns a pointer to the requested database
+    //!  \brief PrmDb get db string function
+    //!  This function returns a string for the requested database
     //!  \param dbType The type of database requested (primary or backup)
-    //!  \param dbPtr Pointer to the database array to be set
+    //!  \return string representing the database
     static Fw::String getDbString(PrmDbType dbType);
 
     Fw::String m_fileName;  //!< filename for parameter storage
