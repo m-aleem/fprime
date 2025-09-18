@@ -137,7 +137,10 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  \param val buffer where value to be saved is stored.
     //!  \param db pointer to the database to update (primary or backup)
     //!  \param index pointer to index of updated or added parameter
-    PrmDbImpl::paramUpdateType updateAddPrm(FwPrmIdType id, Fw::ParamBuffer& val, PrmDbType prmDbType, FwSizeType* index);
+    PrmDbImpl::paramUpdateType updateAddPrm(FwPrmIdType id,
+                                            Fw::ParamBuffer& val,
+                                            PrmDbType prmDbType,
+                                            FwSizeType* index);
 
     //!  \brief component ping handler
     //!

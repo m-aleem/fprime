@@ -662,7 +662,6 @@ void PrmDbTester::runSetFileTests() {
         }
     }
 
-
     this->m_errorType = FILE_DATA_ERROR;
     for (FwSizeType i = 0; i < 2; i++) {
         clearEvents();
@@ -691,7 +690,6 @@ void PrmDbTester::runSetFileTests() {
                 FAIL() << "Reached unknown case";
         }
     }
-
 }
 
 void PrmDbTester::printDb(PrmDb_PrmDbType dbType) {
