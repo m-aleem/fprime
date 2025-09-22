@@ -32,6 +32,7 @@ class PrmDbTester : public PrmDbGTestBase {
     void runDbCopyTest();
     void runPrimeSaveBackupSet();
     void runSetFileTests();
+    void runSetFileRevertTest();
 
   private:
     //! Handler for from_pingOut

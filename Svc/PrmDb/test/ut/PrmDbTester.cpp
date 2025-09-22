@@ -692,6 +692,109 @@ void PrmDbTester::runSetFileTests() {
     }
 }
 
+void PrmDbTester::runSetFileRevertTest() {
+    // 1. Set up initial parameters in the Prime DB
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_PRIME);
+    this->m_impl.clearDb(PrmDb_PrmDbType::DB_BACKUP);
+
+    // Add a few parameters to the Prime DB
+    U32 val1 = 0x1234;
+    FwPrmIdType id1 = 0x100;
+    Fw::ParamBuffer pBuff;
+    Fw::SerializeStatus serStat = pBuff.serializeFrom(val1);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
+
+    // Add a second parameter
+    F32 val2 = 3.14159f;
+    FwPrmIdType id2 = 0x200;
+    pBuff.resetSer();
+    serStat = pBuff.serializeFrom(val2);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    this->m_impl.updateAddPrm(id2, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
+
+    printf("Initial Prime DB state:\n");
+    printDb(PrmDb_PrmDbType::DB_PRIME);
+
+    // 2. Make a copy to the Backup DB
+    this->m_impl.dbCopy(PrmDb_PrmDbType::DB_BACKUP, PrmDb_PrmDbType::DB_PRIME);
+    EXPECT_TRUE(this->m_impl.dbEqual()); // Verify the DBs are equal before the test
+
+    // 3. Make some changes to the Prime DB that should be reverted after SET_FILE failure
+    U32 val1_modified = 0x5678;
+    pBuff.resetSer();
+    serStat = pBuff.serializeFrom(val1_modified);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
+
+    // Add a new parameter that should disappear after revert
+    U16 val3 = 0xABCD;
+    FwPrmIdType id3 = 0x300;
+    pBuff.resetSer();
+    serStat = pBuff.serializeFrom(val3);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    this->m_impl.updateAddPrm(id3, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
+
+    // Verify the DBs are now different
+    EXPECT_FALSE(this->m_impl.dbEqual());
+
+    printf("Modified Prime DB state (before revert):\n");
+    printDb(PrmDb_PrmDbType::DB_PRIME);
+    printf("Backup DB state:\n");
+    printDb(PrmDb_PrmDbType::DB_BACKUP);
+
+    // 4. Setup for file read error
+    Os::Stub::File::Test::StaticData::setReadResult(m_io_data, Os::Stub::File::Test::StaticData::data.pointer);
+    Os::Stub::File::Test::StaticData::setNextStatus(Os::File::OP_OK);
+    this->m_errorType = FILE_DATA_ERROR; // Choose an error type that will cause SET_FILE to fail
+    this->m_waits = 0; // Fail on first read
+
+    // 5. Attempt SET_FILE command which should fail
+    this->clearEvents();
+    this->sendCmd_PRM_SET_FILE(0, 12, this->m_impl.m_fileName);
+    Fw::QueuedComponentBase::MsgDispatchStatus cmdStat = this->m_impl.doDispatch();
+    ASSERT_EQ(cmdStat, Fw::QueuedComponentBase::MSG_DISPATCH_OK);
+
+    // 6. Verify events - should see error event followed by DB restore event
+    ASSERT_EVENTS_SIZE(2);
+    ASSERT_EVENTS_PrmFileReadError_SIZE(1);
+    ASSERT_EVENTS_PrmDbCopyAllComplete_SIZE(1);
+    ASSERT_EVENTS_PrmDbCopyAllComplete(0, "Backup", "Prime");
+
+    printf("Prime DB state after revert:\n");
+    printDb(PrmDb_PrmDbType::DB_PRIME);
+
+    // 7. Verify the databases are equal after the error, showing the Prime DB was reverted
+    EXPECT_TRUE(this->m_impl.dbEqual());
+
+    // 8. Verify specific values in the Prime DB match the original values (not the modified ones)
+    // Verify first parameter has original value
+    pBuff.resetSer();
+    U32 testVal1;
+    this->invoke_to_getPrm(0, id1, pBuff);
+    serStat = pBuff.deserializeTo(testVal1);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    EXPECT_EQ(val1, testVal1);
+    EXPECT_NE(val1_modified, testVal1);
+
+    // Verify second parameter has original value
+    pBuff.resetSer();
+    F32 testVal2;
+    this->invoke_to_getPrm(0, id2, pBuff);
+    serStat = pBuff.deserializeTo(testVal2);
+    EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
+    EXPECT_EQ(val2, testVal2);
+
+    // Verify the third parameter is not present after revert
+    pBuff.resetSer();
+    EXPECT_EQ(Fw::ParamValid::INVALID, this->invoke_to_getPrm(0, id3, pBuff).e);
+
+    // Verify that an event is generated for the missing parameter
+    ASSERT_EVENTS_SIZE(3); // Previous 2 events + PrmIdNotFound
+    ASSERT_EVENTS_PrmIdNotFound_SIZE(1);
+    ASSERT_EVENTS_PrmIdNotFound(0, id3);
+}
+
 void PrmDbTester::printDb(PrmDb_PrmDbType dbType) {
     PrmDbImpl::t_dbStruct* db;
     this->m_impl.getDbPtr(dbType, &db);

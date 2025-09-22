@@ -251,6 +251,25 @@ TEST(ParameterDbTest, PrmSetFileTests) {
     tester.runSetFileTests();
 }
 
+TEST(ParameterDbTest, PrmSetFileRevert) {
+    COMMENT("Verify parmeter changes are reverted on Set File failure");
+
+    Svc::PrmDbImpl impl("PrmDbImpl");
+
+    impl.init(10, 0);
+    impl.configure("TestFile.prm");
+
+    Svc::PrmDbTester tester(impl);
+
+    tester.init();
+
+    // connect ports
+    connectPorts(impl, tester);
+
+    // run test
+    tester.runSetFileRevertTest();
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
