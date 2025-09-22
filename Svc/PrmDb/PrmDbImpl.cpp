@@ -225,7 +225,7 @@ void PrmDbImpl::PRM_SAVE_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
 
             // serialize parameter id
 
-            serStat = buff.serializeFrom(this->m_db[entry].id);
+            serStat = buff.serializeFrom(db[entry].id);
             // should always work
             FW_ASSERT(Fw::FW_SERIALIZE_OK == serStat, static_cast<FwAssertArgType>(serStat));
 

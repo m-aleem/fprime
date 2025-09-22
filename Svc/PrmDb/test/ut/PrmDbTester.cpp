@@ -362,7 +362,7 @@ void PrmDbTester::runPrimeSaveBackupSet() {
     U32 val = 2;
     FwPrmIdType id = 0x123;
     Fw::ParamBuffer pBuff;
-    serStat = pBuff.serialize(val);
+    serStat = pBuff.serializeFrom(val);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
     this->clearEvents();
     this->m_impl.updateAddPrm(id, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
@@ -411,7 +411,7 @@ void PrmDbTester::runDbEqualTest() {
     FwPrmIdType id1 = 0x100;
     Fw::ParamBuffer pBuff;
 
-    serStat = pBuff.serialize(val1);
+    serStat = pBuff.serializeFrom(val1);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
 
     this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
@@ -419,7 +419,7 @@ void PrmDbTester::runDbEqualTest() {
 
     // 3. Add same entry to backup DB - should be equal again
     pBuff.resetSer();
-    serStat = pBuff.serialize(val1);
+    serStat = pBuff.serializeFrom(val1);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
 
     this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_BACKUP, nullptr);
@@ -428,7 +428,7 @@ void PrmDbTester::runDbEqualTest() {
     // 4. Update entry in prime DB only - should not be equal
     U32 val2 = 0x43;
     pBuff.resetSer();
-    serStat = pBuff.serialize(val2);
+    serStat = pBuff.serializeFrom(val2);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
 
     this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
@@ -436,7 +436,7 @@ void PrmDbTester::runDbEqualTest() {
 
     // 5. Update backup DB to match - should be equal again
     pBuff.resetSer();
-    serStat = pBuff.serialize(val2);
+    serStat = pBuff.serializeFrom(val2);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
 
     this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_BACKUP, nullptr);
@@ -446,7 +446,7 @@ void PrmDbTester::runDbEqualTest() {
     U32 val3 = 0x44;
     FwPrmIdType id2 = 0x101;
     pBuff.resetSer();
-    serStat = pBuff.serialize(val3);
+    serStat = pBuff.serializeFrom(val3);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
 
     this->m_impl.updateAddPrm(id2, pBuff, PrmDb_PrmDbType::DB_BACKUP, nullptr);
@@ -470,7 +470,7 @@ void PrmDbTester::runDbCopyTest() {
 
     // Add first parameter
     pBuff.resetSer();
-    serStat = pBuff.serialize(val1);
+    serStat = pBuff.serializeFrom(val1);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
     this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
 
@@ -478,7 +478,7 @@ void PrmDbTester::runDbCopyTest() {
     F32 val2 = 3.14159f;
     FwPrmIdType id2 = 0x200;
     pBuff.resetSer();
-    serStat = pBuff.serialize(val2);
+    serStat = pBuff.serializeFrom(val2);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
     this->m_impl.updateAddPrm(id2, pBuff, PrmDb_PrmDbType::DB_PRIME, nullptr);
 
@@ -520,14 +520,14 @@ void PrmDbTester::runDbCopyTest() {
 
     // Prime DB - add first parameter
     pBuff.resetSer();
-    serStat = pBuff.serialize(val1);
+    serStat = pBuff.serializeFrom(val1);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
     FwSizeType primeIdx1;
     this->m_impl.updateAddPrm(id1, pBuff, PrmDb_PrmDbType::DB_PRIME, &primeIdx1);
 
     // Prime DB - add second parameter
     pBuff.resetSer();
-    serStat = pBuff.serialize(val2);
+    serStat = pBuff.serializeFrom(val2);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
     FwSizeType primeIdx2;
     this->m_impl.updateAddPrm(id2, pBuff, PrmDb_PrmDbType::DB_PRIME, &primeIdx2);
@@ -536,7 +536,7 @@ void PrmDbTester::runDbCopyTest() {
     U16 val3 = 0x5678;
     FwPrmIdType id3 = 0x300;
     pBuff.resetSer();
-    serStat = pBuff.serialize(val3);
+    serStat = pBuff.serializeFrom(val3);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, serStat);
     this->m_impl.updateAddPrm(id3, pBuff, PrmDb_PrmDbType::DB_BACKUP, nullptr);
 
