@@ -32,7 +32,7 @@ void PrmDbTester::runNominalPopulate() {
 
     Fw::ParamBuffer pBuff;
 
-    Fw::SerializeStatus stat = pBuff.serialize(val);
+    Fw::SerializeStatus stat = pBuff.serializeFrom(val);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, stat);
 
     // clear all events
@@ -71,7 +71,7 @@ void PrmDbTester::runNominalPopulate() {
     val = 0x15;
     pBuff.resetSer();
 
-    stat = pBuff.serialize(val);
+    stat = pBuff.serializeFrom(val);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, stat);
 
     // clear all events
@@ -99,7 +99,7 @@ void PrmDbTester::runNominalPopulate() {
     id = 0x25;
     val = 0x30;
     pBuff.resetSer();
-    stat = pBuff.serialize(val);
+    stat = pBuff.serializeFrom(val);
     EXPECT_EQ(Fw::FW_SERIALIZE_OK, stat);
 
     // clear all events
@@ -201,7 +201,7 @@ void PrmDbTester::runMissingExtraParams() {
     this->clearEvents();
     // write too many entries
     for (FwPrmIdType entry = 0; entry <= PRMDB_NUM_DB_ENTRIES; entry++) {
-        EXPECT_EQ(Fw::FW_SERIALIZE_OK, pBuff.serialize(static_cast<U32>(10)));
+        EXPECT_EQ(Fw::FW_SERIALIZE_OK, pBuff.serializeFrom(static_cast<U32>(10)));
         this->invoke_to_setPrm(0, entry, pBuff);
         // dispatch message
         this->m_impl.doDispatch();
@@ -221,7 +221,7 @@ void PrmDbTester::runRefPrmFile() {
 
         Fw::ParamBuffer pBuff;
 
-        Fw::SerializeStatus stat = pBuff.serialize(val);
+        Fw::SerializeStatus stat = pBuff.serializeFrom(val);
         EXPECT_EQ(Fw::FW_SERIALIZE_OK, stat);
 
         // clear all events
@@ -251,7 +251,7 @@ void PrmDbTester::runRefPrmFile() {
 
         Fw::ParamBuffer pBuff;
 
-        Fw::SerializeStatus stat = pBuff.serialize(val);
+        Fw::SerializeStatus stat = pBuff.serializeFrom(val);
         EXPECT_EQ(Fw::FW_SERIALIZE_OK, stat);
 
         // clear all events
@@ -281,7 +281,7 @@ void PrmDbTester::runRefPrmFile() {
 
         Fw::ParamBuffer pBuff;
 
-        Fw::SerializeStatus stat = pBuff.serialize(val);
+        Fw::SerializeStatus stat = pBuff.serializeFrom(val);
         EXPECT_EQ(Fw::FW_SERIALIZE_OK, stat);
 
         // clear all events
@@ -311,7 +311,7 @@ void PrmDbTester::runRefPrmFile() {
 
         Fw::ParamBuffer pBuff;
 
-        Fw::SerializeStatus stat = pBuff.serialize(val);
+        Fw::SerializeStatus stat = pBuff.serializeFrom(val);
         EXPECT_EQ(Fw::FW_SERIALIZE_OK, stat);
 
         // clear all events
