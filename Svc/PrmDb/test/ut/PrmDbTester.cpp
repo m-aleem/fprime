@@ -718,7 +718,7 @@ void PrmDbTester::runSetFileRevertTest() {
 
     // 2. Make a copy to the Backup DB
     this->m_impl.dbCopy(PrmDb_PrmDbType::DB_BACKUP, PrmDb_PrmDbType::DB_PRIME);
-    EXPECT_TRUE(this->m_impl.dbEqual()); // Verify the DBs are equal before the test
+    EXPECT_TRUE(this->m_impl.dbEqual());  // Verify the DBs are equal before the test
 
     // 3. Make some changes to the Prime DB that should be reverted after SET_FILE failure
     U32 val1_modified = 0x5678;
@@ -746,8 +746,8 @@ void PrmDbTester::runSetFileRevertTest() {
     // 4. Setup for file read error
     Os::Stub::File::Test::StaticData::setReadResult(m_io_data, Os::Stub::File::Test::StaticData::data.pointer);
     Os::Stub::File::Test::StaticData::setNextStatus(Os::File::OP_OK);
-    this->m_errorType = FILE_DATA_ERROR; // Choose an error type that will cause SET_FILE to fail
-    this->m_waits = 0; // Fail on first read
+    this->m_errorType = FILE_DATA_ERROR;  // Choose an error type that will cause SET_FILE to fail
+    this->m_waits = 0;                    // Fail on first read
 
     // 5. Attempt SET_FILE command which should fail
     this->clearEvents();
@@ -790,7 +790,7 @@ void PrmDbTester::runSetFileRevertTest() {
     EXPECT_EQ(Fw::ParamValid::INVALID, this->invoke_to_getPrm(0, id3, pBuff).e);
 
     // Verify that an event is generated for the missing parameter
-    ASSERT_EVENTS_SIZE(3); // Previous 2 events + PrmIdNotFound
+    ASSERT_EVENTS_SIZE(3);  // Previous 2 events + PrmIdNotFound
     ASSERT_EVENTS_PrmIdNotFound_SIZE(1);
     ASSERT_EVENTS_PrmIdNotFound(0, id3);
 }

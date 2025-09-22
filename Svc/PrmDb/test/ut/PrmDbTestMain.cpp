@@ -252,7 +252,7 @@ TEST(ParameterDbTest, PrmSetFileTests) {
 }
 
 TEST(ParameterDbTest, PrmSetFileRevert) {
-    COMMENT("Verify parmeter changes are reverted on Set File failure");
+    COMMENT("Verify parameter changes are reverted on Set File failure");
 
     Svc::PrmDbImpl impl("PrmDbImpl");
 
