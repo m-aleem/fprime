@@ -176,8 +176,6 @@ TEST(ParameterDbTest, PrmFileWriteError) {
 }
 
 TEST(ParameterDbTest, PrmDbEqualTest) {
-    COMMENT("Verify helper that checks equality of prime and backup DBs");
-
     Svc::PrmDbImpl impl("PrmDbImpl");
 
     impl.init(10, 0);
@@ -190,13 +188,10 @@ TEST(ParameterDbTest, PrmDbEqualTest) {
     // connect ports
     connectPorts(impl, tester);
 
-    // run test
     tester.runDbEqualTest();
 }
 
 TEST(ParameterDbTest, PrmDbCopyTest) {
-    COMMENT("Verify parameter DB copy helpers");
-
     Svc::PrmDbImpl impl("PrmDbImpl");
 
     impl.init(10, 0);
@@ -209,13 +204,10 @@ TEST(ParameterDbTest, PrmDbCopyTest) {
     // connect ports
     connectPorts(impl, tester);
 
-    // run test
     tester.runDbCopyTest();
 }
 
-TEST(ParameterDbTest, PrmDbPrimeSaveBackupSet) {
-    COMMENT("Verify Backup Parameter DB set from Save File");
-
+TEST(ParameterDbTest, PrmDbCommitTest) {
     Svc::PrmDbImpl impl("PrmDbImpl");
 
     impl.init(10, 0);
@@ -228,13 +220,10 @@ TEST(ParameterDbTest, PrmDbPrimeSaveBackupSet) {
     // connect ports
     connectPorts(impl, tester);
 
-    // run test
-    tester.runPrimeSaveBackupSet();
+    tester.runDbCommitTest();
 }
 
-TEST(ParameterDbTest, PrmSetFileTests) {
-    COMMENT("Verify Backup Parameter DB set from Set File");
-
+TEST(ParameterDbTest, PrmDbFileLoadNominal) {
     Svc::PrmDbImpl impl("PrmDbImpl");
 
     impl.init(10, 0);
@@ -247,13 +236,10 @@ TEST(ParameterDbTest, PrmSetFileTests) {
     // connect ports
     connectPorts(impl, tester);
 
-    // run test
-    tester.runSetFileTests();
+    tester.runPrmFileLoadNominal();
 }
 
-TEST(ParameterDbTest, PrmSetFileRevert) {
-    COMMENT("Verify parameter changes are reverted on Set File failure");
-
+TEST(ParameterDbTest, PrmDbFileLoadWithErrors) {
     Svc::PrmDbImpl impl("PrmDbImpl");
 
     impl.init(10, 0);
@@ -266,8 +252,23 @@ TEST(ParameterDbTest, PrmSetFileRevert) {
     // connect ports
     connectPorts(impl, tester);
 
-    // run test
-    tester.runSetFileRevertTest();
+    tester.runPrmFileLoadWithErrors();
+}
+
+TEST(ParameterDbTest, PrmFileLoadIllegalActions) {
+    Svc::PrmDbImpl impl("PrmDbImpl");
+
+    impl.init(10, 0);
+    impl.configure("TestFile.prm");
+
+    Svc::PrmDbTester tester(impl);
+
+    tester.init();
+
+    // connect ports
+    connectPorts(impl, tester);
+
+    tester.runPrmFileLoadIllegal();
 }
 
 int main(int argc, char** argv) {

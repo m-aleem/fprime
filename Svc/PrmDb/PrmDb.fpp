@@ -9,9 +9,17 @@ module Svc {
 
     @ Parameter DB type
     enum PrmDbType {
-      DB_PRIME,
-      DB_BACKUP
+      DB_ACTIVE,
+      DB_STAGING
     }
+
+    @ State of parameter DB file load operations
+    enum PrmDbFileLoadState {
+        IDLE,
+        LOADING_FILE_UPDATES,
+        FILE_UPDATES_STAGED,
+    }
+
 
     @ Parameter read error
     enum PrmReadError {

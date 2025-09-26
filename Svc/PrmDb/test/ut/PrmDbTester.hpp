@@ -20,19 +20,21 @@ class PrmDbTester : public PrmDbGTestBase {
     PrmDbTester(Svc::PrmDbImpl& inst);
     virtual ~PrmDbTester();
 
-    // Test Cases
     void runNominalPopulate();
     void runNominalSaveFile();
     void runNominalLoadFile();
     void runMissingExtraParams();
     void runFileReadError();
     void runFileWriteError();
-    void runRefPrmFile();
     void runDbEqualTest();
     void runDbCopyTest();
-    void runPrimeSaveBackupSet();
-    void runSetFileTests();
-    void runSetFileRevertTest();
+    // FIXME Tests to add:
+    void runDbCommitTest();
+    void runPrmFileLoadNominal();
+    void runPrmFileLoadWithErrors();
+    void runPrmFileLoadIllegal();
+
+    void runRefPrmFile();
 
   private:
     //! Handler for from_pingOut
@@ -61,9 +63,6 @@ class PrmDbTester : public PrmDbGTestBase {
     Os::File::Status WriteInterceptor();
     Os::File::Status m_testWriteStatus;
 
-    // Param db print method to aid with debugging
-    void printDb(PrmDb_PrmDbType dbType);
-
   public:
     class PrmDbTestFile : public Os::Stub::File::Test::TestFile {
       public:
@@ -75,6 +74,8 @@ class PrmDbTester : public PrmDbGTestBase {
         static void setTester(PrmDbTester* tester);
         static PrmDbTester* s_tester;
     };
+
+    void printDb(PrmDb_PrmDbType dbType);
 };
 
 }  // namespace Svc

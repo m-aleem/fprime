@@ -19,7 +19,7 @@ event PrmIdUpdated(
 event PrmDbFull(
                     Id: FwPrmIdType @< The parameter ID
                 ) \
-    severity fatal \
+    severity warning high \
     id 2 \
     format "Parameter DB full when adding ID 0x{x} "
 
@@ -71,13 +71,11 @@ event PrmFileLoadComplete(
     id 7 \
     format "Parameter file load completed. Database: {}, Records: {} ({} added and {} updated)."
 
-
-event PrmSetFileComplete(
-    records: U32 @< The number of records loaded
-    ) \
+@ Committed staged parameter updates
+event PrmDbCommitComplete() \
     severity activity high \
     id 8 \
-    format "Parameter set file completed. Applied {} records."
+    format "Parameter DB commit complete, staged updates are now active."
 
 @ All parameters Copied from one DB to another
 event PrmDbCopyAllComplete(
@@ -87,3 +85,18 @@ event PrmDbCopyAllComplete(
     severity activity high \
     id 9 \
     format "All parameters copied. Source database: {}, Destination database: {}."
+
+@ Parameter file load failed, not staging any update
+event PrmDbFileLoadFailed() \
+    severity warning high \
+    id 10 \
+    format "Parameter file load failed. Clearing staging database and abandoning parameter file load."
+
+@ Invalid Action during parameter file load
+event PrmDbFileLoadInvalidAction(
+                            currentState: PrmDbFileLoadState @< The current state
+                            attemptedAction: string @< The invalid action attempted
+) \
+    severity warning low \
+    id 11 \
+    format "Invalid action during parameter file load. Current state: {}, Action (Invalid for current state): {}."

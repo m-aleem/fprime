@@ -34,24 +34,40 @@ class WorkingBuffer : public Fw::SerializeBufferBase {
 };
 }  // namespace
 
-PrmDbImpl::PrmDbImpl(const char* name) : PrmDbComponentBase(name) {
-    this->clearDb(PrmDbType::DB_PRIME);
-    this->clearDb(PrmDbType::DB_BACKUP);
+//! ----------------------------------------------------------------------
+//! Construction, initialization, and destruction
+//! ----------------------------------------------------------------------
+PrmDbImpl::PrmDbImpl(const char* name) : PrmDbComponentBase(name), m_state(PrmDbFileLoadState::IDLE) {
+    this->m_activeDb = this->m_dbStore1;
+    this->m_stagingDb = this->m_dbStore2;
+
+    this->clearDb(PrmDbType::DB_ACTIVE);
+    this->clearDb(PrmDbType::DB_STAGING);
 }
+
+PrmDbImpl::~PrmDbImpl() {}
 
 void PrmDbImpl::configure(const char* file) {
     FW_ASSERT(file != nullptr);
     this->m_fileName = file;
 }
 
-void PrmDbImpl::clearDb(PrmDbType prmDbType) {
-    t_dbStruct* db;
-    getDbPtr(prmDbType, &db);
-    for (FwSizeType entry = 0; entry < PRMDB_NUM_DB_ENTRIES; entry++) {
-        db[entry].used = false;
-        db[entry].id = 0;
-    }
+void PrmDbImpl::readParamFile() {
+    // Assumed to run at initialization time
+    // State should be IDLE upon entry
+    FW_ASSERT(static_cast<FwAssertArgType>(m_state == PrmDbFileLoadState::IDLE));
+
+    // Clear databases
+    this->clearDb(PrmDbType::DB_ACTIVE);
+    this->clearDb(PrmDbType::DB_STAGING);
+
+    // Read parameter file to active database
+    (void)readParamFileImpl(this->m_fileName, PrmDbType::DB_ACTIVE);
 }
+
+//! ----------------------------------------------------------------------
+//! Port & Command Handlers
+//! ----------------------------------------------------------------------
 
 // If ports are no longer guarded, these accesses need to be protected from each other
 // If there are a lot of accesses, perhaps an interrupt lock could be used instead of guarded ports
@@ -61,9 +77,9 @@ Fw::ParamValid PrmDbImpl::getPrm_handler(FwIndexType portNum, FwPrmIdType id, Fw
     Fw::ParamValid stat = Fw::ParamValid::INVALID;
 
     for (FwSizeType entry = 0; entry < PRMDB_NUM_DB_ENTRIES; entry++) {
-        if (this->m_dbPrime[entry].used) {
-            if (this->m_dbPrime[entry].id == id) {
-                val = this->m_dbPrime[entry].val;
+        if (this->m_activeDb[entry].used) {
+            if (this->m_activeDb[entry].id == id) {
+                val = this->m_activeDb[entry].val;
                 stat = Fw::ParamValid::VALID;
                 break;
             }
@@ -78,86 +94,42 @@ Fw::ParamValid PrmDbImpl::getPrm_handler(FwIndexType portNum, FwPrmIdType id, Fw
     return stat;
 }
 
-PrmDbImpl::paramUpdateType PrmDbImpl::updateAddPrm(FwPrmIdType id,
-                                                   Fw::ParamBuffer& val,
-                                                   PrmDbType prmDbType,
-                                                   FwSizeType* index) {
-    paramUpdateType updateStatus = NO_SLOTS;
-
-    t_dbStruct* db;
-    getDbPtr(prmDbType, &db);
-
-    this->lock();
-    // search for existing entry
-
-    bool existingEntry = false;
-
-    for (FwSizeType entry = 0; entry < PRMDB_NUM_DB_ENTRIES; entry++) {
-        if ((db[entry].used) && (id == db[entry].id)) {
-            db[entry].val = val;
-            existingEntry = true;
-            updateStatus = PARAM_UPDATED;
-            if (index != nullptr) {
-                *index = entry;
-            }
-            break;
-        }
-    }
-
-    // if there is no existing entry, add one
-    if (!existingEntry) {
-        for (FwSizeType entry = 0; entry < PRMDB_NUM_DB_ENTRIES; entry++) {
-            if (!(db[entry].used)) {
-                db[entry].val = val;
-                db[entry].id = id;
-                db[entry].used = true;
-                updateStatus = PARAM_ADDED;
-                if (index != nullptr) {
-                    *index = entry;
-                }
-                break;
-            }
-        }
-    }
-
-    this->unLock();
-    return updateStatus;
-}
-
 void PrmDbImpl::setPrm_handler(FwIndexType portNum, FwPrmIdType id, Fw::ParamBuffer& val) {
-    FwSizeType index;  // Which index was used for this parameter
+    // Reject parameter updates during non-idle file load states
+    if (m_state != PrmDbFileLoadState::IDLE) {
+        this->log_WARNING_LO_PrmDbFileLoadInvalidAction(m_state, Fw::String("setPrm"));
+        return;
+    }
 
-    // Update in the backup DB first
-    paramUpdateType update_status = updateAddPrm(id, val, PrmDbType::DB_BACKUP, &index);
+    // Update the parameter in the active database
+    PrmUpdateType update_status = updateAddPrmImpl(id, val, PrmDbType::DB_ACTIVE);
 
     // Issue relevant EVR
-    // Copy to primary DB if added or updated
     if (update_status == PARAM_UPDATED) {
-        dbCopySingle(PrmDbType::DB_PRIME, PrmDbType::DB_BACKUP, index);
         this->log_ACTIVITY_HI_PrmIdUpdated(id);
     } else if (update_status == NO_SLOTS) {
-        this->log_FATAL_PrmDbFull(id);
+        this->log_WARNING_HI_PrmDbFull(id);
     } else {
-        dbCopySingle(PrmDbType::DB_PRIME, PrmDbType::DB_BACKUP, index);
         this->log_ACTIVITY_HI_PrmIdAdded(id);
     }
 }
 
+void PrmDbImpl::pingIn_handler(FwIndexType portNum, U32 key) {
+    // respond to ping
+    this->pingOut_out(0, key);
+}
+
 void PrmDbImpl::PRM_SAVE_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
-    PrmDbType dbType = PrmDbType::DB_PRIME;  // default, could be changed later to be an argument
-
-    FW_ASSERT(dbType == PrmDbType::DB_PRIME or dbType == PrmDbType::DB_BACKUP);
-    FW_ASSERT(this->m_fileName.length() > 0);
-
-    t_dbStruct* db;
-    if (dbType == PrmDbType::DB_PRIME) {
-        db = this->m_dbPrime;
-    } else if (dbType == PrmDbType::DB_BACKUP) {
-        db = this->m_dbBackup;
-    } else {
-        this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::VALIDATION_ERROR);
+    // Reject PRM_SAVE_FILE command during non-idle file load states
+    if (m_state != PrmDbFileLoadState::IDLE) {
+        this->log_WARNING_LO_PrmDbFileLoadInvalidAction(m_state, Fw::String("SAVE_FILE"));
+        this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::BUSY);
         return;
     }
+
+    FW_ASSERT(this->m_fileName.length() > 0);
+
+    t_dbStruct* db = getDbPtr(PrmDbType::DB_ACTIVE);
 
     Os::File paramFile;
     WorkingBuffer buff;
@@ -273,51 +245,78 @@ void PrmDbImpl::PRM_SAVE_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
     this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
 }
 
-void PrmDbImpl::PRM_SET_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq, const Fw::CmdStringArg& fileName) {
-    Fw::CmdResponse retVal = Fw::CmdResponse::EXECUTION_ERROR;
+void PrmDbImpl::PRM_LOAD_FILE_cmdHandler(FwOpcodeType opCode,
+                                         U32 cmdSeq,
+                                         const Fw::CmdStringArg& fileName,
+                                         bool merge) {
+    // Reject PRM_LOAD_FILE command during non-idle file load states
+    if (m_state != PrmDbFileLoadState::IDLE) {
+        this->log_WARNING_LO_PrmDbFileLoadInvalidAction(m_state, Fw::String("LOAD_FILE"));
+        this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::BUSY);
+        return;
+    }
 
-    // Update Prime
-    bool prime_ok = PrmDbImpl::readParamFileImpl(fileName, PrmDbType::DB_PRIME);
+    // Set state to loading
+    m_state = PrmDbFileLoadState::LOADING_FILE_UPDATES;
 
-    if (prime_ok) {
-        // Update Prime
-        bool backup_ok = PrmDbImpl::readParamFileImpl(fileName, PrmDbType::DB_BACKUP);
-        if (backup_ok) {
-            retVal = Fw::CmdResponse::OK;
-        }
+    // If reset is true, clear the staging database first
+    if (merge) {
+        // Copy active to staging for merging
+        dbCopy(PrmDbType::DB_STAGING, PrmDbType::DB_ACTIVE);
     } else {
-        // Revert Prime using Backup
-        dbCopy(PrmDbType::DB_PRIME, PrmDbType::DB_BACKUP);
+        // reset staging db, all file contents will be loaded but no old parameters will be retained
+        this->clearDb(PrmDbType::DB_STAGING);
     }
 
-    // Prime/backup should be the same after
-    FW_ASSERT(static_cast<FwAssertArgType>(dbEqual()));
+    // Load the file into staging database
+    // The readParamFileImpl will emit the relevant EVR if the file load fails
+    // and also if it succeeds will emit EVRs with the number of records
+    bool success = PrmDbImpl::readParamFileImpl(fileName, PrmDbType::DB_STAGING);
 
-    this->cmdResponse_out(opCode, cmdSeq, retVal);
-}
-
-PrmDbImpl::~PrmDbImpl() {}
-
-void PrmDbImpl::readParamFile() {
-    // Assumed to run at initialization time
-
-    // Clear databases
-    this->clearDb(PrmDbType::DB_PRIME);
-    this->clearDb(PrmDbType::DB_BACKUP);
-
-    // Read parameter file to prime and backup
-    bool prime_ok = readParamFileImpl(this->m_fileName, PrmDbType::DB_PRIME);
-    if (prime_ok) {
-        dbCopy(PrmDbType::DB_BACKUP, PrmDbType::DB_PRIME);
-        FW_ASSERT(static_cast<FwAssertArgType>(dbEqual()));
+    if (success) {
+        this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
+        m_state = PrmDbFileLoadState::FILE_UPDATES_STAGED;
+    } else {
+        this->log_WARNING_HI_PrmDbFileLoadFailed();
+        // clear the staging DB and reset to an IDLE state in case of issues
+        this->clearDb(PrmDbType::DB_STAGING);
+        m_state = PrmDbFileLoadState::IDLE;
+        this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::EXECUTION_ERROR);
     }
 }
+
+void PrmDbImpl::PRM_COMMIT_STAGED_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
+    // Verify we are in the correct state
+    if (m_state != PrmDbFileLoadState::FILE_UPDATES_STAGED) {
+        this->log_WARNING_LO_PrmDbFileLoadInvalidAction(m_state, Fw::String("COMMIT_STAGED"));
+        this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::VALIDATION_ERROR);
+        return;
+    }
+
+    // Swap active and staging databases
+    t_dbStruct* temp = this->m_activeDb;
+    this->m_activeDb = this->m_stagingDb;
+    this->m_stagingDb = temp;
+
+    // Clear the new staging database
+    this->clearDb(PrmDbType::DB_STAGING);
+
+    // Set file load state to idle
+    m_state = PrmDbFileLoadState::IDLE;
+
+    this->log_ACTIVITY_HI_PrmDbCommitComplete();
+    this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
+}
+
+//! ----------------------------------------------------------------------
+//! Helpers for construction/destruction, init, & handlers
+//! ----------------------------------------------------------------------
 
 bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbType) {
+    FW_ASSERT(dbType == PrmDbType::DB_ACTIVE or dbType == PrmDbType::DB_STAGING);
     FW_ASSERT(fileName.length() > 0);
 
-    t_dbStruct* db;
-    getDbPtr(dbType, &db);
+    t_dbStruct* db = getDbPtr(dbType);
     Fw::String dbString = getDbString(dbType);
 
     // load file. FIXME: Put more robust file checking, such as a CRC.
@@ -441,8 +440,7 @@ bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbTy
         }
 
         // Actually update or add parameter
-        FwSizeType index;  // Which index was used for this parameter
-        paramUpdateType updateStatus = updateAddPrm(parameterId, tmpParamBuffer, dbType, &index);
+        PrmUpdateType updateStatus = updateAddPrmImpl(parameterId, tmpParamBuffer, dbType);
         if (updateStatus == PARAM_ADDED) {
             recordNumAdded++;
         } else if (updateStatus == PARAM_UPDATED) {
@@ -450,7 +448,7 @@ bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbTy
         }
 
         if (updateStatus == NO_SLOTS) {
-            this->log_FATAL_PrmDbFull(parameterId);
+            this->log_WARNING_HI_PrmDbFull(parameterId);
         }
 
         // set serialized size to read size
@@ -464,14 +462,56 @@ bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbTy
     return true;
 }
 
-void PrmDbImpl::pingIn_handler(FwIndexType portNum, U32 key) {
-    // respond to ping
-    this->pingOut_out(0, key);
+PrmDbImpl::PrmUpdateType PrmDbImpl::updateAddPrmImpl(FwPrmIdType id, Fw::ParamBuffer& val, PrmDbType prmDbType) {
+    t_dbStruct* db = getDbPtr(prmDbType);
+
+    PrmUpdateType updateStatus = NO_SLOTS;
+
+    this->lock();
+    // search for existing entry
+    bool existingEntry = false;
+
+    for (FwSizeType entry = 0; entry < PRMDB_NUM_DB_ENTRIES; entry++) {
+        if ((db[entry].used) && (id == db[entry].id)) {
+            db[entry].val = val;
+            existingEntry = true;
+            updateStatus = PARAM_UPDATED;
+            break;
+        }
+    }
+
+    // if there is no existing entry, add one
+    if (!existingEntry) {
+        for (FwSizeType entry = 0; entry < PRMDB_NUM_DB_ENTRIES; entry++) {
+            if (!(db[entry].used)) {
+                db[entry].val = val;
+                db[entry].id = id;
+                db[entry].used = true;
+                updateStatus = PARAM_ADDED;
+                break;
+            }
+        }
+    }
+
+    this->unLock();
+    return updateStatus;
+}
+
+//! ----------------------------------------------------------------------
+//! Helpers for database management
+//! ----------------------------------------------------------------------
+
+void PrmDbImpl::clearDb(PrmDbType prmDbType) {
+    t_dbStruct* db = getDbPtr(prmDbType);
+    for (FwSizeType entry = 0; entry < PRMDB_NUM_DB_ENTRIES; entry++) {
+        db[entry].used = false;
+        db[entry].id = 0;
+    }
 }
 
 bool PrmDbImpl::dbEqual() {
     for (FwSizeType i = 0; i < PRMDB_NUM_DB_ENTRIES; i++) {
-        if (!(this->m_dbPrime[i] == this->m_dbBackup[i]))
+        if (!(this->m_dbStore1[i] == this->m_dbStore2[i]))
             return false;
     }
     return true;
@@ -485,11 +525,8 @@ void PrmDbImpl::dbCopy(PrmDbType dest, PrmDbType src) {
 }
 
 void PrmDbImpl::dbCopySingle(PrmDbType dest, PrmDbType src, FwSizeType index) {
-    t_dbStruct* srcPtr;
-    t_dbStruct* destPtr;
-
-    getDbPtr(src, &srcPtr);
-    getDbPtr(dest, &destPtr);
+    t_dbStruct* srcPtr = getDbPtr(src);
+    t_dbStruct* destPtr = getDbPtr(dest);
 
     FW_ASSERT(index < PRMDB_NUM_DB_ENTRIES);
     destPtr[index].used = srcPtr[index].used;
@@ -497,21 +534,20 @@ void PrmDbImpl::dbCopySingle(PrmDbType dest, PrmDbType src, FwSizeType index) {
     destPtr[index].val = srcPtr[index].val;
 }
 
-void PrmDbImpl::getDbPtr(PrmDbType dbType, t_dbStruct** dbPtr) {
-    FW_ASSERT(dbType == PrmDbType::DB_PRIME or dbType == PrmDbType::DB_BACKUP);
-    if (dbType == PrmDbType::DB_PRIME) {
-        *dbPtr = this->m_dbPrime;
-    } else if (dbType == PrmDbType::DB_BACKUP) {
-        *dbPtr = this->m_dbBackup;
+PrmDbImpl::t_dbStruct* PrmDbImpl::getDbPtr(PrmDbType dbType) {
+    FW_ASSERT(dbType == PrmDbType::DB_ACTIVE or dbType == PrmDbType::DB_STAGING);
+    if (dbType == PrmDbType::DB_ACTIVE) {
+        return m_activeDb;
     }
+    return m_stagingDb;
 }
 
 Fw::String PrmDbImpl::getDbString(PrmDbType dbType) {
-    FW_ASSERT(dbType == PrmDbType::DB_PRIME or dbType == PrmDbType::DB_BACKUP);
-    if (dbType == PrmDbType::DB_PRIME) {
-        return Fw::String("Prime");
+    FW_ASSERT(dbType == PrmDbType::DB_ACTIVE or dbType == PrmDbType::DB_STAGING);
+    if (dbType == PrmDbType::DB_ACTIVE) {
+        return Fw::String("ACTIVE");
     }
-    return Fw::String("Backup");
+    return Fw::String("STAGING");
 }
 
 }  // namespace Svc

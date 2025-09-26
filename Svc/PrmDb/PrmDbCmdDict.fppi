@@ -3,8 +3,13 @@ async command PRM_SAVE_FILE \
   opcode 0x00
 
 
-@ Loads a file from storage and updates the volatile values for the parameters defined in the file. The file could have selective IDs and not the whole set.
-async command PRM_SET_FILE(
-  fileName: string size 100 @< The name of the on-board file to set parameters format
+@ Loads a file from storage into the staging database. The file could have selective IDs and not the whole set.
+async command PRM_LOAD_FILE(
+  fileName: string size 100 @< The name of the on-board file to set parameters from
+  merge: bool @< Whether to merge (true) or fully reset (false) the parameter database from the file contents
   ) \
   opcode 0x01
+
+@ Commits the backup database to become the prime (active) database
+async command PRM_COMMIT_STAGED \
+  opcode 0x02

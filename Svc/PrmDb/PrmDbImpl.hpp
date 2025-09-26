@@ -16,6 +16,7 @@
 #include <Fw/Types/String.hpp>
 #include <Os/Mutex.hpp>
 #include <Svc/PrmDb/PrmDbComponentAc.hpp>
+#include <Svc/PrmDb/PrmDb_PrmDbFileLoadStateEnumAc.hpp>
 #include <Svc/PrmDb/PrmDb_PrmDbTypeEnumAc.hpp>
 #include <config/PrmDbImplCfg.hpp>
 
@@ -24,6 +25,7 @@ namespace Svc {
 typedef PrmDb_PrmWriteError PrmWriteError;
 typedef PrmDb_PrmReadError PrmReadError;
 typedef PrmDb_PrmDbType PrmDbType;
+typedef PrmDb_PrmDbFileLoadState PrmDbFileLoadState;
 
 //! \class PrmDbImpl
 //! \brief Component class for managing parameters
@@ -39,8 +41,7 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  \brief PrmDb constructor
     //!
     //!  The constructor for the PrmDbImpl class.
-    //!   The constructor clears the database and stores
-    //!   the file name for opening later.
+    //!   The constructor clears the database and initiates the internal state.
     //!
     //!  \param name component instance name
     PrmDbImpl(const char* name);
@@ -63,10 +64,21 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!
     virtual ~PrmDbImpl();
 
-    enum paramUpdateType { NO_SLOTS, PARAM_ADDED, PARAM_UPDATED, MAX_PARAM_UPDATE_TYPES };
+    // Parameter update status for an individual parameter update or add
+    enum PrmUpdateType {
+        NO_SLOTS,       //!< No slots available to add new parameter
+        PARAM_ADDED,    //!< Parameter added to database
+        PARAM_UPDATED,  //!< Parameter already in database, updated parameter
+        MAX_PARAM_UPDATE_TYPES
+    };
 
   protected:
   private:
+    Fw::String m_fileName;  //!< filename for parameter storage
+
+    PrmDbFileLoadState m_state;  // Current file load state of the parameter database
+
+    // Structure for a single parameter entry
     struct t_dbStruct {
         bool used;            //!< whether slot is being used
         FwPrmIdType id;       //!< the id being stored in the slot
@@ -85,39 +97,39 @@ class PrmDbImpl final : public PrmDbComponentBase {
         }
     };
 
-    //! \brief Check param db equality
-    //!
-    //!  This helper method verifies the prime and backup parameter dbs are equal
-    bool dbEqual();
+    // Pointers to the active and staging databases
+    // These point to the actual storage arrays below
+    // The active database is the ONLY one used for getting parameters
+    // The staging database is used for loading parameters from a file
+    // when commanded. Upon reading the file, the parameters are "staged"
+    // into the staging database, and then committed to the active database
+    // when a commit command is received.
+    t_dbStruct* m_activeDb;   //!< Pointer to the active database
+    t_dbStruct* m_stagingDb;  //!< Pointer to the staging database
 
-    //! \brief Deep copy for db
-    //!
-    //!  Copies one db to another
-    //! \param dest The destination db to copy to (primary or backup)
-    //! \param src The source db to copy from (primary or backup)
-    void dbCopy(PrmDbType dest, PrmDbType src);
+    // Actual storage for the active and staging databases
+    t_dbStruct m_dbStore1[PRMDB_NUM_DB_ENTRIES];
+    t_dbStruct m_dbStore2[PRMDB_NUM_DB_ENTRIES];
 
-    //! \brief Deep copy for single db entry
-    //!
-    //!  Copies one db entry to another at specified index
-    //!
-    //! \param dest The destination db to copy to (primary or backup)
-    //! \param src The source db to copy from (primary or backup)
-    //! \param index The index of the entry to copy
-    void dbCopySingle(PrmDbType dest, PrmDbType src, FwSizeType index);
+    //! ----------------------------------------------------------------------
+    //! Port & Command Handlers
+    //! ----------------------------------------------------------------------
 
-    //! \brief Read a parameter file and apply the values to the database
+    //! \brief Read a parameter file and store parameter values into a database
     //!
-    //!  This method reads a parameter file and applies the values to the database.
+    //!  This method reads a parameter file and applies the values to the specified database
+    //!  (i.e. active or staging).
+    //!
     //!
     //!  \param fileName The name of the parameter file to read
-    //!  \param dbType The type of database to read into (primary or backup)
-    //!  \return status success (True)/failure(False)
+    //!  \param dbType The type of database to read into  (active or staging)
+    //!  \return status success (True) / failure(False)
     bool readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbType);
 
     //!  \brief PrmDb parameter get handler
     //!
     //!  This function retrieves a parameter value from the loaded set of stored parameters
+    //!  It ALWAYS searches the active database, only
     //!
     //!  \param portNum input port number. Should always be zero
     //!  \param id identifier for parameter being used.
@@ -141,12 +153,8 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!
     //!  \param id identifier for parameter being used.
     //!  \param val buffer where value to be saved is stored.
-    //!  \param dbType The type of database to read into (primary or backup)
-    //!  \param index pointer to index of updated or added parameter
-    PrmDbImpl::paramUpdateType updateAddPrm(FwPrmIdType id,
-                                            Fw::ParamBuffer& val,
-                                            PrmDbType prmDbType,
-                                            FwSizeType* index);
+    //!  \param dbType The type of database to read into (active or staging)
+    PrmDbImpl::PrmUpdateType updateAddPrmImpl(FwPrmIdType id, Fw::ParamBuffer& val, PrmDbType prmDbType);
 
     //!  \brief component ping handler
     //!
@@ -170,38 +178,72 @@ class PrmDbImpl final : public PrmDbComponentBase {
 
     //!  \brief PrmDb PRM_SAVE_FILE command handler
     //!
-    //!  This function applies the parameter values from a specified
-    //!  file into the RAM parameter values. Note that these updates
-    //!  are not saved until a subsequent call to SAVE file.
+    //!  This function loads the parameter values from a specified
+    //!  file into the backup parameter database. The command
+    //!  takes a reset argument which specifies whether the existing
+    //!  backup database should be cleared before loading the file, otherwise
+    //!  the file contents are merged with the existing database.
     //!
     //!  \param opCode The opcode of this commands
     //!  \param cmdSeq The sequence number of the command
     //!  \param fileName The name of the parameter load file
-    void PRM_SET_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq, const Fw::CmdStringArg& fileName);
+    //!  \param merge Whether to merge (true) or fully reset (false) the parameter database from the file contents
+    void PRM_LOAD_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq, const Fw::CmdStringArg& fileName, bool merge);
+
+    //!  \brief PrmDb PRM_COMMIT_STAGED command handler
+    //!
+    //! This function copies the contents of the staging parameter database
+    //!  to the active parameter database, making the staged parameters
+    //!  active. This command should only be called after a successful
+    //!  PRM_LOAD_FILE command.
+    //!
+    //!  \param opCode The opcode of this commands
+    //!  \param cmdSeq The sequence number of the command
+    void PRM_COMMIT_STAGED_cmdHandler(FwOpcodeType opCode, U32 cmdSeq);
+
+    //! ----------------------------------------------------------------------
+    //! Helpers for database management
+    //! ----------------------------------------------------------------------
 
     //!  \brief PrmDb clear database function
     //!
     //!  This function clears all entries from the RAM database
     //!
-    //!  \param dbType The type of database to read into (primary or backup)
-    void clearDb(PrmDbType prmDbType);  //!< clear the parameter database
+    //!  \param dbType The type of database to clear (active or staging)
+    void clearDb(PrmDbType prmDbType);
 
     //!  \brief PrmDb get db pointer function
     //!  This function returns a pointer to the requested database
-    //!  \param dbType The type of database requested (primary or backup)
-    //!  \param dbPtr Pointer to the database array to be set
-    void getDbPtr(PrmDbType dbType, t_dbStruct** dbPtr);
+    //!  \param dbType The type of database requested (active or staging)
+    //!  \return Pointer to the database array to be set
+    t_dbStruct* getDbPtr(PrmDbType dbType);
 
     //!  \brief PrmDb get db string function
     //!  This function returns a string for the requested database
-    //!  \param dbType The type of database requested (primary or backup)
+    //!  \param dbType The type of database requested (active or staging)
     //!  \return string representing the database
     static Fw::String getDbString(PrmDbType dbType);
 
-    Fw::String m_fileName;  //!< filename for parameter storage
+    //! \brief Check param db equality
+    //!
+    //!  This helper method verifies the active and staging parameter dbs are equal
+    bool dbEqual();
 
-    t_dbStruct m_dbPrime[PRMDB_NUM_DB_ENTRIES];
-    t_dbStruct m_dbBackup[PRMDB_NUM_DB_ENTRIES];
+    //! \brief Deep copy for db
+    //!
+    //!  Copies one db to another
+    //! \param dest The destination db to copy to  (active or staging)
+    //! \param src The source db to copy from  (active or staging)
+    void dbCopy(PrmDbType dest, PrmDbType src);
+
+    //! \brief Deep copy for single db entry
+    //!
+    //!  Copies one db entry to another at specified index
+    //!
+    //! \param dest The destination db to copy to  (active or staging)
+    //! \param src The source db to copy from  (active or staging)
+    //! \param index The index of the entry to copy
+    void dbCopySingle(PrmDbType dest, PrmDbType src, FwSizeType index);
 };
 }  // namespace Svc
 
