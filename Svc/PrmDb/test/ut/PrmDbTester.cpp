@@ -903,7 +903,7 @@ void PrmDbTester::runPrmFileLoadNominal() {
     EXPECT_EQ(dispatchStatus, Fw::QueuedComponentBase::MSG_DISPATCH_OK);
 
     ASSERT_EVENTS_SIZE(2);
-    // Verify EVRs for copy (becuase we are merging)
+    // Verify EVRs for copy (because we are merging)
     ASSERT_EVENTS_PrmDbCopyAllComplete_SIZE(1);
     ASSERT_EVENTS_PrmDbCopyAllComplete(0, "ACTIVE", "STAGING");
     // Verify EVRs for the file load
@@ -1069,7 +1069,7 @@ void PrmDbTester::runPrmFileLoadWithErrors() {
     EXPECT_EQ(dispatchStatus, Fw::QueuedComponentBase::MSG_DISPATCH_OK);
 
     ASSERT_EVENTS_SIZE(3);
-    // Verify EVRs for copy (becuase we are merging)
+    // Verify EVRs for copy (because we are merging)
     ASSERT_EVENTS_PrmDbCopyAllComplete_SIZE(1);
     // Verify EVRs for file load read error
     ASSERT_EVENTS_PrmFileReadError_SIZE(1);
