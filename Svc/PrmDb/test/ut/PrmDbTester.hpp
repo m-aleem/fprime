@@ -28,7 +28,6 @@ class PrmDbTester : public PrmDbGTestBase {
     void runFileWriteError();
     void runDbEqualTest();
     void runDbCopyTest();
-    // FIXME Tests to add:
     void runDbCommitTest();
     void runPrmFileLoadNominal();
     void runPrmFileLoadWithErrors();
