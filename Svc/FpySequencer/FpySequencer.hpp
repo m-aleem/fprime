@@ -61,6 +61,7 @@ class FpySequencer : public FpySequencerComponentBase {
         FpySequencer_DiscardDirective discard;
         FpySequencer_MemCmpDirective memCmp;
         FpySequencer_StackCmdDirective stackCmd;
+        FpySequencer_PushTimeDirective pushTime;
 
         DirectiveUnion() {}
         ~DirectiveUnion() {}
@@ -473,6 +474,9 @@ class FpySequencer : public FpySequencerComponentBase {
     //! Internal interface handler for directive_stackCmd
     void directive_stackCmd_internalInterfaceHandler(const Svc::FpySequencer_StackCmdDirective& directive) override;
 
+    //! Internal interface handler for directive_pushTime
+    void directive_pushTime_internalInterfaceHandler(const Svc::FpySequencer_PushTimeDirective& directive) override;
+
     void parametersLoaded() override;
     void parameterUpdated(FwPrmIdType id) override;
 
@@ -747,6 +751,7 @@ class FpySequencer : public FpySequencerComponentBase {
     Signal discard_directiveHandler(const FpySequencer_DiscardDirective& directive, DirectiveError& error);
     Signal memCmp_directiveHandler(const FpySequencer_MemCmpDirective& directive, DirectiveError& error);
     Signal stackCmd_directiveHandler(const FpySequencer_StackCmdDirective& directive, DirectiveError& error);
+    Signal pushTime_directiveHandler(const FpySequencer_PushTimeDirective& directive, DirectiveError& error);
 };
 
 }  // namespace Svc
