@@ -48,6 +48,15 @@ class Buffer : public Fw::Serializable {
     friend class Fw::BufferTester;
 
   public:
+    //! Buffer ownership state
+    //!
+    //! A convenience enumeration to help users implement ownership tracking of buffers.
+    enum class OwnershipState {
+        NOT_OWNED,  //!< The buffer is currently not owned
+        OWNED,      //!< The buffer is currently owned
+    };
+
+  public:
     //! The size type for a buffer - for backwards compatibility
     using SizeType = FwSizeType;
 
