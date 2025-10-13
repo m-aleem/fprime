@@ -97,7 +97,7 @@ Fw::ParamValid PrmDbImpl::getPrm_handler(FwIndexType portNum, FwPrmIdType id, Fw
 void PrmDbImpl::setPrm_handler(FwIndexType portNum, FwPrmIdType id, Fw::ParamBuffer& val) {
     // Reject parameter updates during non-idle file load states
     if (m_state != PrmDbFileLoadState::IDLE) {
-        this->log_WARNING_LO_PrmDbFileLoadInvalidAction(m_state, Fw::String("setPrm"));
+        this->log_WARNING_LO_PrmDbFileLoadInvalidAction(m_state, PrmDb_PrmLoadAction::SET_PARAMETER);
         return;
     }
 
@@ -122,14 +122,14 @@ void PrmDbImpl::pingIn_handler(FwIndexType portNum, U32 key) {
 void PrmDbImpl::PRM_SAVE_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
     // Reject PRM_SAVE_FILE command during non-idle file load states
     if (m_state != PrmDbFileLoadState::IDLE) {
-        this->log_WARNING_LO_PrmDbFileLoadInvalidAction(m_state, Fw::String("SAVE_FILE"));
+        this->log_WARNING_LO_PrmDbFileLoadInvalidAction(m_state, PrmDb_PrmLoadAction::SAVE_FILE_COMMAND);
         this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::BUSY);
         return;
     }
 
     FW_ASSERT(this->m_fileName.length() > 0);
+    
 
-    t_dbStruct* db = getDbPtr(PrmDbType::DB_ACTIVE);
 
     Os::File paramFile;
     WorkingBuffer buff;
@@ -142,6 +142,8 @@ void PrmDbImpl::PRM_SAVE_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
     }
 
     this->lock();
+    t_dbStruct* db = getDbPtr(PrmDbType::DB_ACTIVE);
+    FW_ASSERT(db != nullptr);
 
     // Traverse the parameter list, saving each entry
 
@@ -248,10 +250,10 @@ void PrmDbImpl::PRM_SAVE_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
 void PrmDbImpl::PRM_LOAD_FILE_cmdHandler(FwOpcodeType opCode,
                                          U32 cmdSeq,
                                          const Fw::CmdStringArg& fileName,
-                                         bool merge) {
+                                         PrmDb_Merge merge) {
     // Reject PRM_LOAD_FILE command during non-idle file load states
     if (m_state != PrmDbFileLoadState::IDLE) {
-        this->log_WARNING_LO_PrmDbFileLoadInvalidAction(m_state, Fw::String("LOAD_FILE"));
+        this->log_WARNING_LO_PrmDbFileLoadInvalidAction(m_state, PrmDb_PrmLoadAction::LOAD_FILE_COMMAND);
         this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::BUSY);
         return;
     }
@@ -260,7 +262,7 @@ void PrmDbImpl::PRM_LOAD_FILE_cmdHandler(FwOpcodeType opCode,
     m_state = PrmDbFileLoadState::LOADING_FILE_UPDATES;
 
     // If reset is true, clear the staging database first
-    if (merge) {
+    if (merge == PrmDb_Merge::MERGE) {
         // Copy active to staging for merging
         dbCopy(PrmDbType::DB_STAGING, PrmDbType::DB_ACTIVE);
     } else {
@@ -271,9 +273,9 @@ void PrmDbImpl::PRM_LOAD_FILE_cmdHandler(FwOpcodeType opCode,
     // Load the file into staging database
     // The readParamFileImpl will emit the relevant EVR if the file load fails
     // and also if it succeeds will emit EVRs with the number of records
-    bool success = PrmDbImpl::readParamFileImpl(fileName, PrmDbType::DB_STAGING);
+    PrmDbImpl::PrmLoadStatus success = PrmDbImpl::readParamFileImpl(fileName, PrmDbType::DB_STAGING);
 
-    if (success) {
+    if (success == PrmLoadStatus::SUCCESS) {
         this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::OK);
         m_state = PrmDbFileLoadState::FILE_UPDATES_STAGED;
     } else {
@@ -288,14 +290,16 @@ void PrmDbImpl::PRM_LOAD_FILE_cmdHandler(FwOpcodeType opCode,
 void PrmDbImpl::PRM_COMMIT_STAGED_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
     // Verify we are in the correct state
     if (m_state != PrmDbFileLoadState::FILE_UPDATES_STAGED) {
-        this->log_WARNING_LO_PrmDbFileLoadInvalidAction(m_state, Fw::String("COMMIT_STAGED"));
+        this->log_WARNING_LO_PrmDbFileLoadInvalidAction(m_state, PrmDb_PrmLoadAction::COMMIT_STAGED_COMMAND);
         this->cmdResponse_out(opCode, cmdSeq, Fw::CmdResponse::VALIDATION_ERROR);
         return;
     }
 
-    // Swap active and staging databases
+    // Swap active and staging databases, safely w.r.t. prmGet
+    this->lock();
     t_dbStruct* temp = this->m_activeDb;
     this->m_activeDb = this->m_stagingDb;
+    this->unLock();
     this->m_stagingDb = temp;
 
     // Clear the new staging database
@@ -312,11 +316,10 @@ void PrmDbImpl::PRM_COMMIT_STAGED_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
 //! Helpers for construction/destruction, init, & handlers
 //! ----------------------------------------------------------------------
 
-bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbType) {
+PrmDbImpl::PrmLoadStatus PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbType) {
     FW_ASSERT(dbType == PrmDbType::DB_ACTIVE or dbType == PrmDbType::DB_STAGING);
     FW_ASSERT(fileName.length() > 0);
 
-    t_dbStruct* db = getDbPtr(dbType);
     Fw::String dbString = getDbString(dbType);
 
     // load file. FIXME: Put more robust file checking, such as a CRC.
@@ -325,7 +328,7 @@ bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbTy
     Os::File::Status stat = paramFile.open(fileName.toChar(), Os::File::OPEN_READ);
     if (stat != Os::File::OP_OK) {
         this->log_WARNING_HI_PrmFileReadError(PrmReadError::OPEN, 0, stat);
-        return false;
+        return PrmLoadStatus::ERROR;
     }
 
     WorkingBuffer buff;
@@ -348,19 +351,19 @@ bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbTy
 
         if (fStat != Os::File::OP_OK) {
             this->log_WARNING_HI_PrmFileReadError(PrmReadError::DELIMITER, static_cast<I32>(recordNumTotal), fStat);
-            return false;
+            return PrmLoadStatus::ERROR;
         }
 
         if (sizeof(delimiter) != readSize) {
             this->log_WARNING_HI_PrmFileReadError(PrmReadError::DELIMITER_SIZE, static_cast<I32>(recordNumTotal),
                                                   static_cast<I32>(readSize));
-            return false;
+            return PrmLoadStatus::ERROR;
         }
 
         if (PRMDB_ENTRY_DELIMITER != delimiter) {
             this->log_WARNING_HI_PrmFileReadError(PrmReadError::DELIMITER_VALUE, static_cast<I32>(recordNumTotal),
                                                   delimiter);
-            return false;
+            return PrmLoadStatus::ERROR;
         }
 
         U32 recordSize = 0;
@@ -371,12 +374,12 @@ bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbTy
         fStat = paramFile.read(buff.getBuffAddr(), readSize, Os::File::WaitType::WAIT);
         if (fStat != Os::File::OP_OK) {
             this->log_WARNING_HI_PrmFileReadError(PrmReadError::RECORD_SIZE, static_cast<I32>(recordNumTotal), fStat);
-            return false;
+            return PrmLoadStatus::ERROR;
         }
         if (sizeof(recordSize) != readSize) {
             this->log_WARNING_HI_PrmFileReadError(PrmReadError::RECORD_SIZE_SIZE, static_cast<I32>(recordNumTotal),
                                                   static_cast<I32>(readSize));
-            return false;
+            return PrmLoadStatus::ERROR;
         }
         // set serialized size to read size
         Fw::SerializeStatus desStat = buff.setBuffLen(static_cast<Fw::Serializable::SizeType>(readSize));
@@ -393,7 +396,7 @@ bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbTy
         if ((recordSize > FW_PARAM_BUFFER_MAX_SIZE + sizeof(U32)) or (recordSize < sizeof(U32))) {
             this->log_WARNING_HI_PrmFileReadError(PrmReadError::RECORD_SIZE_VALUE, static_cast<I32>(recordNumTotal),
                                                   static_cast<I32>(recordSize));
-            return false;
+            return PrmLoadStatus::ERROR;
         }
 
         // read the parameter ID
@@ -403,12 +406,12 @@ bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbTy
         fStat = paramFile.read(buff.getBuffAddr(), readSize, Os::File::WaitType::WAIT);
         if (fStat != Os::File::OP_OK) {
             this->log_WARNING_HI_PrmFileReadError(PrmReadError::PARAMETER_ID, static_cast<I32>(recordNumTotal), fStat);
-            return false;
+            return PrmLoadStatus::ERROR;
         }
         if (sizeof(parameterId) != static_cast<FwSizeType>(readSize)) {
             this->log_WARNING_HI_PrmFileReadError(PrmReadError::PARAMETER_ID_SIZE, static_cast<I32>(recordNumTotal),
                                                   static_cast<I32>(readSize));
-            return false;
+            return PrmLoadStatus::ERROR;
         }
 
         // set serialized size to read parameter ID
@@ -431,12 +434,12 @@ bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbTy
         if (fStat != Os::File::OP_OK) {
             this->log_WARNING_HI_PrmFileReadError(PrmReadError::PARAMETER_VALUE, static_cast<I32>(recordNumTotal),
                                                   fStat);
-            return false;
+            return PrmLoadStatus::ERROR;
         }
         if (static_cast<U32>(readSize) != recordSize - sizeof(parameterId)) {
             this->log_WARNING_HI_PrmFileReadError(PrmReadError::PARAMETER_VALUE_SIZE, static_cast<I32>(recordNumTotal),
                                                   static_cast<I32>(readSize));
-            return false;
+            return PrmLoadStatus::ERROR;
         }
 
         // Actually update or add parameter
@@ -450,16 +453,12 @@ bool PrmDbImpl::readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbTy
         if (updateStatus == NO_SLOTS) {
             this->log_WARNING_HI_PrmDbFull(parameterId);
         }
-
-        // set serialized size to read size
-        desStat = db[entry].val.setBuffLen(static_cast<Fw::Serializable::SizeType>(readSize));
-        // should never fail
-        FW_ASSERT(Fw::FW_SERIALIZE_OK == desStat, static_cast<FwAssertArgType>(desStat));
         recordNumTotal++;
     }
 
+
     this->log_ACTIVITY_HI_PrmFileLoadComplete(dbString, recordNumTotal, recordNumAdded, recordNumUpdated);
-    return true;
+    return PrmLoadStatus::SUCCESS;
 }
 
 PrmDbImpl::PrmUpdateType PrmDbImpl::updateAddPrmImpl(FwPrmIdType id, Fw::ParamBuffer& val, PrmDbType prmDbType) {

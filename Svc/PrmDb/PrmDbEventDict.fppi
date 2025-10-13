@@ -1,3 +1,10 @@
+enum PrmLoadAction : U8 {
+    SET_PARAMETER,
+    SAVE_FILE_COMMAND,
+    LOAD_FILE_COMMAND,
+    COMMIT_STAGED_COMMAND,
+}
+
 @ Parameter ID not found in database.
 event PrmIdNotFound(
                         Id: FwPrmIdType @< The parameter ID
@@ -95,7 +102,7 @@ event PrmDbFileLoadFailed() \
 @ Invalid Action during parameter file load
 event PrmDbFileLoadInvalidAction(
                             currentState: PrmDbFileLoadState @< The current state
-                            attemptedAction: string @< The invalid action attempted
+                            attemptedAction: PrmLoadAction @< The invalid action attempted
 ) \
     severity warning low \
     id 11 \

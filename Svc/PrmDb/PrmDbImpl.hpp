@@ -72,6 +72,12 @@ class PrmDbImpl final : public PrmDbComponentBase {
         MAX_PARAM_UPDATE_TYPES
     };
 
+    // Enum to return status of parameter file load
+    enum PrmLoadStatus {
+        SUCCESS, //!< File load successful
+        ERROR,   //!< File load error
+    };
+
   protected:
   private:
     Fw::String m_fileName;  //!< filename for parameter storage
@@ -124,7 +130,7 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  \param fileName The name of the parameter file to read
     //!  \param dbType The type of database to read into  (active or staging)
     //!  \return status success (True) / failure(False)
-    bool readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbType);
+    PrmLoadStatus readParamFileImpl(const Fw::StringBase& fileName, PrmDbType dbType);
 
     //!  \brief PrmDb parameter get handler
     //!
@@ -188,7 +194,7 @@ class PrmDbImpl final : public PrmDbComponentBase {
     //!  \param cmdSeq The sequence number of the command
     //!  \param fileName The name of the parameter load file
     //!  \param merge Whether to merge (true) or fully reset (false) the parameter database from the file contents
-    void PRM_LOAD_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq, const Fw::CmdStringArg& fileName, bool merge);
+    void PRM_LOAD_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq, const Fw::CmdStringArg& fileName, PrmDb_Merge merge);
 
     //!  \brief PrmDb PRM_COMMIT_STAGED command handler
     //!

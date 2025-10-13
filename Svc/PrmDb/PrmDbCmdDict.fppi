@@ -1,12 +1,15 @@
+enum Merge : U8{
+    MERGE,
+    RESET
+}
 @ Command to save parameter image to file. Uses file name passed to constructor
 async command PRM_SAVE_FILE \
   opcode 0x00
 
-
 @ Loads a file from storage into the staging database. The file could have selective IDs and not the whole set.
 async command PRM_LOAD_FILE(
-  fileName: string size 100 @< The name of the on-board file to set parameters from
-  merge: bool @< Whether to merge (true) or fully reset (false) the parameter database from the file contents
+  fileName: string size FileNameStringSize @< The name of the on-board file to set parameters from
+  merge: Merge @< Whether to merge or fully reset the parameter database from the file contents
   ) \
   opcode 0x01
 
