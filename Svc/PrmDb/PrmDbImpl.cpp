@@ -128,8 +128,6 @@ void PrmDbImpl::PRM_SAVE_FILE_cmdHandler(FwOpcodeType opCode, U32 cmdSeq) {
     }
 
     FW_ASSERT(this->m_fileName.length() > 0);
-    
-
 
     Os::File paramFile;
     WorkingBuffer buff;
@@ -455,7 +453,6 @@ PrmDbImpl::PrmLoadStatus PrmDbImpl::readParamFileImpl(const Fw::StringBase& file
         }
         recordNumTotal++;
     }
-
 
     this->log_ACTIVITY_HI_PrmFileLoadComplete(dbString, recordNumTotal, recordNumAdded, recordNumUpdated);
     return PrmLoadStatus::SUCCESS;

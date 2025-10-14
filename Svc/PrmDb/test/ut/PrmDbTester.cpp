@@ -1126,7 +1126,8 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     ASSERT_CMD_RESPONSE(0, PrmDbImpl::OPCODE_PRM_LOAD_FILE, 10, Fw::CmdResponse::BUSY);
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES, PrmDb_PrmLoadAction::LOAD_FILE_COMMAND);
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES,
+                                             PrmDb_PrmLoadAction::LOAD_FILE_COMMAND);
 
     // 1.2 Attempt PRM_SAVE_FILE during loading
     this->clearEvents();
@@ -1140,7 +1141,8 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     ASSERT_CMD_RESPONSE(0, PrmDbImpl::OPCODE_PRM_SAVE_FILE, 11, Fw::CmdResponse::BUSY);
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES, PrmDb_PrmLoadAction::SAVE_FILE_COMMAND);
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES,
+                                             PrmDb_PrmLoadAction::SAVE_FILE_COMMAND);
 
     // 1.3 Attempt to set parameter during loading
     this->clearEvents();
@@ -1152,7 +1154,8 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     // Verify appropriate error response (warning event only, no added event)
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES, PrmDb_PrmLoadAction::SET_PARAMETER);
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES,
+                                             PrmDb_PrmLoadAction::SET_PARAMETER);
     ASSERT_EVENTS_PrmIdAdded_SIZE(0);
     ASSERT_EVENTS_PrmIdUpdated_SIZE(0);
 
@@ -1168,7 +1171,8 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     ASSERT_CMD_RESPONSE(0, PrmDbImpl::OPCODE_PRM_COMMIT_STAGED, 12, Fw::CmdResponse::VALIDATION_ERROR);
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES, PrmDb_PrmLoadAction::COMMIT_STAGED_COMMAND);
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES,
+                                             PrmDb_PrmLoadAction::COMMIT_STAGED_COMMAND);
 
     // Verify state hasn't changed
     EXPECT_EQ(this->m_impl.m_state, PrmDbFileLoadState::LOADING_FILE_UPDATES);
@@ -1190,7 +1194,8 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     ASSERT_CMD_RESPONSE(0, PrmDbImpl::OPCODE_PRM_LOAD_FILE, 13, Fw::CmdResponse::BUSY);
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::FILE_UPDATES_STAGED, PrmDb_PrmLoadAction::LOAD_FILE_COMMAND);
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::FILE_UPDATES_STAGED,
+                                             PrmDb_PrmLoadAction::LOAD_FILE_COMMAND);
 
     // 2.2 Attempt PRM_SAVE_FILE when updates are staged
     this->clearEvents();
@@ -1204,7 +1209,8 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     ASSERT_CMD_RESPONSE(0, PrmDbImpl::OPCODE_PRM_SAVE_FILE, 14, Fw::CmdResponse::BUSY);
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::FILE_UPDATES_STAGED, PrmDb_PrmLoadAction::SAVE_FILE_COMMAND);
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::FILE_UPDATES_STAGED,
+                                             PrmDb_PrmLoadAction::SAVE_FILE_COMMAND);
 
     // 2.3 Attempt to set parameter when updates are staged
     this->clearEvents();
@@ -1216,7 +1222,8 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     // Verify appropriate error response (warning event only, no added event)
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::FILE_UPDATES_STAGED, PrmDb_PrmLoadAction::SET_PARAMETER);
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::FILE_UPDATES_STAGED,
+                                             PrmDb_PrmLoadAction::SET_PARAMETER);
     ASSERT_EVENTS_PrmIdAdded_SIZE(0);
     ASSERT_EVENTS_PrmIdUpdated_SIZE(0);
 

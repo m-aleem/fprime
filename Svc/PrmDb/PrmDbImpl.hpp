@@ -74,8 +74,8 @@ class PrmDbImpl final : public PrmDbComponentBase {
 
     // Enum to return status of parameter file load
     enum PrmLoadStatus {
-        SUCCESS, //!< File load successful
-        ERROR,   //!< File load error
+        SUCCESS,  //!< File load successful
+        ERROR,    //!< File load error
     };
 
   protected:
