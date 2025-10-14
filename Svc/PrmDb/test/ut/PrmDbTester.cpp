@@ -898,7 +898,7 @@ void PrmDbTester::runPrmFileLoadNominal() {
     Os::Stub::File::Test::StaticData::setNextStatus(Os::File::OP_OK);
     this->clearEvents();
     this->clearHistory();
-    this->sendCmd_PRM_LOAD_FILE(0, 10, file, true);
+    this->sendCmd_PRM_LOAD_FILE(0, 10, file, PrmDb_Merge::MERGE);
     dispatchStatus = this->m_impl.doDispatch();
     EXPECT_EQ(dispatchStatus, Fw::QueuedComponentBase::MSG_DISPATCH_OK);
 
@@ -1064,7 +1064,7 @@ void PrmDbTester::runPrmFileLoadWithErrors() {
     Os::Stub::File::Test::StaticData::setNextStatus(Os::File::DOESNT_EXIST);
     this->clearEvents();
     this->clearHistory();
-    this->sendCmd_PRM_LOAD_FILE(0, 10, file, true);
+    this->sendCmd_PRM_LOAD_FILE(0, 10, file, PrmDb_Merge::MERGE);
     dispatchStatus = this->m_impl.doDispatch();
     EXPECT_EQ(dispatchStatus, Fw::QueuedComponentBase::MSG_DISPATCH_OK);
 
@@ -1117,7 +1117,7 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     // 1.1 Attempt PRM_LOAD_FILE while already loading
     this->clearEvents();
     this->clearHistory();
-    this->sendCmd_PRM_LOAD_FILE(0, 10, Fw::String("file.prm"), true);
+    this->sendCmd_PRM_LOAD_FILE(0, 10, Fw::String("file.prm"), PrmDb_Merge::MERGE);
     dispatchStatus = this->m_impl.doDispatch();
     EXPECT_EQ(dispatchStatus, Fw::QueuedComponentBase::MSG_DISPATCH_OK);
 
@@ -1126,7 +1126,7 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     ASSERT_CMD_RESPONSE(0, PrmDbImpl::OPCODE_PRM_LOAD_FILE, 10, Fw::CmdResponse::BUSY);
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES, "LOAD_FILE");
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES, PrmDb_PrmLoadAction::LOAD_FILE_COMMAND);
 
     // 1.2 Attempt PRM_SAVE_FILE during loading
     this->clearEvents();
@@ -1140,7 +1140,7 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     ASSERT_CMD_RESPONSE(0, PrmDbImpl::OPCODE_PRM_SAVE_FILE, 11, Fw::CmdResponse::BUSY);
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES, "SAVE_FILE");
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES, PrmDb_PrmLoadAction::SAVE_FILE_COMMAND);
 
     // 1.3 Attempt to set parameter during loading
     this->clearEvents();
@@ -1152,7 +1152,7 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     // Verify appropriate error response (warning event only, no added event)
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES, "setPrm");
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES, PrmDb_PrmLoadAction::SET_PARAMETER);
     ASSERT_EVENTS_PrmIdAdded_SIZE(0);
     ASSERT_EVENTS_PrmIdUpdated_SIZE(0);
 
@@ -1168,7 +1168,7 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     ASSERT_CMD_RESPONSE(0, PrmDbImpl::OPCODE_PRM_COMMIT_STAGED, 12, Fw::CmdResponse::VALIDATION_ERROR);
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES, "COMMIT_STAGED");
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::LOADING_FILE_UPDATES, PrmDb_PrmLoadAction::COMMIT_STAGED_COMMAND);
 
     // Verify state hasn't changed
     EXPECT_EQ(this->m_impl.m_state, PrmDbFileLoadState::LOADING_FILE_UPDATES);
@@ -1181,7 +1181,7 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     // 2.1 Attempt PRM_LOAD_FILE when updates are staged
     this->clearEvents();
     this->clearHistory();
-    this->sendCmd_PRM_LOAD_FILE(0, 13, Fw::String("file.prm"), false);
+    this->sendCmd_PRM_LOAD_FILE(0, 13, Fw::String("file.prm"), PrmDb_Merge::RESET);
     dispatchStatus = this->m_impl.doDispatch();
     EXPECT_EQ(dispatchStatus, Fw::QueuedComponentBase::MSG_DISPATCH_OK);
 
@@ -1190,7 +1190,7 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     ASSERT_CMD_RESPONSE(0, PrmDbImpl::OPCODE_PRM_LOAD_FILE, 13, Fw::CmdResponse::BUSY);
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::FILE_UPDATES_STAGED, "LOAD_FILE");
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::FILE_UPDATES_STAGED, PrmDb_PrmLoadAction::LOAD_FILE_COMMAND);
 
     // 2.2 Attempt PRM_SAVE_FILE when updates are staged
     this->clearEvents();
@@ -1204,7 +1204,7 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     ASSERT_CMD_RESPONSE(0, PrmDbImpl::OPCODE_PRM_SAVE_FILE, 14, Fw::CmdResponse::BUSY);
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::FILE_UPDATES_STAGED, "SAVE_FILE");
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::FILE_UPDATES_STAGED, PrmDb_PrmLoadAction::SAVE_FILE_COMMAND);
 
     // 2.3 Attempt to set parameter when updates are staged
     this->clearEvents();
@@ -1216,7 +1216,7 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     // Verify appropriate error response (warning event only, no added event)
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::FILE_UPDATES_STAGED, "setPrm");
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::FILE_UPDATES_STAGED, PrmDb_PrmLoadAction::SET_PARAMETER);
     ASSERT_EVENTS_PrmIdAdded_SIZE(0);
     ASSERT_EVENTS_PrmIdUpdated_SIZE(0);
 
@@ -1240,7 +1240,7 @@ void PrmDbTester::runPrmFileLoadIllegal() {
     ASSERT_CMD_RESPONSE(0, PrmDbImpl::OPCODE_PRM_COMMIT_STAGED, 15, Fw::CmdResponse::VALIDATION_ERROR);
     ASSERT_EVENTS_SIZE(1);
     ASSERT_EVENTS_PrmDbFileLoadInvalidAction_SIZE(1);
-    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::IDLE, "COMMIT_STAGED");
+    ASSERT_EVENTS_PrmDbFileLoadInvalidAction(0, PrmDbFileLoadState::IDLE, PrmDb_PrmLoadAction::COMMIT_STAGED_COMMAND);
 
     // Verify state hasn't changed
     EXPECT_EQ(this->m_impl.m_state, PrmDbFileLoadState::IDLE);
