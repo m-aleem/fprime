@@ -652,7 +652,7 @@ strnlen
 subgrouping
 subhist
 subhistory
-subseconds
+subsecond
 subtopology
 suppr
 suseconds
@@ -719,6 +719,7 @@ uge
 uitofp
 UML
 umod
+unconfigured
 UNEXP
 unistd
 UNITTESTASSERT
