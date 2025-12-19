@@ -42,6 +42,7 @@ bitshifts
 bitwidth
 bocchino
 boolt
+BSB
 bsd
 BSDI
 bst
@@ -606,6 +607,7 @@ sfregoso
 sge
 SGN
 sgt
+shahab
 SHAREDSTATEDIR
 SHELLCOMMAND
 showinitializer
